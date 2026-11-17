@@ -186,7 +186,7 @@ pub fn open_document_inner(
         return password_payload(&g);
     }
 
-    let mut doc = PdfDoc::load_mem(&bytes).map_err(EngineError::from)?;
+    let mut doc = stitchup_core::model::load_lenient(&bytes).map_err(EngineError::from)?;
     // Nested page trees are flattened up front (outside the op log) so every
     // structural op and its undo snapshot work on a flat /Kids list.
     let _ = flatten_page_tree(&mut doc);
@@ -344,7 +344,7 @@ pub fn merge_document_inner(
         ));
     }
     let other_bytes = std::fs::read(&target)?;
-    let other = PdfDoc::load_mem(&other_bytes).map_err(EngineError::from)?;
+    let other = stitchup_core::model::load_lenient(&other_bytes).map_err(EngineError::from)?;
     if other.is_encrypted() {
         return Err(EngineError::new(
             ErrorCode::Encrypted,
@@ -454,13 +454,7 @@ pub fn unlock_document_inner(
     }
 
     let bytes = g.opened_bytes.clone().ok_or_else(no_doc)?;
-    let mut doc = PdfDoc::load_mem_with_options(
-        &bytes,
-        lopdf::LoadOptions {
-            password: Some(password.clone()),
-            ..Default::default()
-        },
-    )
+    let mut doc = stitchup_core::model::load_lenient_with_password(&bytes, &password)
     .map_err(|e| {
         EngineError::new(ErrorCode::Encrypted, format!("cannot open with that password: {e}"))
     })?;
@@ -489,8 +483,12 @@ pub fn unlock_document_inner(
     g.password_required = false;
     g.password = Some(password);
     g.doc = Some(doc);
-    let (p, h, s, w, b) = session_state(&g)?;
-    payload_for(false, p, &h, s, &w, g.doc.as_ref().unwrap(), &b)
+    let (p, h, s, w, _) = session_state(&g)?;
+    // The viewer gets the DECRYPTED document: the original bytes still need
+    // the password, which the renderer doesn't have ("No password given").
+    let mut plain = Vec::new();
+    g.doc.as_ref().unwrap().clone().save_to(&mut plain).map_err(|e| EngineError::new(ErrorCode::IoError, e.to_string()))?;
+    payload_for(false, p, &h, s, &w, g.doc.as_ref().unwrap(), &plain)
 }
 
 #[tauri::command]
@@ -714,7 +712,7 @@ pub fn combine_documents_inner(st: &Mutex<SessionState>, paths: Vec<String>) -> 
     let mut iter = paths.iter();
     let first = iter.next().ok_or_else(|| EngineError::new(ErrorCode::ValidationFailed, "choose at least one PDF"))?;
     let load = |p: &String| -> Result<PdfDoc, EngineError> {
-        let doc = PdfDoc::load_mem(&std::fs::read(p)?).map_err(EngineError::from)?;
+        let doc = stitchup_core::model::load_lenient(&std::fs::read(p)?).map_err(EngineError::from)?;
         if doc.is_encrypted() {
             return Err(EngineError::new(ErrorCode::Encrypted, format!("{p} is password-protected")));
         }

@@ -56,7 +56,7 @@ pub fn open_bytes(bytes: Vec<u8>, path: PathBuf) -> Result<OpenInfo, EngineError
     }
     let mut warnings = Vec::new();
     let doc =
-        PdfDoc::load_mem(&bytes).map_err(|e| classify_open_error(&e.to_string(), bytes.len()))?;
+        crate::model::load_lenient(&bytes).map_err(|e| classify_open_error(&e.to_string(), bytes.len()))?;
     if doc.objects.is_empty() {
         return Err(crate::err!(ErrorCode::Malformed, "empty object map after parse"));
     }

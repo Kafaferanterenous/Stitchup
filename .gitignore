@@ -33,3 +33,5 @@ source/app/src-tauri/icons/ios/
 source/app/src-tauri/icons/64x64.png
 source/app/src-tauri/icons/Square*.png
 source/app/src-tauri/icons/StoreLogo.png
+# Local sample PDFs for manual testing (third-party; not published)
+/fixtures/*.pdf

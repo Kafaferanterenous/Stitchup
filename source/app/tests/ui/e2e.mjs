@@ -1977,6 +1977,28 @@ await check("opening a slow (large) PDF shows “Keep your pants on, mate — it
   openPath = MAIN;
 });
 
+// Local sample files (not in the repo): run when present.
+const LOCAL = path.resolve(APP, "..", "..", "fixtures");
+if (existsSync(path.join(LOCAL, "protected.pdf"))) {
+  await check("a PDF that needs a password to OPEN (RC4-128) unlocks and renders", async () => {
+    // (Not openViaRibbon: a locked document has no page to wait for.)
+    await pick(path.join(LOCAL, "protected.pdf"));
+    await tab("Document");
+    await rb("open").click();
+    const pw = page.locator('[role=dialog][aria-label="unlock document"] input[type=password]');
+    await pw.waitFor();
+    await pw.fill("samplefiles");
+    await pw.press("Enter");
+    await waitStatus(/Unlocked 3 pages/);
+    await page.waitForFunction(() => document.querySelector('[data-page="1"] canvas')?.width > 0, null, { timeout: 15000 });
+    assert(!(await page.locator(".viewer-error").count()), "no renderer error");
+    assert((await liveText())[0].includes("Password Protection"), "text readable after unlock");
+    await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
+    await waitStatus(/main\.pdf/);
+    openPath = MAIN;
+  });
+}
+
 // ---- Settings, quit warning, crash recovery (last: it restarts the backend)
 await check("Settings (⌘,): recovery interval, opening zoom and colour scheme are saved", async () => {
   await page.locator(".viewer-scroll").click({ position: { x: 5, y: 5 } });

@@ -1183,3 +1183,17 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
 - dev_bridge test switch test_set_open_delay; e2e check with a 2.6 s open.
 - User: Linux testing going well so far.
 - TESTS: core 64, command layer 9, e2e 83/83.
+
+2026-11-17 — v0.14.2: FIXES FROM LINUX TESTING (AppImage)
+- User: protected.pdf (password "samplefiles") could not be opened; sample-10mb.pdf failed.
+  Both reproduced on macOS too (not Linux-specific).
+- Password: unlock_document returned the ORIGINAL encrypted bytes to the viewer → pdf.js
+  "PasswordException: No password given". Now returns the decrypted, re-serialized document.
+  (Earlier tests only had owner-password files, which pdf.js opens without a password.)
+- Big samples (10 MB / 50 MB): valid PDF ending ~5.9 KB in, then a huge padding object AFTER %%EOF;
+  lopdf only looks for startxref near the very end. model::load_lenient trims to the last
+  startxref…%%EOF when the normal parse fails (file on disk untouched); used for open, unlock,
+  merge/import and combine.
+- Regression: core test (junk tail), e2e with fixtures/protected.pdf when present (sample files are
+  third-party → kept local, /fixtures/*.pdf ignored).
+- TESTS: core 65, command layer 9, e2e 84/84.

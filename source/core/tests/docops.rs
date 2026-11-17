@@ -138,3 +138,22 @@ fn headers_footers_page_and_bates_numbers() {
     let f2 = o2.iter().find(|o| o.text.contains("Page 6")).unwrap();
     assert!(f2.rect[3] - f2.rect[1] > f2.rect[2] - f2.rect[0], "rotated with the page: {:?}", f2.rect);
 }
+
+#[test]
+fn files_with_junk_after_the_end_marker_still_open() {
+    // Like the "sample-10mb.pdf" files: a valid PDF, then a big padding object
+    // after %%EOF (no startxref near the end of the file).
+    let doc = stitchup_core::docops::new_blank(612.0, 792.0).unwrap();
+    let mut bytes = vec![];
+    doc.clone().save_to(&mut bytes).unwrap();
+    bytes.extend_from_slice(b"\n9999 0 obj\n<< /Length 2000000 >>\nstream\n");
+    bytes.extend(std::iter::repeat(b'A').take(2_000_000));
+    bytes.extend_from_slice(b"\nendstream\nendobj\n");
+    assert!(lopdf::Document::load_mem(&bytes).is_err(), "plain lopdf can't parse it");
+    let back = stitchup_core::model::load_lenient(&bytes).expect("lenient load");
+    assert_eq!(back.get_pages().len(), 1);
+    // A normal file is not touched.
+    let mut ok = vec![];
+    doc.clone().save_to(&mut ok).unwrap();
+    assert_eq!(stitchup_core::model::parse_end(&ok), None);
+}

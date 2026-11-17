@@ -190,3 +190,42 @@ pub fn build_open_info(
         warnings,
     })
 }
+/// Where a parser should stop reading: just after the LAST `%%EOF` that
+/// follows the last `startxref`, when there is data after it. Some files carry
+/// padding or junk after their end marker; readers like Preview and pdf.js
+/// ignore it, lopdf (which looks for `startxref` near the very end) does not.
+/// Returns None when nothing needs trimming.
+pub fn parse_end(bytes: &[u8]) -> Option<usize> {
+    let rfind = |hay: &[u8], needle: &[u8]| hay.windows(needle.len()).rposition(|w| w == needle);
+    let sx = rfind(bytes, b"startxref")?;
+    let eof = bytes[sx..].windows(5).position(|w| w == b"%%EOF")? + sx + 5;
+    // Keep one line ending after %%EOF; trim only when real data follows.
+    let mut end = eof;
+    while end < bytes.len() && (bytes[end] == b'\r' || bytes[end] == b'\n') && end - eof < 2 {
+        end += 1;
+    }
+    (bytes[end..].iter().any(|b| !b.is_ascii_whitespace())).then_some(end)
+}
+
+/// Load a PDF, tolerating data after its final end marker (see [`parse_end`]).
+pub fn load_lenient(bytes: &[u8]) -> Result<lopdf::Document, lopdf::Error> {
+    match lopdf::Document::load_mem(bytes) {
+        Ok(d) => Ok(d),
+        Err(e) => match parse_end(bytes) {
+            Some(end) => lopdf::Document::load_mem(&bytes[..end]).map_err(|_| e),
+            None => Err(e),
+        },
+    }
+}
+
+/// [`load_lenient`] with a password.
+pub fn load_lenient_with_password(bytes: &[u8], password: &str) -> Result<lopdf::Document, lopdf::Error> {
+    let opts = || lopdf::LoadOptions { password: Some(password.to_string()), ..Default::default() };
+    match lopdf::Document::load_mem_with_options(bytes, opts()) {
+        Ok(d) => Ok(d),
+        Err(e) => match parse_end(bytes) {
+            Some(end) => lopdf::Document::load_mem_with_options(&bytes[..end], opts()).map_err(|_| e),
+            None => Err(e),
+        },
+    }
+}
