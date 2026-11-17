@@ -94,6 +94,7 @@ fn dispatch(st: &Mutex<SessionState>, cmd: &str, a: &Value) -> Result<Value, Val
         "redact_area" => go!(redact_area_inner(st, arg(a, "page").map_err(bad)?, arg(a, "rect").map_err(bad)?)),
         "list_objects" => go!(list_objects_inner(st, arg(a, "page").map_err(bad)?)),
         "object_op" => go!(object_op_inner(st, arg(a, "page").map_err(bad)?, arg(a, "data").map_err(bad)?)),
+        "underline_text" => go!(underline_text_inner(st, arg(a, "page").map_err(bad)?, arg(a, "ids").map_err(bad)?)),
         "insert_shape" => go!(insert_shape_inner(st, arg(a, "page").map_err(bad)?, arg(a, "spec").map_err(bad)?)),
         "list_fields" => go!(list_fields_inner(st)),
         "set_field" => go!(set_field_inner(st, arg(a, "name").map_err(bad)?, arg(a, "value").map_err(bad)?)),

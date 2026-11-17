@@ -546,7 +546,7 @@ await check("right-click a thumbnail: Delete Page / Extract Page… act on that 
   await pick(one);
   await page.locator('[data-thumb="3"] .thumb').click({ button: "right" });
   await page.locator(".context-menu").getByRole("menuitem", { name: "Extract Page…" }).click();
-  await waitNotice(/Saved 1 page/);
+  await waitNotice(/Saved 1 page\b/);
   assert((await pdfText(one)).length === 1, "one page extracted");
   // Several selected, right-click one of them: the menu acts on all of them.
   await page.locator('[data-thumb="1"] .thumb').click();
@@ -895,6 +895,61 @@ await check("Content ▸ Colour and Font change the selected text", async () => 
   const bytes = Buffer.from((await ipc("render_bytes")).bytes_b64, "base64").toString("latin1");
   assert(bytes.includes("Times-Bold"), "Times-Bold font resource");
   assert((await liveText())[3].includes("quick brown fox"), "text kept");
+});
+
+await check("Pages ▸ Underline: several selected lines in one step, and U on the edit bar", async () => {
+  // A page with at least two lines of text.
+  let P = 0;
+  let lines = [];
+  for (const n of [3, 1]) {
+    const runs = await page.locator(`[data-page="${n}"] .text-run`).allInnerTexts();
+    lines = [...new Set(runs.map((t) => t.trim()).filter((t) => t.length > 6))].slice(0, 2);
+    if (lines.length === 2) {
+      P = n;
+      break;
+    }
+  }
+  assert(P, "a page with two lines");
+  await page.locator(`[data-thumb="${P}"] .thumb`).click();
+  await page.waitForSelector(`[data-page="${P}"] .page-overlay[data-ready="true"]`);
+  const paths = async () => (await ipc("list_objects", { page: P })).filter((o) => o.kind === "path").length;
+  const before = await paths();
+  const a = await runBox(P, lines[0]);
+  await page.mouse.click(a.x + 10, a.y + a.height / 2);
+  const b = await runBox(P, lines[1]);
+  await page.keyboard.down("Meta");
+  await page.mouse.click(b.x + 10, b.y + b.height / 2);
+  await page.keyboard.up("Meta");
+  await page.waitForFunction((n) => document.querySelectorAll(`[data-page="${n}"] .obj-box.picked`).length >= 2, P);
+  await rb("underline").click();
+  await waitStatus(/Underlined/);
+  assert((await paths()) === before + 2, `two underlines: ${before} → ${await paths()}`);
+  assert((await liveText())[P - 1].includes(lines[0].slice(0, 6)), "text kept");
+  await page.keyboard.press("Meta+z");
+  await page.waitForFunction(async () => true);
+  for (let i = 0; i < 20 && (await paths()) !== before; i++) await page.waitForTimeout(200);
+  assert((await paths()) === before, "undo removes them");
+  // Edit bar: double-click a line, U.
+  await page.keyboard.press("Escape");
+  await rb("editText").click();
+  await page.waitForSelector(`[data-page="${P}"] .text-run`);
+  const c = await runBox(P, lines[0]);
+  await page.mouse.click(c.x + 10, c.y + c.height / 2);
+  await page.locator(".edit-bar").waitFor();
+  await page.locator(".edit-bar").getByLabel("Underline").click();
+  await waitStatus(/Underlined/);
+  for (let i = 0; i < 5 && (await page.locator(".inline-editor").count()); i++) {
+    await page.locator(".inline-editor").first().press("Escape").catch(() => {});
+    await page.waitForTimeout(200);
+  }
+  assert(!(await page.locator(".inline-editor").count()), "line editor closed");
+  assert((await paths()) === before + 1, "edit bar underlined the line");
+  if (await rb("editText").getAttribute("aria-pressed") === "true") await rb("editText").click();
+  // Leave the Select tool on, as the next check expects.
+  if ((await rb("select").getAttribute("aria-pressed")) !== "true") await rb("select").click();
+  await page.waitForSelector('[data-page="4"] .page-overlay[data-ready="true"]');
+  await page.keyboard.press("Meta+z");
+  for (let i = 0; i < 20 && (await paths()) !== before; i++) await page.waitForTimeout(200);
 });
 
 await check("Content ▸ Select picks a vector shape in the page; Colour recolours it, Delete removes it", async () => {
@@ -1380,7 +1435,7 @@ await check("Security ▸ QuickSign: a signature from a PNG, kept locked with a 
 });
 
 await check("every button on every ribbon tab is live with a document open", async () => {
-  const needsSelection = new Set(["objDelete", "recolor", "font"]);
+  const needsSelection = new Set(["objDelete", "recolor", "font", "underline"]);
   const dead = [];
   for (const t of ["Document", "Pages", "Annotate", "Zoom", "Navigate", "Security"]) {
     await tab(t);

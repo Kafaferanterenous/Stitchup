@@ -33,7 +33,7 @@ export function QuickSignNewDialog() {
   const [file, setFile] = useState<{ b64: string; name: string } | null>(null);
   const [sigFile, setSig] = useState<PreparedSignature | null>(null);
   const [removeWhite, setRemoveWhite] = useState(true);
-  const [name, setName] = useState("My signature");
+  const [name, setName] = useState(() => tr("My signature"));
   const [keep, setKeep] = useState(true);
   const [lock, setLock] = useState(false);
   const [pw1, setPw1] = useState("");
@@ -65,7 +65,7 @@ export function QuickSignNewDialog() {
     }
   }
 
-  const pwProblem = keep && lock ? (pw1.length < 4 ? "Use a password of at least 4 characters" : pw1 !== pw2 ? "The passwords don't match" : null) : null;
+  const pwProblem = keep && lock ? (pw1.length < 4 ? tr("Use a password of at least 4 characters") : pw1 !== pw2 ? tr("The passwords don't match") : null) : null;
 
   async function place() {
     if (pwProblem) return;

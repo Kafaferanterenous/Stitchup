@@ -48,6 +48,7 @@ import {
   cmdRedact,
   cmdObjectOp,
   cmdInsertShape,
+  cmdUnderline,
   cmdSetField,
   cmdInsertImage,
   cmdTabNew,
@@ -67,7 +68,7 @@ import { signatureFromPng, SIGNATURE_WIDTH_PT, type PreparedSignature } from "./
 import { ask } from "@tauri-apps/plugin-dialog";
 import { search as searchText } from "./adapters/renderAdapter";
 
-import { language, onLanguageChange, tr } from "./i18n";
+import { language, onLanguageChange, tr, trn } from "./i18n";
 
 /** Virtual path prefix the backend gives never-saved documents. */
 export const UNTITLED = "stitchup-untitled:";
@@ -338,7 +339,7 @@ const EMPTY_SLICE: TabSlice = {
 };
 
 /** "#rrggbb" → [r, g, b] in 0..1. */
-export type FormatOp = { op: "recolor" | "font"; color?: number[]; family?: string; size?: number };
+export type FormatOp = { op: "recolor" | "font" | "underline"; color?: number[]; family?: string; size?: number };
 
 export interface EditingLine {
   page: number;
@@ -487,7 +488,7 @@ export const store = {
         unlockOpen: doc.passwordRequired,
         statusMessage: doc.passwordRequired
           ? tr("This document is password-protected")
-          : tr("Opened {0} page{1}", doc.pages.length, doc.pages.length === 1 ? "" : "s"),
+          : trn(doc.pages.length, "Opened {0} page", "Opened {0} pages"),
       });
       this.addRecent(path);
       const w = doc.warnings.filter((x) => !/password-protected/.test(x));
@@ -511,7 +512,7 @@ export const store = {
         currentPage: 1,
         unlockOpen: false,
         selectionText: "",
-        statusMessage: tr("Unlocked {0} pages", doc.pages.length),
+        statusMessage: trn(doc.pages.length, "Unlocked {0} page", "Unlocked {0} pages"),
       });
       notify(tr("Unlocked — copies you save will not be password-protected"));
       return true;
@@ -532,7 +533,7 @@ export const store = {
   /** Combine several PDFs into a new untitled document. */
   async combine(paths: string[]) {
     await this.freshTab();
-    return this.adopt(() => cmdCombine(paths), tr("Combined {0} files", paths.length));
+    return this.adopt(() => cmdCombine(paths), trn(paths.length, "Combined {0} file", "Combined {0} files"));
   },
 
   /** Replace the open document with one the backend just built. */
@@ -909,7 +910,7 @@ export const store = {
     return this.command(
       { kind: "object", before: doc.pages.map((p) => p.page_no), data: { ocr: found.length } },
       () => cmdOcrApply(found),
-      () => ({ status: tr("Recognised {0} line{1} on {2} page{3} — now searchable", total, total === 1 ? "" : "s", found.length, found.length === 1 ? "" : "s"), page: found[0].page }),
+      () => ({ status: tr("Recognised {0} {1} — now searchable", trn(total, "{0} line", "{0} lines"), trn(found.length, "on {0} page", "on {0} pages")), page: found[0].page }),
     );
   },
 
@@ -1002,8 +1003,8 @@ export const store = {
     }
     const ok = await this.command(
       { kind: "object", before: doc.pages.map((x) => x.page_no), data },
-      () => cmdObjectOp(p.page, { ...data, ids: p.objects }),
-      () => ({ status: data.op === "recolor" ? "Recoloured" : tr("Font changed"), page: p.page }),
+      () => (data.op === "underline" ? cmdUnderline(p.page, p.objects) : cmdObjectOp(p.page, { ...data, ids: p.objects })),
+      () => ({ status: data.op === "underline" ? tr("Underlined") : data.op === "recolor" ? "Recoloured" : tr("Font changed"), page: p.page }),
     );
     set({ picked: null });
     return ok;
@@ -1028,10 +1029,10 @@ export const store = {
       notify(tr("This line can't be reformatted (its text isn't readable from the PDF)"));
       return false;
     }
-    const what = data.op === "recolor" ? tr("Recoloured the line") : data.family ? `Font: ${data.family}${data.size ? ` ${data.size} pt` : ""}` : `Size: ${data.size} pt`;
+    const what = data.op === "underline" ? tr("Underlined") : data.op === "recolor" ? tr("Recoloured the line") : data.family ? `Font: ${data.family}${data.size ? ` ${data.size} pt` : ""}` : `Size: ${data.size} pt`;
     return this.command(
       { kind: "object", before: doc.pages.map((p) => p.page_no), data },
-      () => cmdObjectOp(page, { ...data, ids }),
+      () => (data.op === "underline" ? cmdUnderline(page, ids) : cmdObjectOp(page, { ...data, ids })),
       () => ({ status: what, page }),
     );
   },
@@ -1275,7 +1276,7 @@ export const store = {
     set({ busy: true, lastError: null });
     try {
       const res = await cmdExportPages(pages, target, true);
-      const msg = tr("Saved {0} page{1} to {2}", pages.length, pages.length === 1 ? "" : "s", res.published_path);
+      const msg = trn(pages.length, "Saved {0} page to {1}", "Saved {0} pages to {1}", res.published_path);
       set({ statusMessage: msg });
       notify(msg);
       return res;
@@ -1292,7 +1293,7 @@ export const store = {
     set({ busy: true, lastError: null });
     try {
       const res = await cmdSplit(every, dir, stem, false);
-      const msg = tr("Split into {0} files in {1}", res.length, dir);
+      const msg = trn(res.length, "Split into {0} file in {1}", "Split into {0} files in {1}", dir);
       set({ statusMessage: msg });
       notify(msg);
       return res;
@@ -1568,10 +1569,10 @@ export const store = {
     }
     set({
       statusMessage: ok
-        ? tr("Copied {0} character{1}", text.length, text.length === 1 ? "" : "s")
+        ? trn(text.length, "Copied {0} character", "Copied {0} characters")
         : tr("Copy failed"),
     });
-    notify(ok ? tr("Copied {0} character{1}", text.length, text.length === 1 ? "" : "s") : tr("Copy failed"));
+    notify(ok ? trn(text.length, "Copied {0} character", "Copied {0} characters") : tr("Copy failed"));
     return ok;
   },
 

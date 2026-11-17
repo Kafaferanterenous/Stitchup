@@ -910,6 +910,47 @@ pub fn insert_shape(doc: &mut PdfDoc, page_no: u32, spec: &ShapeSpec) -> Result<
     crate::docops::append_to_page(doc, page, ops, vec![], vec![])
 }
 
+/// Underline the given text objects (ids from [`list`]) by drawing a line in
+/// the page content just below each one's baseline, in the text's own colour
+/// and with a thickness that follows its size. One edit for all of them.
+/// Returns how many lines were underlined.
+pub fn underline_text(doc: &mut PdfDoc, page_no: u32, ids: &[String]) -> Result<usize, EngineError> {
+    let page = *doc.get_pages().get(&page_no).ok_or_else(|| crate::err!(ErrorCode::ValidationFailed, "no page {page_no}"))?;
+    let objs = list(doc, page_no)?;
+    let mut ops = vec![Operation::new("q", vec![]), Operation::new("J", vec![0.into()])];
+    let mut n = 0;
+    for o in objs.iter().filter(|o| o.kind == "text" && ids.contains(&o.id)) {
+        let size = o.size.unwrap_or(12.0).max(1.0);
+        let [x0, y0, x1, _] = norm(o.rect);
+        // The box reaches 0.22 × size below the baseline (see glyph_box).
+        let y = y0 + 0.22 * size - 0.11 * size;
+        let rgb = o.color.as_deref().and_then(hex_rgb).unwrap_or([0.0, 0.0, 0.0]);
+        ops.extend([
+            Operation::new("RG", rgb.iter().map(|v| r(*v)).collect()),
+            Operation::new("w", vec![r((size * 0.06).max(0.5))]),
+            Operation::new("m", vec![r(x0), r(y)]),
+            Operation::new("l", vec![r(x1), r(y)]),
+            Operation::new("S", vec![]),
+        ]);
+        n += 1;
+    }
+    if n == 0 {
+        return Err(crate::err!(ErrorCode::ValidationFailed, "select one or more lines of text to underline"));
+    }
+    ops.push(Operation::new("Q", vec![]));
+    crate::docops::append_to_page(doc, page, ops, vec![], vec![])?;
+    Ok(n)
+}
+
+fn hex_rgb(h: &str) -> Option<[f64; 3]> {
+    let h = h.strip_prefix('#')?;
+    if h.len() != 6 {
+        return None;
+    }
+    let c = |i: usize| u8::from_str_radix(&h[i..i + 2], 16).ok().map(|v| v as f64 / 255.0);
+    Some([c(0)?, c(2)?, c(4)?])
+}
+
 /// TRUE redaction of `rect` (user space) on a page.
 pub fn redact(doc: &mut PdfDoc, page_no: u32, rect: [f64; 4]) -> Result<RedactReport, EngineError> {
     let rect = norm(rect);

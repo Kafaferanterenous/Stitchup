@@ -127,6 +127,7 @@ export interface PageObject {
 }
 export const cmdListObjects = (page: number) => cmd<PageObject[]>("list_objects", { page });
 export const cmdObjectOp = (page: number, data: unknown) => cmd<PageMeta[]>("object_op", { page, data });
+export const cmdUnderline = (page: number, ids: string[]) => cmd<PageMeta[]>("underline_text", { page, ids });
 export const cmdInsertShape = (page: number, spec: unknown) => cmd<PageMeta[]>("insert_shape", { page, spec });
 export const cmdSign = (target: string, spec: unknown) => cmd<CommitResult>("sign_document", { target, spec });
 export const cmdOpenUrl = (url: string) => cmd<void>("open_url", { url });

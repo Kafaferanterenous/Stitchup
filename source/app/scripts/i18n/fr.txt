@@ -80,7 +80,7 @@
 79|Contenu
 80|Continu
 81|Défilement continu
-82|{0} caractère(s) copié(s)
+82|{0} caractère copié‖{0} caractères copiés
 83|Copier
 84|Copier la ligne
 85|Échec de la copie
@@ -151,7 +151,7 @@
 150|Exporter chaque page en image JPG ou PNG
 151|Échec de l’export : {0}
 152|Exporter les pages en images
-153|{0} image(s) exportée(s)
+153|{0} image exportée‖{0} images exportées
 154|{0} exporté → {1}
 155|Exporter…
 156|Extraire
@@ -331,7 +331,7 @@
 330|Lecture…
 331|Motif
 332|Reçu
-333|{0} ligne(s) reconnue(s) sur {2} page(s) — désormais consultables
+333|{0} reconnues {1} — désormais consultables
 334|Reconnaissance du texte : page {0} sur {1}…
 335|Reconnaître le texte (OCR)
 336|Changer la couleur du texte, des formes ou des annotations sélectionnés, ou de la ligne en cours de modification
@@ -401,7 +401,7 @@
 400|Sélectionnez d’abord du texte (Pages ▸ Sélectionner, puis cliquez sur une ligne)
 401|Sélection : cliquez sur un objet ou tracez un cadre · faites glisser pour déplacer · ⌫ supprime
 402|Sélection : cliquez ou tracez un cadre · ⌘-clic ajoute · faites glisser pour déplacer · ⌫ supprime
-403|{0} page(s) envoyée(s) à l’impression
+403|{0} page envoyée à l’impression‖{0} pages envoyées à l’impression
 404|Réglages
 405|Réglages enregistrés
 406|Réglages…
@@ -527,10 +527,10 @@
 526|avertissement
 527|{0} Ko
 528|Couleur {0}
-529|{0} fichiers
+529|{0} fichier‖{0} fichiers
 530|{0} arrive bientôt (objectif {1} dans GOALS.md)
-531|{0} page(s) sélectionnée(s)
-532|{0} pages sélectionnées
+531|{0} page sélectionnée‖{0} pages sélectionnées
+532|{0} page sélectionnée‖les {0} pages sélectionnées
 533|{0} · {1} pt
 534|{0} — cliquez sur la page pour la placer (faites glisser pour fixer sa largeur)
 535|{0} — modifications non enregistrées
@@ -552,7 +552,7 @@
 551|Signet supprimé (page {0})
 552|Signet ajouté à la page {0}
 553|Fermer Stitchup
-554|{0} fichiers combinés
+554|{0} fichier combiné‖{0} fichiers combinés
 555|Échec de la commande
 556|Ignorer et quitter
 557|Échec de l’extraction
@@ -560,14 +560,14 @@
 559|Échec de la mise à jour des métadonnées
 560|Métadonnées mises à jour
 561|Échec de l’ouverture
-562|{0} page(s) ouverte(s)
+562|{0} page ouverte‖{0} pages ouvertes
 563|Ligne recolorée
 564|{0} récupéré — utilisez « Enregistrer sous » pour le garder
 565|Échec du rétablissement
 566|Échec de l’enregistrement
-567|{0} page(s) enregistrée(s) dans {2}
+567|{0} page enregistrée dans {1}‖{0} pages enregistrées dans {1}
 568|Échec de la division
-569|Scindé en {0} fichiers dans {1}
+569|Scindé en {0} fichier dans {1}‖Scindé en {0} fichiers dans {1}
 570|Texte du tampon
 571|Texte modifié
 572|Texte modifié ({0})
@@ -575,7 +575,7 @@
 574|Ce document est protégé par un mot de passe
 575|Échec de l’annulation
 576|Échec du déverrouillage
-577|{0} pages déverrouillées
+577|{0} page déverrouillée‖{0} pages déverrouillées
 578|Sans titre
 579|Logiciel expérimental
 580|J’ai compris
@@ -642,6 +642,43 @@
 641|Pivoter
 642|Pivoter la ou les pages actuelles vers la gauche ou la droite, ou toutes les pages
 643|Enregistrer le document en texte, CSV, images, RTF, DOCX ou ODT
-644|Supprimer {0} pages
-645|Extraire {0} pages…
+644|Supprimer {0} page‖Supprimer {0} pages
+645|Extraire {0} page…‖Extraire {0} pages…
 646|Ajouter une page vierge après
+647|Souligner le texte
+648|Souligner la ligne (⌘U)
+649|Souligner les lignes de texte sélectionnées ou la ligne en cours de modification (⌘U)
+650|Souligné
+651|Cliquez pour modifier
+652|Double-cliquez pour modifier · clic droit pour plus
+653|Aller à la page
+654|Aller à la page {0}
+655|Insérer une page vierge après la page {0} (même taille)
+656|Ma signature
+657|Page {0} · pivotée de {1}° · ⌘-clic / Maj-clic pour en sélectionner plusieurs
+658|Page {0} · ⌘-clic / Maj-clic pour en sélectionner plusieurs
+659|Pivoter {0} de 90° dans le sens horaire
+660|Pivoter {0} de 90° dans le sens antihoraire
+661|Enregistrer {0} comme nouveau PDF
+662|Rechercher parmi {0} polices installées
+663|Les mots de passe ne correspondent pas
+664|Utilisez un mot de passe d’au moins 4 caractères
+665|la page {0}
+666|Couleurs par défaut
+667|Sans remplissage
+668|Police d’origine
+669|Nouveau / Ouvrir / Enregistrer / Enregistrer sous
+670|Annuler / Rétablir
+671|Rechercher, occurrence suivante / précédente
+672|Pivoter à droite / à gauche
+673|Supprimer la ou les pages sélectionnées
+674|Sélectionner toutes les pages
+675|Zoom avant / arrière / 100 % / largeur / page entière
+676|Page précédente / suivante
+677|Imprimer / aperçu avant impression
+678|Mode sombre
+679|Ce guide
+680|Letter (8,5 × 11 po)
+681|Legal (8,5 × 14 po)
+682|{0} ligne‖{0} lignes
+683|sur {0} page‖sur {0} pages

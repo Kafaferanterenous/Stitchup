@@ -547,3 +547,24 @@ fn text_inside_a_group_is_edited_in_place_not_covered() {
     let s = back.get_object(group).unwrap().as_stream().unwrap();
     assert!(String::from_utf8_lossy(&s.decompressed_content().unwrap()).contains("Caption inside a group"), "shared group unchanged");
 }
+
+#[test]
+fn underline_draws_one_line_under_each_selected_text_object() {
+    let mut d = doc();
+    let texts: Vec<_> = objects::list(&d, 1).unwrap().into_iter().filter(|o| o.kind == "text").collect();
+    assert!(texts.len() >= 2, "fixture has at least two text lines");
+    let ids: Vec<String> = texts.iter().take(2).map(|o| o.id.clone()).collect();
+    let before = Content::decode(&d.get_page_content(*d.get_pages().get(&1).unwrap())).unwrap().operations.iter().filter(|o| o.operator == "S").count();
+    assert_eq!(objects::underline_text(&mut d, 1, &ids).unwrap(), 2);
+    let back = reload(&mut d);
+    let ops = Content::decode(&back.get_page_content(*back.get_pages().get(&1).unwrap())).unwrap().operations;
+    assert_eq!(ops.iter().filter(|o| o.operator == "S").count(), before + 2);
+    // The line sits just under the text and spans its width.
+    let l = ops.iter().rposition(|o| o.operator == "l").unwrap();
+    let y = ops[l].operands[1].as_float().unwrap() as f64;
+    let t = &texts[1];
+    assert!(y > t.rect[1] - 1.0 && y < t.rect[1] + 0.25 * t.size.unwrap(), "y {y} vs box {:?}", t.rect);
+    // The text is still there and still readable.
+    assert_eq!(objects::list(&back, 1).unwrap().iter().filter(|o| o.kind == "text").count(), texts.len());
+    assert!(objects::underline_text(&mut d, 1, &["i999".to_string()]).is_err());
+}

@@ -80,7 +80,7 @@
 79|Inhalt
 80|Fortlaufend
 81|Fortlaufend scrollen
-82|{0} Zeichen kopiert
+82|{0} Zeichen kopiert‖{0} Zeichen kopiert
 83|Kopieren
 84|Zeile kopieren
 85|Kopieren fehlgeschlagen
@@ -151,7 +151,7 @@
 150|Jede Seite als JPG- oder PNG-Bild exportieren
 151|Export fehlgeschlagen: {0}
 152|Seiten als Bilder exportieren
-153|{0} Bild(er) exportiert
+153|{0} Bild exportiert‖{0} Bilder exportiert
 154|{0} exportiert → {1}
 155|Exportieren…
 156|Extrahieren
@@ -331,7 +331,7 @@
 330|Wird gelesen…
 331|Grund
 332|Erhalten
-333|{0} Zeile(n) auf {2} Seite(n) erkannt — jetzt durchsuchbar
+333|{0} {1} erkannt – jetzt durchsuchbar
 334|Text wird erkannt: Seite {0} von {1}…
 335|Text erkennen (OCR)
 336|Ausgewählten Text, Formen oder Kommentare oder die bearbeitete Zeile umfärben
@@ -401,7 +401,7 @@
 400|Zuerst Text auswählen (Seiten ▸ Auswählen, dann eine Zeile anklicken)
 401|Auswählen: Objekt anklicken oder Rahmen ziehen · ziehen zum Verschieben · ⌫ löscht
 402|Auswählen: klicken oder Rahmen ziehen · ⌘-Klick fügt hinzu · ziehen zum Verschieben · ⌫ löscht
-403|{0} Seite(n) an das Druckfenster gesendet
+403|{0} Seite an den Druckdialog gesendet‖{0} Seiten an den Druckdialog gesendet
 404|Einstellungen
 405|Einstellungen gespeichert
 406|Einstellungen…
@@ -527,10 +527,10 @@
 526|Warnung
 527|{0} KB
 528|{0}-Farbe
-529|{0} Dateien
+529|{0} Datei‖{0} Dateien
 530|{0} kommt demnächst (Ziel {1} in GOALS.md)
-531|{0} Seite(n) ausgewählt
-532|{0} ausgewählte Seiten
+531|{0} Seite ausgewählt‖{0} Seiten ausgewählt
+532|{0} ausgewählte Seite‖{0} ausgewählte Seiten
 533|{0} · {1} pt
 534|{0} — auf der Seite klicken, um sie zu platzieren (ziehen, um die Breite festzulegen)
 535|{0} — ungespeicherte Änderungen
@@ -552,7 +552,7 @@
 551|Lesezeichen entfernt (Seite {0})
 552|Lesezeichen für Seite {0} gesetzt
 553|Stitchup schließen
-554|{0} Dateien kombiniert
+554|{0} Datei zusammengeführt‖{0} Dateien zusammengeführt
 555|Befehl fehlgeschlagen
 556|Verwerfen und beenden
 557|Extrahieren fehlgeschlagen
@@ -560,14 +560,14 @@
 559|Aktualisieren der Metadaten fehlgeschlagen
 560|Metadaten aktualisiert
 561|Öffnen fehlgeschlagen
-562|{0} Seite(n) geöffnet
+562|{0} Seite geöffnet‖{0} Seiten geöffnet
 563|Zeile umgefärbt
 564|{0} wiederhergestellt — mit „Speichern unter“ behalten
 565|Wiederholen fehlgeschlagen
 566|Speichern fehlgeschlagen
-567|{0} Seite(n) gespeichert unter {2}
+567|{0} Seite in {1} gespeichert‖{0} Seiten in {1} gespeichert
 568|Teilen fehlgeschlagen
-569|In {0} Dateien in {1} geteilt
+569|In {0} Datei in {1} aufgeteilt‖In {0} Dateien in {1} aufgeteilt
 570|Stempeltext
 571|Text bearbeitet
 572|Text bearbeitet ({0})
@@ -575,7 +575,7 @@
 574|Dieses Dokument ist passwortgeschützt
 575|Rückgängig fehlgeschlagen
 576|Entsperren fehlgeschlagen
-577|{0} Seiten entsperrt
+577|{0} Seite entsperrt‖{0} Seiten entsperrt
 578|Ohne Titel
 579|Experimentelle Software
 580|Verstanden
@@ -642,6 +642,43 @@
 641|Drehen
 642|Die aktuelle(n) Seite(n) nach links oder rechts drehen, oder alle Seiten
 643|Das Dokument als Text, CSV, Bilder, RTF, DOCX oder ODT speichern
-644|{0} Seiten löschen
-645|{0} Seiten extrahieren…
+644|{0} Seite löschen‖{0} Seiten löschen
+645|{0} Seite extrahieren…‖{0} Seiten extrahieren…
 646|Leere Seite danach einfügen
+647|Text unterstreichen
+648|Zeile unterstreichen (⌘U)
+649|Die ausgewählten Textzeilen oder die bearbeitete Zeile unterstreichen (⌘U)
+650|Unterstrichen
+651|Zum Bearbeiten klicken
+652|Doppelklick zum Bearbeiten · Rechtsklick für mehr
+653|Zur Seite
+654|Zu Seite {0}
+655|Leere Seite nach Seite {0} einfügen (gleiche Größe)
+656|Meine Unterschrift
+657|Seite {0} · um {1}° gedreht · ⌘-Klick / Umschalt-Klick, um mehrere auszuwählen
+658|Seite {0} · ⌘-Klick / Umschalt-Klick, um mehrere auszuwählen
+659|{0} um 90° im Uhrzeigersinn drehen
+660|{0} um 90° gegen den Uhrzeigersinn drehen
+661|{0} als neue PDF speichern
+662|{0} installierte Schriften durchsuchen
+663|Die Passwörter stimmen nicht überein
+664|Passwort mit mindestens 4 Zeichen verwenden
+665|Seite {0}
+666|Standardfarben
+667|Keine Füllung
+668|Originalschrift
+669|Neu / Öffnen / Speichern / Speichern unter
+670|Rückgängig / Wiederholen
+671|Suchen, nächster / vorheriger Treffer
+672|Rechts / links drehen
+673|Ausgewählte Seite(n) löschen
+674|Alle Seiten auswählen
+675|Vergrößern / verkleinern / 100 % / Breite / ganze Seite
+676|Vorherige / nächste Seite
+677|Drucken / Druckvorschau
+678|Dunkelmodus
+679|Diese Anleitung
+680|Letter (8,5 × 11 Zoll)
+681|Legal (8,5 × 14 Zoll)
+682|{0} Zeile‖{0} Zeilen
+683|auf {0} Seite‖auf {0} Seiten

@@ -415,7 +415,7 @@ export function PageOverlay({
                 type="button"
                 className={`annot-hot ${a.subtype === "Link" ? "link" : "note"}`}
                 style={{ left: b[0], top: b[1], width: b[2] - b[0], height: b[3] - b[1] }}
-                title={a.subtype === "Link" ? a.url ?? "Go to page" : a.contents}
+                title={a.subtype === "Link" ? a.url ?? tr("Go to page") : a.contents}
                 aria-label={a.subtype === "Link" ? `Link ${a.url ?? ""}` : "Note"}
                 onClick={(e) => {
                   e.stopPropagation();

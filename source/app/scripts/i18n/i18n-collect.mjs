@@ -18,6 +18,8 @@ function walk(dir) {
 function scan(file) {
   const src = ts.createSourceFile(file, fs.readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true, file.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   const visit = (n) => {
+    // trn(n, "one", "other", …): the English plural is the key.
+    if (ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === "trn" && n.arguments[2] && ts.isStringLiteral(n.arguments[2])) keys.add(n.arguments[2].text);
     if (ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === "tr" && n.arguments[0] && (ts.isStringLiteral(n.arguments[0]) || ts.isNoSubstitutionTemplateLiteral(n.arguments[0]))) keys.add(n.arguments[0].text);
     if (ts.isPropertyAssignment(n) && PROPS.has(n.name.getText(src)) && (ts.isStringLiteral(n.initializer) || ts.isNoSubstitutionTemplateLiteral(n.initializer)) && hasWords(n.initializer.text)) keys.add(n.initializer.text);
     if (ts.isVariableDeclaration(n) && n.name.getText(src) === "TOOL_HINT" && n.initializer && ts.isObjectLiteralExpression(n.initializer))

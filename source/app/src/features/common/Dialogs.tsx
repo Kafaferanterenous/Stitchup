@@ -11,7 +11,7 @@ import { pageImage, toBase64 } from "../../export";
 import { PAPERS, fitOnSheet, printDocument } from "../../print";
 import { renderPage } from "../../adapters/renderAdapter";
 
-import { LANGUAGES, language, setLanguage, tr, type Lang } from "../../i18n";
+import { LANGUAGES, language, setLanguage, tr, trn, type Lang } from "../../i18n";
 
 /** Shared modal shell: backdrop click and Escape close it. */
 function Modal({ title, onClose, children, wide }: { title: string; onClose: () => void; children: ReactNode; wide?: boolean }) {
@@ -186,7 +186,7 @@ export function ExtractDialog() {
         <input value={range} onChange={(e) => setRange(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void go()} autoFocus />
       </label>
       <p className={pages ? "muted" : "err-note"}>
-        {pages ? tr("{0} page{1} selected", pages.length, pages.length === 1 ? "" : "s") : tr("Use page numbers between 1 and {0}", max)}
+        {pages ? trn(pages.length, "{0} page selected", "{0} pages selected") : tr("Use page numbers between 1 and {0}", max)}
       </p>
       <div className="modal-actions">
         <button onClick={() => void go()} disabled={!pages || app.busy}>
@@ -216,7 +216,7 @@ export function SplitDialog() {
         {tr("Pages per file")}
         <input type="number" min={1} max={Math.max(1, max - 1)} value={every} onChange={(e) => setEvery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void go()} autoFocus />
       </label>
-      <p className={valid ? "muted" : "err-note"}>{valid ? tr("{0} files", parts) : tr("Choose 1 to {0}", max - 1)}</p>
+      <p className={valid ? "muted" : "err-note"}>{valid ? trn(parts, "{0} file", "{0} files") : tr("Choose 1 to {0}", max - 1)}</p>
       <div className="modal-actions">
         <button onClick={() => void go()} disabled={!valid || app.busy}>
           {tr("Choose Folder…")}
@@ -610,7 +610,7 @@ export function ExportImagesDialog() {
         return;
       }
     }
-    store.notify(tr("Exported {0} image{1}", pages.length, pages.length === 1 ? "" : "s"));
+    store.notify(trn(pages.length, "Exported {0} image", "Exported {0} images"));
     close();
   }
   return (
@@ -703,7 +703,7 @@ export function PrintDialog() {
     setBusy(true);
     try {
       await printDocument(s, new Map(doc.pages.map((p) => [p.page_no, p.rotation])), { pages, paper: pp, landscape });
-      store.notify(tr("Sent {0} page{1} to the print panel", pages.length, pages.length === 1 ? "" : "s"));
+      store.notify(trn(pages.length, "Sent {0} page to the print panel", "Sent {0} pages to the print panel"));
       close();
     } finally {
       setBusy(false);
@@ -732,7 +732,7 @@ export function PrintDialog() {
             {tr("Paper")}
             <select value={paper} onChange={(e) => setPaper(e.target.value)} aria-label="Paper">
               {PAPERS.map((p) => (
-                <option key={p.name}>{p.name}</option>
+                <option key={p.name} value={p.name}>{tr(p.name)}</option>
               ))}
             </select>
           </label>
@@ -781,7 +781,7 @@ export function HelpDialog() {
         <h3>{tr("QuickSign (handwritten signature)")}</h3>
         <p>{tr("Security ▸ QuickSign ▸ Create New Signature: choose a JPG, GIF or PNG of your signature. Stitchup trims it and makes the white paper transparent. Keep it for next time if you like, optionally locked with a password (stored encrypted; asked for every time it is used). Then click on the page where it goes, or drag to set its width. Saved signatures are listed under QuickSign; Manage Signatures deletes them.")}</p>
         <h3>{tr("Editing text")}</h3>
-        <p>{tr("Double-click any line (or Pages ▸ Edit Text, then click it). It is edited in place, in the document’s own font when it has the needed letters. A bar above the line shows its font and size: change the font, bold / italic, size or colour there, or with Content ▸ Fore and Font. Enter or clicking away saves; Tab moves to the next line; Esc cancels; clearing the text deletes the line.")}</p>
+        <p>{tr("Double-click any line (or Pages ▸ Edit Text, then click it). It is edited in place, in the document’s own font when it has the needed letters. A bar above the line shows its font and size: change the font, bold / italic, size or colour there, or with Pages ▸ Fore and Font. Enter or clicking away saves; Tab moves to the next line; Esc cancels; clearing the text deletes the line.")}</p>
         <h3>{tr("Pages sidebar")}</h3>
         <p>{tr("Drag thumbnails to reorder. ⌘-click and Shift-click select several pages; Rotate, Delete, Extract and Watermark then act on the selection. F8 shows or hides the sidebar.")}</p>
         <h3>{tr("Keyboard")}</h3>
@@ -794,6 +794,7 @@ export function HelpDialog() {
               ["⌘R / ⌘⇧R", "Rotate right / left"],
               ["⌫", "Delete selected page(s)"],
               ["⌘A", "Select all pages"],
+              ["⌘U", "Underline Text"],
               ["⌘= / ⌘− / ⌘1 / ⌘2 / ⌘0", "Zoom in / out / 100% / fit width / fit page"],
               ["⌘↑ ⌘↓, PgUp PgDn", "Previous / next page"],
               ["F5 / F8", "Two-page spread / sidebar"],
@@ -805,7 +806,7 @@ export function HelpDialog() {
                 <td>
                   <kbd>{k}</kbd>
                 </td>
-                <td>{v}</td>
+                <td>{tr(v)}</td>
               </tr>
             ))}
           </tbody>
@@ -855,7 +856,7 @@ export function AnnotInputDialog() {
     }
     done();
   }
-  const title = p.kind === "note" ? "Sticky note" : p.kind === "link" ? "Link" : "Text box";
+  const title = tr(p.kind === "note" ? "Sticky note" : p.kind === "link" ? "Link" : "Text box");
   return (
     <Modal title={title} onClose={done}>
       {p.kind === "link" ? (

@@ -294,6 +294,8 @@ export const COMMANDS: Command[] = [
     enabled: (s) => hasDoc(s) && !!s.picked && s.picked.objects.length + s.picked.annots.length > 0, run: () => store.deletePicked() },
   { id: "font", label: "Font", menu: "Font and Size…", tip: "Change the font family and size of the selected text or the line being edited", icon: "font", tab: "Pages", group: "edit",
     enabled: (s) => hasDoc(s) && (!!s.picked?.objects.length || !!s.editingLine), run: () => store.setDialog("font") },
+  { id: "underline", label: "Underline", menu: "Underline Text", tip: "Underline the selected lines of text, or the line being edited (⌘U)", icon: "underline", accel: "CmdOrCtrl+U", tab: "Pages", group: "edit",
+    enabled: (s) => hasDoc(s) && (!!s.picked?.objects.length || !!s.editingLine), run: () => store.objectOp({ op: "underline" }) },
   { id: "fore", label: "Colour", menu: "Text Colour…", tip: "Recolour the selected text, shapes or annotations, or the line being edited", icon: "palette", tab: "Pages", group: "edit", swatch: "fore", run: () => {} },
   { id: "image", label: "Image", menu: "Insert Image…", tip: "Insert a picture (PNG, JPEG, GIF, WebP, HEIC…): choose it, then click or drag on the page", icon: "image", tab: "Pages", group: "edit", enabled: hasDoc, active: isTool("image"), run: insertImage },
   { id: "ocr", label: "OCR", menu: "Recognize Text (OCR)", tip: "Make scanned pages searchable: recognise their text on this computer (Apple Vision on macOS) and add it as an invisible layer", icon: "find", tab: "Pages", group: "edit", enabled: (st) => hasDoc(st) && st.platform.ocr,
@@ -406,7 +408,7 @@ export const MENUS: { title: string; items: (string | "-" | { submenu: string })
   // app menu, Export is a File submenu, tab switching is in Window, every
   // page command is in Pages and every protection tool in Security.
   { title: "File", items: ["new", "open", { submenu: "recent" }, "-", "newTab", "closeTab", "-", "save", "saveAs", { submenu: "export" }, "-", "combineNew", "compress", "properties", "-", "print"] },
-  { title: "Edit", items: ["undo", "redo", "-", { submenu: "clipboard" }, "-", "find", "findNext", "findPrev", "-", "select", "editText", "objDelete", "fore", "font", "image", "ocr"] },
+  { title: "Edit", items: ["undo", "redo", "-", { submenu: "clipboard" }, "-", "find", "findNext", "findPrev", "-", "select", "editText", "objDelete", "fore", "font", "underline", "image", "ocr"] },
   { title: "Pages", items: ["import", "addPage", "delete", "-", "rotateCw", "rotateCcw", "rotateAll", "-", "extract", "split", "autoCrop", "headerFooter", "-", "selectAll"] },
   { title: "Annotate", items: ["annType", "annMark", "-", "annHighlight", "annUnderline", "annStrike", "annNote", "annText", "annShape", "annStamp", "annLink", "annPen", "-", "annFore", "back"] },
   { title: "Security", items: ["encrypt", "sign", "quickSign", "annRedact", "watermark"] },

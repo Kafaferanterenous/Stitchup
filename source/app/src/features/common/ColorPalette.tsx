@@ -51,7 +51,7 @@ export function ColorPalette({
       </div>
       {allowNone && (
         <button type="button" role="menuitem" className={`color-none${value === null ? " on" : ""}`} onMouseDown={keepFocus} onClick={() => onPick(null)}>
-          {noneLabel}
+          {tr(noneLabel)}
         </button>
       )}
       <div className="color-custom">

@@ -80,7 +80,7 @@
 79|Contenuto
 80|Continua
 81|Scorrimento continuo
-82|{0} caratteri copiati
+82|Copiato {0} carattere‖Copiati {0} caratteri
 83|Copia
 84|Copia riga
 85|Copia non riuscita
@@ -151,7 +151,7 @@
 150|Esporta ogni pagina come immagine JPG o PNG
 151|Esportazione non riuscita: {0}
 152|Esporta pagine come immagini
-153|Immagini esportate: {0}
+153|Esportata {0} immagine‖Esportate {0} immagini
 154|Esportato {0} → {1}
 155|Esporta…
 156|Estrai
@@ -331,7 +331,7 @@
 330|Lettura…
 331|Motivo
 332|Ricevuto
-333|Righe riconosciute: {0} su {2} pagine — ora ricercabili
+333|Riconosciute {0} {1}: ora ricercabili
 334|Riconoscimento del testo: pagina {0} di {1}…
 335|Riconosci testo (OCR)
 336|Cambia il colore di testo, forme o annotazioni selezionati, o della riga in modifica
@@ -401,7 +401,7 @@
 400|Seleziona prima il testo (Pagine ▸ Seleziona, poi fai clic su una riga)
 401|Selezione: fai clic su un oggetto o trascina un riquadro · trascina per spostare · ⌫ elimina
 402|Selezione: fai clic o trascina un riquadro · ⌘-clic aggiunge · trascina per spostare · ⌫ elimina
-403|Pagine inviate alla stampa: {0}
+403|{0} pagina inviata alla stampa‖{0} pagine inviate alla stampa
 404|Impostazioni
 405|Impostazioni salvate
 406|Impostazioni…
@@ -527,10 +527,10 @@
 526|avviso
 527|{0} KB
 528|Colore {0}
-529|{0} file
+529|{0} file‖{0} file
 530|{0} in arrivo (obiettivo {1} in GOALS.md)
-531|Pagine selezionate: {0}
-532|{0} pagine selezionate
+531|{0} pagina selezionata‖{0} pagine selezionate
+532|{0} pagina selezionata‖le {0} pagine selezionate
 533|{0} · {1} pt
 534|{0} — fai clic sulla pagina per posizionarla (trascina per impostarne la larghezza)
 535|{0} — modifiche non salvate
@@ -552,7 +552,7 @@
 551|Segnalibro rimosso (pagina {0})
 552|Segnalibro aggiunto a pagina {0}
 553|Chiudi Stitchup
-554|File combinati: {0}
+554|Unito {0} file‖Uniti {0} file
 555|Comando non riuscito
 556|Scarta ed esci
 557|Estrazione non riuscita
@@ -560,14 +560,14 @@
 559|Aggiornamento dei metadati non riuscito
 560|Metadati aggiornati
 561|Apertura non riuscita
-562|Pagine aperte: {0}
+562|Aperta {0} pagina‖Aperte {0} pagine
 563|Riga ricolorata
 564|{0} recuperato — usa «Salva con nome» per conservarlo
 565|Ripristino non riuscito
 566|Salvataggio non riuscito
-567|Pagine salvate ({0}) in {2}
+567|{0} pagina salvata in {1}‖{0} pagine salvate in {1}
 568|Divisione non riuscita
-569|Diviso in {0} file in {1}
+569|Diviso in {0} file in {1}‖Diviso in {0} file in {1}
 570|Testo del timbro
 571|Testo modificato
 572|Testo modificato ({0})
@@ -575,7 +575,7 @@
 574|Questo documento è protetto da password
 575|Annullamento non riuscito
 576|Sblocco non riuscito
-577|Pagine sbloccate: {0}
+577|Sbloccata {0} pagina‖Sbloccate {0} pagine
 578|Senza titolo
 579|Software sperimentale
 580|Ho capito
@@ -642,6 +642,43 @@
 641|Ruota
 642|Ruota la pagina o le pagine correnti a sinistra o a destra, oppure tutte le pagine
 643|Salva il documento come testo, CSV, immagini, RTF, DOCX o ODT
-644|Elimina {0} pagine
-645|Estrai {0} pagine…
+644|Elimina {0} pagina‖Elimina {0} pagine
+645|Estrai {0} pagina…‖Estrai {0} pagine…
 646|Aggiungi una pagina vuota dopo
+647|Sottolinea testo
+648|Sottolinea la riga (⌘U)
+649|Sottolinea le righe di testo selezionate o la riga in modifica (⌘U)
+650|Sottolineato
+651|Fai clic per modificare
+652|Doppio clic per modificare · clic destro per altro
+653|Vai alla pagina
+654|Vai alla pagina {0}
+655|Inserisci una pagina vuota dopo la pagina {0} (stessa dimensione)
+656|La mia firma
+657|Pagina {0} · ruotata di {1}° · ⌘-clic / Maiusc-clic per selezionarne più di una
+658|Pagina {0} · ⌘-clic / Maiusc-clic per selezionarne più di una
+659|Ruota {0} di 90° in senso orario
+660|Ruota {0} di 90° in senso antiorario
+661|Salva {0} come nuovo PDF
+662|Cerca tra {0} caratteri installati
+663|Le password non coincidono
+664|Usa una password di almeno 4 caratteri
+665|la pagina {0}
+666|Colori predefiniti
+667|Nessun riempimento
+668|Carattere originale
+669|Nuovo / Apri / Salva / Salva con nome
+670|Annulla / Ripeti
+671|Trova, risultato successivo / precedente
+672|Ruota a destra / a sinistra
+673|Elimina le pagine selezionate
+674|Seleziona tutte le pagine
+675|Ingrandisci / riduci / 100% / larghezza / pagina intera
+676|Pagina precedente / successiva
+677|Stampa / anteprima di stampa
+678|Modalità scura
+679|Questa guida
+680|Letter (8,5 × 11 pollici)
+681|Legal (8,5 × 14 pollici)
+682|{0} riga‖{0} righe
+683|su {0} pagina‖su {0} pagine

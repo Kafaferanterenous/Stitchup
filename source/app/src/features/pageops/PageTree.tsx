@@ -16,11 +16,12 @@ import { CSS } from "@dnd-kit/utilities";
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { extractTo } from "../../actions";
 import { Icon } from "../ribbon/icons";
+import { osTip } from "../ribbon/Ribbon";
 import { useAppState, store } from "../../store";
 import { ContextMenu, type MenuItem } from "../viewer/Viewer";
 import { renderPage, type RenderSession } from "../../adapters/renderAdapter";
 
-import { tr } from "../../i18n";
+import { tr, trn } from "../../i18n";
 
 /**
  * Live page preview: renders the page through the SAME pdf.js session as the
@@ -126,7 +127,7 @@ function Thumb({
         e.preventDefault();
         onMenu(pageNo, e);
       }}
-      title={`Page ${pageNo}${base?.rotation ? ` · rotated ${base.rotation}°` : ""} · ⌘-click / Shift-click to select several`}
+      title={osTip(base?.rotation ? tr("Page {0} · rotated {1}° · ⌘-click / Shift-click to select several", pageNo, base.rotation) : tr("Page {0} · ⌘-click / Shift-click to select several", pageNo))}
     >
       {app.session ? (
         <PagePreview
@@ -145,7 +146,7 @@ function Thumb({
         className={`thumb-bookmark${bookmarked ? " on" : ""}`}
         role="button"
         tabIndex={0}
-        title={bookmarked ? "Remove bookmark" : "Bookmark this page"}
+        title={tr(bookmarked ? "Remove bookmark" : "Bookmark this page")}
         onPointerDown={(e) => e.stopPropagation()}
         onClick={(e) => {
           e.stopPropagation();
@@ -249,7 +250,7 @@ function PagesContent() {
 
   const locked = app.doc.passwordRequired || app.busy;
   const targets = sel.length ? sel : [app.currentPage];
-  const what = sel.length > 1 ? `${sel.length} selected pages` : `page ${targets[0]}`;
+  const what = sel.length > 1 ? trn(sel.length, "{0} selected page", "{0} selected pages") : tr("page {0}", targets[0]);
 
   return (
     <>
@@ -263,8 +264,8 @@ function PagesContent() {
             const n = ps.length;
             const all = n >= (app.doc?.pages.length ?? 0);
             return [
-              { label: n === 1 ? tr("Delete Page") : tr("Delete {0} Pages", n), disabled: locked || all, run: () => void store.deletePages(ps) },
-              { label: n === 1 ? tr("Extract Page…") : tr("Extract {0} Pages…", n), disabled: locked, run: () => void extractTo(ps) },
+              { label: n === 1 ? tr("Delete Page") : trn(n, "Delete {0} Page", "Delete {0} Pages"), disabled: locked || all, run: () => void store.deletePages(ps) },
+              { label: n === 1 ? tr("Extract Page…") : trn(n, "Extract {0} Page…", "Extract {0} Pages…"), disabled: locked, run: () => void extractTo(ps) },
               "-",
               { label: tr("Rotate Left"), disabled: locked, run: () => void store.rotate(ps, false) },
               { label: tr("Rotate Right"), disabled: locked, run: () => void store.rotate(ps, true) },
@@ -275,10 +276,10 @@ function PagesContent() {
         />
       )}
       <div className="pages-tools" role="toolbar" aria-label="Page tools">
-        <button onClick={() => void store.rotate(targets, false)} disabled={locked} title={`Rotate ${what} 90° counter-clockwise`} aria-label="Rotate left">
+        <button onClick={() => void store.rotate(targets, false)} disabled={locked} title={tr("Rotate {0} 90° counter-clockwise", what)} aria-label="Rotate left">
           <Icon name="rotate-ccw" size={16} />
         </button>
-        <button onClick={() => void store.rotate(targets, true)} disabled={locked} title={`Rotate ${what} 90° clockwise`} aria-label="Rotate right">
+        <button onClick={() => void store.rotate(targets, true)} disabled={locked} title={tr("Rotate {0} 90° clockwise", what)} aria-label="Rotate right">
           <Icon name="rotate-cw" size={16} />
         </button>
         <button
@@ -291,11 +292,11 @@ function PagesContent() {
         <button
           onClick={() => void store.insertBlank(targets[targets.length - 1])}
           disabled={locked}
-          title={`Insert a blank page after page ${targets[targets.length - 1]} (same size)`}
+          title={tr("Insert a blank page after page {0} (same size)", targets[targets.length - 1])}
           aria-label="Insert blank page">
           <Icon name="insert-blank" size={16} />
         </button>
-        <button onClick={() => void extractTo(targets)} disabled={locked} title={`Save ${what} as a new PDF`} aria-label="Extract pages">
+        <button onClick={() => void extractTo(targets)} disabled={locked} title={tr("Save {0} as a new PDF", what)} aria-label="Extract pages">
           <Icon name="extract" size={16} />
         </button>
         {sel.length > 1 && (
@@ -358,7 +359,7 @@ function BookmarksContent() {
                   />
                 </span>
               )}
-              <button className="bm-jump" onClick={() => store.goToPage(n)} title={`Go to page ${n}`}>
+              <button className="bm-jump" onClick={() => store.goToPage(n)} title={tr("Go to page {0}", n)}>
                 {tr("Page")} {n}
               </button>
               <button

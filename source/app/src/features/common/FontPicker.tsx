@@ -119,7 +119,7 @@ export function FontPicker({
         <div className="font-picker-pop" onMouseDown={(e) => e.stopPropagation()}>
           <input
             className="font-picker-search"
-            placeholder={`Search ${families.length} installed fonts`}
+            placeholder={tr("Search {0} installed fonts", families.length)}
             aria-label="Search fonts"
             value={q}
             autoFocus
@@ -133,7 +133,7 @@ export function FontPicker({
           <div className="font-picker-list" role="listbox" aria-label="Fonts">
             {allowOriginal && !needle && (
               <button type="button" role="option" aria-selected={value === "original"} className={value === "original" ? "on" : ""} onClick={() => pick("original")}>
-                {originalLabel}
+                {tr(originalLabel)}
               </button>
             )}
             {!needle && <div className="font-picker-head">{tr("Standard — not embedded, smallest file")}</div>}

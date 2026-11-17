@@ -1253,6 +1253,16 @@ pub fn insert_shape_inner(st: &Mutex<SessionState>, page: u32, spec: Value) -> R
     logged(&mut g, "Insert shape", |doc| objects::insert_shape(doc, page, &spec))
 }
 
+#[tauri::command]
+pub fn underline_text(st: tauri::State<'_, Mutex<SessionState>>, page: u32, ids: Vec<String>) -> Result<Vec<PageMeta>, EngineError> {
+    underline_text_inner(&st, page, ids)
+}
+
+pub fn underline_text_inner(st: &Mutex<SessionState>, page: u32, ids: Vec<String>) -> Result<Vec<PageMeta>, EngineError> {
+    let mut g = lock(st)?;
+    logged(&mut g, "Underline", |doc| objects::underline_text(doc, page, &ids).map(|_| ()))
+}
+
 /// Digitally sign and save a signed copy (the open document is unchanged).
 #[tauri::command]
 pub fn sign_document(st: tauri::State<'_, Mutex<SessionState>>, target: String, spec: Value) -> Result<CommitResult, EngineError> {

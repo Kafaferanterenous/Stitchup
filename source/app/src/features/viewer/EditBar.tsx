@@ -119,6 +119,15 @@ export function EditBar({ run, page, zoom }: { run: TextRun; page: number; zoom:
         }}>
         <i>I</i>
       </button>
+      <button
+        type="button"
+        className="edit-bar-toggle"
+        aria-label="Underline"
+        title={tr("Underline the line (⌘U)")}
+        onMouseDown={keepFocus}
+        onClick={() => void apply({ op: "underline" })}>
+        <u>U</u>
+      </button>
       <input
         aria-label="Font size"
         className="edit-bar-size"

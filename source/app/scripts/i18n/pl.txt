@@ -80,7 +80,7 @@
 79|Zawartość
 80|Ciągły
 81|Przewijanie ciągłe
-82|Skopiowano znaki: {0}
+82|Skopiowano {0} znak‖Skopiowano {0} znaki‖Skopiowano {0} znaków
 83|Kopiuj
 84|Kopiuj wiersz
 85|Kopiowanie nie powiodło się
@@ -151,7 +151,7 @@
 150|Eksportuj każdą stronę jako obraz JPG lub PNG
 151|Eksport nie powiódł się: {0}
 152|Eksportuj strony jako obrazy
-153|Wyeksportowano obrazy: {0}
+153|Wyeksportowano {0} obraz‖Wyeksportowano {0} obrazy‖Wyeksportowano {0} obrazów
 154|Wyeksportowano {0} → {1}
 155|Eksportuj…
 156|Wyodrębnij
@@ -331,7 +331,7 @@
 330|Wczytywanie…
 331|Powód
 332|Otrzymano
-333|Rozpoznano wiersze: {0} na stronach: {2} – można je teraz przeszukiwać
+333|Rozpoznano {0} {1} – można je teraz przeszukiwać
 334|Rozpoznawanie tekstu: strona {0} z {1}…
 335|Rozpoznaj tekst (OCR)
 336|Zmień kolor zaznaczonego tekstu, kształtów lub adnotacji albo edytowanego wiersza
@@ -401,7 +401,7 @@
 400|Najpierw zaznacz tekst (Strony ▸ Zaznacz, a potem kliknij wiersz)
 401|Zaznaczanie: kliknij obiekt lub przeciągnij ramkę · przeciągnij, aby przenieść · ⌫ usuwa
 402|Zaznaczanie: kliknij lub przeciągnij ramkę · ⌘-klik dodaje · przeciągnij, aby przenieść · ⌫ usuwa
-403|Wysłano strony do drukowania: {0}
+403|Wysłano {0} stronę do drukowania‖Wysłano {0} strony do drukowania‖Wysłano {0} stron do drukowania
 404|Ustawienia
 405|Zapisano ustawienia
 406|Ustawienia…
@@ -527,10 +527,10 @@
 526|ostrzeżenie
 527|{0} KB
 528|{0} – kolor
-529|Pliki: {0}
+529|{0} plik‖{0} pliki‖{0} plików
 530|{0} będzie wkrótce (cel {1} w GOALS.md)
-531|Zaznaczone strony: {0}
-532|Zaznaczone strony: {0}
+531|Zaznaczono {0} stronę‖Zaznaczono {0} strony‖Zaznaczono {0} stron
+532|{0} zaznaczoną stronę‖{0} zaznaczone strony‖{0} zaznaczonych stron
 533|{0} · {1} pt
 534|{0} – kliknij na stronie, aby go umieścić (przeciągnij, aby ustawić szerokość)
 535|{0} – niezapisane zmiany
@@ -552,7 +552,7 @@
 551|Usunięto zakładkę (strona {0})
 552|Dodano zakładkę do strony {0}
 553|Zamknij Stitchup
-554|Połączono pliki: {0}
+554|Połączono {0} plik‖Połączono {0} pliki‖Połączono {0} plików
 555|Polecenie nie powiodło się
 556|Odrzuć i zakończ
 557|Wyodrębnianie nie powiodło się
@@ -560,14 +560,14 @@
 559|Aktualizacja metadanych nie powiodła się
 560|Zaktualizowano metadane
 561|Otwieranie nie powiodło się
-562|Otwarto strony: {0}
+562|Otwarto {0} stronę‖Otwarto {0} strony‖Otwarto {0} stron
 563|Zmieniono kolor wiersza
 564|Odzyskano {0} – użyj „Zapisz jako”, aby zachować
 565|Ponowienie nie powiodło się
 566|Zapisywanie nie powiodło się
-567|Zapisano strony ({0}) do {2}
+567|Zapisano {0} stronę do {1}‖Zapisano {0} strony do {1}‖Zapisano {0} stron do {1}
 568|Dzielenie nie powiodło się
-569|Podzielono na pliki ({0}) w {1}
+569|Podzielono na {0} plik w {1}‖Podzielono na {0} pliki w {1}‖Podzielono na {0} plików w {1}
 570|Tekst pieczątki
 571|Zmieniono tekst
 572|Zmieniono tekst ({0})
@@ -575,12 +575,11 @@
 574|Ten dokument jest chroniony hasłem
 575|Cofnięcie nie powiodło się
 576|Odblokowanie nie powiodło się
-577|Odblokowano strony: {0}
+577|Odblokowano {0} stronę‖Odblokowano {0} strony‖Odblokowano {0} stron
 578|Bez tytułu
 579|Rzecz eksperymentalna
 580|Rozumiem i przyjmuję
 581|Stitchup jest edytorem PDF eksperymentalnym, sporządzonym na własne autora potrzeby i ku pożytkowi ogółu jako open source udostępnionym. Waszmość używasz go na własne ryzyko: miej kopie ważnych dokumentów i sprawdzaj wyniki, nim im zawierzysz. Żadnej rękojmi ani gwarancji się nie daje.
-
 582|Dodaj numery stron, „Strona X z Y”, numery Batesa lub dowolny tekst u góry lub u dołu stron
 583|Wszystkie ({0})
 584|Zapytaj GitHub, czy jest nowsza wersja Stitchup (nic nie jest pobierane ani instalowane)
@@ -643,6 +642,43 @@
 641|Obróć
 642|Obróć bieżącą stronę (strony) w lewo lub w prawo albo wszystkie strony
 643|Zapisz dokument jako tekst, CSV, obrazy, RTF, DOCX lub ODT
-644|Usuń strony ({0})
-645|Wyodrębnij strony ({0})…
+644|Usuń {0} stronę‖Usuń {0} strony‖Usuń {0} stron
+645|Wyodrębnij {0} stronę…‖Wyodrębnij {0} strony…‖Wyodrębnij {0} stron…
 646|Dodaj pustą stronę za nią
+647|Podkreśl tekst
+648|Podkreśl wiersz (⌘U)
+649|Podkreśl zaznaczone wiersze tekstu albo edytowany wiersz (⌘U)
+650|Podkreślono
+651|Kliknij, aby edytować
+652|Kliknij dwukrotnie, aby edytować · prawy przycisk – więcej
+653|Przejdź do strony
+654|Przejdź do strony {0}
+655|Wstaw pustą stronę za stroną {0} (ten sam rozmiar)
+656|Mój podpis
+657|Strona {0} · obrócona o {1}° · ⌘-klik / Shift-klik, by zaznaczyć kilka
+658|Strona {0} · ⌘-klik / Shift-klik, by zaznaczyć kilka
+659|Obróć {0} o 90° w prawo
+660|Obróć {0} o 90° w lewo
+661|Zapisz {0} jako nowy PDF
+662|Szukaj wśród zainstalowanych czcionek ({0})
+663|Hasła się nie zgadzają
+664|Użyj hasła o długości co najmniej 4 znaków
+665|stronę {0}
+666|Kolory domyślne
+667|Bez wypełnienia
+668|Czcionka oryginalna
+669|Nowy / Otwórz / Zapisz / Zapisz jako
+670|Cofnij / Ponów
+671|Znajdź, następne / poprzednie trafienie
+672|Obróć w prawo / w lewo
+673|Usuń zaznaczone strony
+674|Zaznacz wszystkie strony
+675|Powiększ / pomniejsz / 100% / do szerokości / cała strona
+676|Poprzednia / następna strona
+677|Drukuj / podgląd wydruku
+678|Tryb ciemny
+679|Ten przewodnik
+680|Letter (8,5 × 11 cali)
+681|Legal (8,5 × 14 cali)
+682|{0} wiersz‖{0} wiersze‖{0} wierszy
+683|na {0} stronie‖na {0} stronach‖na {0} stronach

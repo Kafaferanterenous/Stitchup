@@ -1222,3 +1222,12 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
 - Thumbnail right-click: Delete Page / Extract Page… / Rotate / Add Blank Page After — acts on the
   right-clicked page, or on the whole selection when it is part of it.
 - TESTS: e2e 87/87.
+- Repo renamed stitchup-MacOS -> Stitchup on 2026-11-17 (user OK); old URLs redirect.
+
+2026-11-18 — v0.14.5: UNDERLINE, POLISH PLURALS, REMAINING ENGLISH
+- objects::underline_text: one line under each selected text object (own colour, 0.06 × size
+  thick, just below the baseline), one undo step. Pages ▸ Underline (⌘U), edit bar "U".
+- i18n: trn(n, one, other, …) picks plural forms with Intl.PluralRules; translations list forms
+  separated by "‖" (pl one‖few‖many, de/fr/it one‖other, zh one). Collector picks up trn keys.
+- ~30 visible strings wrapped (QuickSign checks, font picker, shortcut table, thumbnail tooltips,
+  palette "No fill"…); help text key mismatch from v0.14.4 fixed.

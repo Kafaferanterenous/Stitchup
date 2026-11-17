@@ -6,7 +6,7 @@ import { extractTo } from "../../actions";
 import { PageOverlay } from "./PageOverlay";
 import { EditBar, runBox } from "./EditBar";
 
-import { tr } from "../../i18n";
+import { tr, trn } from "../../i18n";
 
 /** Places that may take focus without closing the line editor. */
 const EDIT_CHROME = ".inline-editor, .edit-bar, .ribbon, .rb-choices, .modal, .modal-backdrop";
@@ -125,7 +125,7 @@ function TextLayer({
               transform: `scaleX(${sx})`,
               visibility: editingIndex === i ? "hidden" : undefined,
             }}
-            title={editable ? "Click to edit" : canEditRun ? "Double-click to edit · right-click for more" : undefined}
+            title={editable ? tr("Click to edit") : canEditRun ? tr("Double-click to edit · right-click for more") : undefined}
             onClick={editable ? (e) => startAt(i, e) : undefined}
             onDoubleClick={canEditRun ? (e) => startAt(i, e) : undefined}
             onContextMenu={
@@ -325,7 +325,7 @@ async function copyText(text: string) {
     document.execCommand("copy");
     ta.remove();
   }
-  store.notify(tr("Copied {0} character{1}", text.length, text.length === 1 ? "" : "s"));
+  store.notify(trn(text.length, "Copied {0} character", "Copied {0} characters"));
 }
 
 // ------------------------------------------------------------------ a page

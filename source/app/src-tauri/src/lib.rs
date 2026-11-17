@@ -56,6 +56,7 @@ pub fn run() {
             commands::list_objects,
             commands::object_op,
             commands::insert_shape,
+            commands::underline_text,
             commands::sign_document,
             commands::open_url,
             commands::list_fields,

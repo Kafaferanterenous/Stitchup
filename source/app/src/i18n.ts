@@ -66,6 +66,37 @@ export function tr(en: string, ...args: unknown[]): string {
   return current === "pl" ? polishTypography(filled) : filled;
 }
 
+/** Plural forms of a translation, in this order, separated by "‖". */
+const PLURAL_ORDER: Record<Lang, Intl.LDMLPluralRule[]> = {
+  en: ["one", "other"],
+  pl: ["one", "few", "many"], // 1 strona · 2–4, 22–24 strony · 5–21, 25… stron
+  de: ["one", "other"],
+  fr: ["one", "other"],
+  it: ["one", "other"],
+  zh: ["other"],
+};
+
+/**
+ * Translate a message with a count: `n` fills {0}, `rest` fills {1}, {2}…
+ * The key is the English plural (`other`); a translation lists its forms
+ * separated by "‖" in PLURAL_ORDER (Polish: one‖few‖many), chosen with the
+ * language's own plural rules.
+ */
+export function trn(n: number, one: string, other: string, ...rest: unknown[]): string {
+  const order = PLURAL_ORDER[current];
+  const cat = new Intl.PluralRules(current === "zh" ? "zh-Hans" : current).select(n);
+  const pick = (forms: string[]) => forms[Math.min(forms.length - 1, Math.max(0, order.indexOf(cat) === -1 ? order.length - 1 : order.indexOf(cat)))];
+  let t: string;
+  if (current === "en") t = n === 1 ? one : other;
+  else {
+    const v = TABLES[current][other];
+    t = v === undefined ? (n === 1 ? one : other) : pick(v.split("‖"));
+  }
+  const args = [n, ...rest];
+  const filled = t.replace(/\{(\d+)\}/g, (m, i) => (args[Number(i)] !== undefined ? String(args[Number(i)]) : m));
+  return current === "pl" ? polishTypography(filled) : filled;
+}
+
 /** Polish typesetting: a one-letter word (a, i, o, u, w, z) never ends a
  *  line — it is bound to the next word with a non-breaking space. */
 export function polishTypography(s: string): string {
