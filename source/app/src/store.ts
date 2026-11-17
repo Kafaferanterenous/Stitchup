@@ -149,6 +149,8 @@ export interface AppState {
   lang: string;
   /** Recently opened files, newest first (File ▸ Open Recent). */
   recent: string[];
+  /** A file being opened (for the "it's loading" message on slow files). */
+  loading: { name: string; since: number } | null;
   strokeWidth: number;
   /** Select tool: picked content objects ("t12"/"i30") and annotations (obj #). */
   picked: { page: number; objects: string[]; annots: number[] } | null;
@@ -292,6 +294,7 @@ let state: AppState = {
   platform: { os: "macos", ocr: true },
   lang: language(),
   recent: loadRecent(),
+  loading: null,
   strokeWidth: 2,
   picked: null,
   pendingInput: null,
@@ -457,7 +460,8 @@ export const store = {
       return;
     }
     await this.freshTab();
-    set({ busy: true, lastError: null });
+    const fileName = path.split(/[\\/]/).pop() ?? path;
+    set({ busy: true, lastError: null, loading: { name: fileName, since: Date.now() }, statusMessage: tr("Opening {0}", fileName) });
     try {
       const doc = await openDocumentAdapter.open(path);
       set({
@@ -486,7 +490,7 @@ export const store = {
     } catch (e) {
       set({ lastError: e as Error, statusMessage: tr("Open failed") });
     } finally {
-      set({ busy: false });
+      set({ busy: false, loading: null });
     }
   },
 

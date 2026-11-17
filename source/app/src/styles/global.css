@@ -1812,3 +1812,30 @@ kbd {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* "keep your pants on" while a large PDF opens */
+.loading-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 22px 28px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card);
+  box-shadow: 0 6px 22px var(--shadow);
+  animation: bubble-in 0.25s ease-out;
+}
+.loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

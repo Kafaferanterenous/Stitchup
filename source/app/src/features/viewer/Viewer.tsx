@@ -635,6 +635,30 @@ function PageView({ session, pageNo }: { session: RenderSession; pageNo: number 
   );
 }
 
+// ------------------------------------------------------------- loading card
+
+/** Shown while a (large) PDF opens: after a short delay, so quick opens don't flash. */
+export function LoadingCard({ name, since }: { name: string; since?: number }) {
+  const [start] = useState(() => since ?? Date.now());
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(t);
+  }, []);
+  const elapsed = now - start;
+  if (elapsed < 400) return <div className="empty-viewer" aria-busy="true" />;
+  return (
+    <div className="empty-viewer" aria-busy="true">
+      <div className="loading-card" role="status">
+        <span className="loading-spinner" aria-hidden="true" />
+        <b>{tr("Keep your pants on, mate — it's loadin'…")}</b>
+        <span className="muted">{name}</span>
+        {elapsed >= 2000 && <span className="muted">{tr("{0} s", Math.floor(elapsed / 1000))}</span>}
+      </div>
+    </div>
+  );
+}
+
 // ------------------------------------------------------------------ viewer
 
 const TOOL_HINT: Record<string, string> = {
@@ -663,6 +687,9 @@ const TOOL_HINT: Record<string, string> = {
 export function Viewer() {
   const app = useAppState();
   const [err, setErr] = useState<string | null>(null);
+  // When the current open started (one timer for reading + preparing pages).
+  const openedAt = useRef<number | undefined>(undefined);
+  if (app.loading) openedAt.current = app.loading.since;
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const programmaticUntil = useRef(0);
 
@@ -779,6 +806,7 @@ export function Viewer() {
   }
 
   const session = app.session;
+  if (!app.doc && app.loading) return <LoadingCard name={app.loading.name} since={app.loading.since} />;
   if (!app.doc)
     return (
       <div className="empty-viewer">
@@ -799,7 +827,7 @@ export function Viewer() {
     );
   if (app.doc.passwordRequired) return <div className="empty-viewer">{tr("🔒 Password required to view this document")}</div>;
   if (err) return <div className="viewer-error">{tr("Renderer failed:")} {err}</div>;
-  if (!session) return <div className="empty-viewer">{tr("Parsing document…")}</div>;
+  if (!session) return <LoadingCard name={app.doc.path.split(/[\\/]/).pop() ?? ""} since={openedAt.current} />;
 
   const pageCount = app.doc.pages.length;
   let body: ReactNode;

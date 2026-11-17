@@ -1174,3 +1174,12 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
   is copyrighted, so it is NOT included or downloaded.
 - e2e: checks after the crash-recovery check have no backend — new checks go before it.
 - TESTS: core 64, command layer 9, e2e 82/82.
+
+2026-11-17 — v0.14.1: "KEEP YOUR PANTS ON, MATE — IT'S LOADIN'…"
+- User request: something visible after Open on large, slow PDFs. store.loading {name, since} during
+  the backend open; Viewer shows a LoadingCard (after 400 ms; spinner, file name, seconds from 2 s)
+  while reading and while pdf.js prepares the pages; status bar "Opening …". Translated (Polish:
+  "Trzymaj portki, Waćpan – ładuje się…").
+- dev_bridge test switch test_set_open_delay; e2e check with a 2.6 s open.
+- User: Linux testing going well so far.
+- TESTS: core 64, command layer 9, e2e 83/83.

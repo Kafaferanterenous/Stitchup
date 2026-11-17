@@ -620,3 +620,5 @@
 619|En haut, à gauche
 620|En haut, à droite
 621|Mise à jour disponible
+622|Garde ton pantalon, mon pote — ça charge…
+623|{0} s

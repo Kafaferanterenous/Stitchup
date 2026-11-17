@@ -621,3 +621,5 @@
 619|Góra, lewo
 620|Góra, prawo
 621|Dostępna aktualizacja
+622|Trzymaj portki, Waćpan – ładuje się…
+623|{0} s

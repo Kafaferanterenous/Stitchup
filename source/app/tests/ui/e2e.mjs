@@ -1954,6 +1954,29 @@ await check("About in Polish: the icon shows the Kabaret Dudek line; a chosen so
   await page.locator(".modal .modal-actions button").first().click();
 });
 
+await check("opening a slow (large) PDF shows “Keep your pants on, mate — it's loadin'…”", async () => {
+  const f = path.join(WORK, "slow.pdf");
+  await makePdf(f, [LETTER, LETTER]);
+  await ipc("test_set_open_delay", { ms: 2600 });
+  try {
+    await pick(f);
+    await tab("Document");
+    await rb("open").click();
+    const card = page.locator(".loading-card");
+    await card.waitFor({ timeout: 3000 });
+    assert((await card.innerText()).includes("slow.pdf"), "file name shown");
+    await page.locator(".loading-card", { hasText: /\d+ s/ }).waitFor({ timeout: 3000 });
+    await page.screenshot({ path: path.join(OUT, "loading.png") });
+    await waitStatus(/slow\.pdf/, 10000);
+    await page.locator(".loading-card").waitFor({ state: "detached" });
+  } finally {
+    await ipc("test_set_open_delay", { ms: 0 });
+  }
+  await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
+  await waitStatus(/main\.pdf/);
+  openPath = MAIN;
+});
+
 // ---- Settings, quit warning, crash recovery (last: it restarts the backend)
 await check("Settings (⌘,): recovery interval, opening zoom and colour scheme are saved", async () => {
   await page.locator(".viewer-scroll").click({ position: { x: 5, y: 5 } });

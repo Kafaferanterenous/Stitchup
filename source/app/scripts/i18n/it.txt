@@ -620,3 +620,5 @@
 619|In alto a sinistra
 620|In alto a destra
 621|Aggiornamento disponibile
+622|Tieniti i pantaloni, amico — sta caricando…
+623|{0} s

@@ -620,3 +620,5 @@
 619|Oben links
 620|Oben rechts
 621|Update verfügbar
+622|Behalt die Hose an, Kumpel — lädt noch…
+623|{0} s

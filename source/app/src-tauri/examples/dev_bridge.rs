@@ -21,6 +21,9 @@ fn arg<T: serde::de::DeserializeOwned>(v: &Value, k: &str) -> Result<T, String> 
     serde_json::from_value(v.get(k).cloned().unwrap_or(Value::Null)).map_err(|e| format!("arg {k}: {e}"))
 }
 
+/// Test-only: delay for open_document (milliseconds).
+static OPEN_DELAY_MS: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
 fn dispatch(st: &Mutex<SessionState>, cmd: &str, a: &Value) -> Result<Value, Value> {
     let e = |e: stitchup_core::EngineError| serde_json::to_value(e).unwrap();
     let bad = |m: String| json!({"code": "validation_failed", "message": m});
@@ -31,7 +34,18 @@ fn dispatch(st: &Mutex<SessionState>, cmd: &str, a: &Value) -> Result<Value, Val
         };
     }
     match cmd {
-        "open_document" => go!(open_document_inner(st, arg(a, "path").map_err(bad)?)),
+        "open_document" => {
+            // Tests can make opening slow, to see the "it's loading" card.
+            let ms = OPEN_DELAY_MS.load(std::sync::atomic::Ordering::Relaxed);
+            if ms > 0 {
+                std::thread::sleep(std::time::Duration::from_millis(ms));
+            }
+            go!(open_document_inner(st, arg(a, "path").map_err(bad)?))
+        }
+        "test_set_open_delay" => {
+            OPEN_DELAY_MS.store(arg(a, "ms").map_err(bad)?, std::sync::atomic::Ordering::Relaxed);
+            Ok(Value::Null)
+        }
         "page_op" => go!(page_op_inner(st, arg(a, "kind").map_err(bad)?, arg(a, "data").map_err(bad)?)),
         "merge_document" => go!(merge_document_inner(st, arg(a, "path").map_err(bad)?)),
         "cmd_set_metadata" => go!(cmd_set_metadata_inner(st, arg(a, "meta").map_err(bad)?)),
