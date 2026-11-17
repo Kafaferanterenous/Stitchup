@@ -1158,3 +1158,19 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
   Backend (Rust) messages are still English.
 - Risk notice: first start (once, localStorage), About, README, release notes.
 - TESTS: core 63, command layer 9, e2e 79/79 (language switch, screenshots of de / zh).
+
+2026-11-17 — v0.14.0: HEADER & FOOTER, RECENT FILES, UPDATE CHECK, POLISH POLISH, ABOUT EASTER EGG
+- docops::header_footer: per page display_space (rotation-aware), replacement_text per item
+  (fonts / scripts as text editing), tokens {page} {pages} {bates} (+ {date} {file} in the UI),
+  six positions, margin, size, start, Bates prefix/digits, page list. Pages ▸ Header/Footer dialog
+  with presets.
+- Recent files (localStorage, 10): File ▸ Open Recent (native submenu rebuilt on change), start
+  screen list. Tab strip: tabs shrink (flex) and the active tab scrolls into view.
+- Help ▸ Check for Updates: curl / wget to the GitHub releases API on request; ask → open page.
+- Polish: tr() binds one-letter words to the next with NBSP; translations use półpauza; About,
+  risk notice, recovery and guide reworded in an older literary style ("Waszmość", "jeno", "przeto").
+- About easter egg (Polish): app icon → „Nie bądź pan rura i nie pękaj pan!” — Kabaret Dudek, and
+  the user's own sound file if chosen (copied to the app data folder, ≤5 MB). The original recording
+  is copyrighted, so it is NOT included or downloaded.
+- e2e: checks after the crash-recovery check have no backend — new checks go before it.
+- TESTS: core 64, command layer 9, e2e 82/82.

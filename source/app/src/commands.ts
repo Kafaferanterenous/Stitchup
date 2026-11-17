@@ -4,11 +4,11 @@
 
 import { getState, store, isUntitled, docName, type AppState, type RibbonTabName, type Tool } from "./store";
 import { extractTo, pickAndOpen, saveAs } from "./actions";
-import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
+import { ask, open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import { toggleDark } from "./themes/theme";
 import type { IconName } from "./features/ribbon/icons";
 import * as exp from "./export";
-import { cmdReadImage, cmdWriteFile } from "./ipc";
+import { cmdCheckUpdate, cmdOpenUrl, cmdReadImage, cmdWriteFile } from "./ipc";
 
 import { language, tr } from "./i18n";
 
@@ -113,6 +113,30 @@ async function exportBytes(ext: string, label: string, make: () => Promise<Uint8
 
 const lines = () => exp.pageLines(getState().session!);
 
+async function checkForUpdates() {
+  store.notify(tr("Checking GitHub for a newer version…"));
+  try {
+    const u = await cmdCheckUpdate();
+    if (!u.newer) {
+      store.notify(tr("Stitchup {0} is the newest version", u.current));
+      return;
+    }
+    let open = false;
+    try {
+      open = await ask(tr("Stitchup {0} is available (you have {1}). Open the download page?", u.latest, u.current), {
+        title: tr("Update available"),
+        okLabel: tr("Open Download Page"),
+        cancelLabel: tr("Later"),
+      });
+    } catch {
+      open = window.confirm(tr("Stitchup {0} is available (you have {1}). Open the download page?", u.latest, u.current));
+    }
+    if (open) await cmdOpenUrl(u.url);
+  } catch (e) {
+    store.notify(tr("Could not check for updates: {0}", (e as { message?: string }).message ?? String(e)));
+  }
+}
+
 function compress() {
   store.setDialog("compress");
 }
@@ -212,6 +236,7 @@ export const COMMANDS: Command[] = [
   { id: "extract", label: "Extract", menu: "Extract Selected Page(s)…", tip: "Save the selected page(s) as their own PDF file", icon: "extract", tab: "Pages", enabled: hasDoc, run: () => (getState().selection.length ? extractTo(store.targets()) : store.setDialog("extract")) },
   { id: "split", label: "Split", menu: "Split Document…", tip: "Split the document into several files", icon: "split", tab: "Pages", enabled: (s) => hasDoc(s) && (s.doc?.pages.length ?? 0) > 1, run: () => store.setDialog("split") },
   { id: "autoCrop", label: "Auto-Crop", menu: "Auto-Crop Selected Page(s)", tip: "Trim the white margin around the selected page(s)", icon: "crop", tab: "Pages", enabled: hasDoc, run: autoCrop },
+  { id: "headerFooter", label: "Header/Footer", menu: "Header & Footer…", tip: "Add page numbers, “Page X of Y”, Bates numbers or any text at the top or bottom of the pages", icon: "text", tab: "Pages", enabled: hasDoc, run: () => store.setDialog("headerFooter") },
   { id: "selectAll", label: "Select All", menu: "Select All Pages", tip: "Select every page (⌘A)", icon: "thumbnails", accel: "CmdOrCtrl+A", enabled: hasDoc, run: () => store.selectAllPages(), textFallback: "selectAll" },
 
   // ---------------------------------------------------------------- Annotate
@@ -288,6 +313,7 @@ export const COMMANDS: Command[] = [
   { id: "copy", label: "Copy", tip: "Copy the selected text (⌘C)", icon: "copy", enabled: (s) => s.selectionText.length > 0, run: () => store.copySelection() },
   { id: "darkMode", label: "Dark Mode", tip: "Flip between Light Grey and Dark Blue (⌘D)", icon: "palette", accel: "CmdOrCtrl+D", run: () => toggleDark() },
   { id: "guide", label: "User Guide", tip: "How to use Stitchup (F1)", icon: "info", accel: "F1", run: () => store.setDialog("help") },
+  { id: "checkUpdate", label: "Check for Updates", menu: "Check for Updates…", tip: "Ask GitHub whether a newer Stitchup is available (nothing is downloaded or installed)", icon: "info", run: checkForUpdates },
   { id: "about", label: "About", menu: "About Stitchup", tip: "Version and open-source licenses", icon: "info", run: () => store.setDialog("about") },
 ];
 
@@ -349,11 +375,11 @@ export const MENUS: { title: string; items: (string | "-" | { submenu: string })
   // macOS conventions + Nitro's grouping: About / Settings / Quit live in the
   // app menu, Export is a File submenu, tab switching is in Window, every
   // page command is in Pages and every protection tool in Security.
-  { title: "File", items: ["new", "open", "-", "newTab", "closeTab", "-", "save", "saveAs", { submenu: "export" }, "-", "combineNew", "compress", "properties", "-", "print"] },
+  { title: "File", items: ["new", "open", { submenu: "recent" }, "-", "newTab", "closeTab", "-", "save", "saveAs", { submenu: "export" }, "-", "combineNew", "compress", "properties", "-", "print"] },
   { title: "Edit", items: ["undo", "redo", "-", { submenu: "clipboard" }, "-", "find", "findNext", "findPrev", "-", "select", "editText", "objDelete", "fore", "font", "image", "ocr"] },
-  { title: "Pages", items: ["import", "addPage", "delete", "-", "rotateCw", "rotateCcw", "rotateAll", "-", "extract", "split", "autoCrop", "-", "selectAll"] },
+  { title: "Pages", items: ["import", "addPage", "delete", "-", "rotateCw", "rotateCcw", "rotateAll", "-", "extract", "split", "autoCrop", "headerFooter", "-", "selectAll"] },
   { title: "Annotate", items: ["annHighlight", "annUnderline", "annStrike", "annNote", "annText", "annShape", "annStamp", "annLink", "annPen", "-", "annFore", "back"] },
   { title: "Security", items: ["encrypt", "sign", "quickSign", "annRedact", "watermark"] },
   { title: "View", items: ["zoomIn", "zoomOut", "zoom100", "fitWidth", "fitPage", "-", "prev", "next", "-", "spread", "single", "continuous", "sidebar", "-", { submenu: "ribbonTabs" }, { submenu: "schemes" }] },
-  { title: "Help", items: ["guide"] },
+  { title: "Help", items: ["guide", "checkUpdate"] },
 ];

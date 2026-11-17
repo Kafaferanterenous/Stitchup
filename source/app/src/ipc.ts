@@ -219,3 +219,31 @@ export interface PlatformInfo {
   ocr: boolean;
 }
 export const cmdPlatformInfo = () => cmd<PlatformInfo>("platform_info");
+
+// ---- header & footer
+export interface HeaderFooterSpec {
+  items: { position: "tl" | "tc" | "tr" | "bl" | "bc" | "br"; text: string }[];
+  size: number;
+  margin: number;
+  color: number[];
+  family: string;
+  start: number;
+  bates_prefix: string;
+  bates_digits: number;
+  pages: number[];
+}
+export const cmdHeaderFooter = (spec: HeaderFooterSpec) => cmd<PageMeta[]>("header_footer", { spec });
+
+// ---- updates
+export interface UpdateInfo {
+  current: string;
+  latest: string;
+  newer: boolean;
+  url: string;
+}
+export const cmdCheckUpdate = () => cmd<UpdateInfo>("check_update");
+
+// ---- About easter egg (the user's own sound file)
+export const cmdAboutSoundSet = (path: string) => cmd<void>("about_sound_set", { path });
+export const cmdAboutSoundGet = () => cmd<{ b64: string; mime: string } | null>("about_sound_get");
+export const cmdAboutSoundClear = () => cmd<void>("about_sound_clear");

@@ -1879,6 +1879,81 @@ if (existsSync(REAL)) {
 }
 
 
+await check("Pages ▸ Header & Footer: page numbers and Bates numbers on every page", async () => {
+  const f = path.join(WORK, "numbered.pdf");
+  await makePdf(f, [LETTER, LETTER, A5]);
+  await openViaRibbon(f);
+  await tab("Pages");
+  await rb("headerFooter").click();
+  await btn("Page X of Y").click();
+  assert((await page.getByLabel("Bottom centre").inputValue()) === "Page {page} of {pages}", "preset filled in");
+  await page.getByLabel("Bottom right").fill("{bates}");
+  await page.getByLabel("Bates prefix").fill("ACME-");
+  await page.getByLabel("Bates digits").fill("5");
+  await page.getByLabel("Top left").fill("{file}");
+  await btn("Apply").click();
+  await waitStatus(/Header \/ footer added to 3 page/);
+  const out = path.join(WORK, "numbered-out.pdf");
+  await pick(out);
+  await tab("Document");
+  await rb("saveAs").click();
+  await waitStatus(/numbered-out\.pdf/);
+  const text = (await pdfText(out)).join(" | ");
+  for (const want of ["Page 1 of 3", "Page 3 of 3", "ACME-00001", "ACME-00003", "numbered"]) assert(text.includes(want), `${want} in ${text}`);
+  // Undo removes it again.
+  await page.locator(".viewer-scroll").click({ position: { x: 5, y: 5 } });
+  await page.keyboard.press("Meta+z");
+  await waitStatus(/Undid/);
+});
+
+await check("Recent files: listed on the start screen and in File ▸ Open Recent; reopening works", async () => {
+  const recent = await page.evaluate(() => window.__stitchup.state().recent);
+  assert(recent[0].endsWith("numbered.pdf") && recent.length >= 3, JSON.stringify(recent.slice(0, 3)));
+  // A new empty tab shows the start screen with the list.
+  await page.keyboard.press("Meta+t");
+  await page.locator(".recent-list").waitFor();
+  await page.locator(".recent-item", { hasText: "real.pdf" }).first().click();
+  await waitStatus(/real\.pdf/);
+  await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
+  await waitStatus(/main\.pdf/);
+  openPath = MAIN;
+});
+
+await check("About in Polish: the icon shows the Kabaret Dudek line; a chosen sound is kept on this computer", async () => {
+  // A tiny WAV stands in for the user's own recording.
+  const sr = 8000, n = 1600;
+  const wav = Buffer.alloc(44 + n * 2);
+  wav.write("RIFF", 0); wav.writeUInt32LE(36 + n * 2, 4); wav.write("WAVEfmt ", 8); wav.writeUInt32LE(16, 16);
+  wav.writeUInt16LE(1, 20); wav.writeUInt16LE(1, 22); wav.writeUInt32LE(sr, 24); wav.writeUInt32LE(sr * 2, 28);
+  wav.writeUInt16LE(2, 32); wav.writeUInt16LE(16, 34); wav.write("data", 36); wav.writeUInt32LE(n * 2, 40);
+  for (let i = 0; i < n; i++) wav.writeInt16LE(Math.round(Math.sin(i / 4) * 8000), 44 + i * 2);
+  const snd = path.join(WORK, "rura.wav");
+  await writeFile(snd, wav);
+  await page.evaluate(() => localStorage.setItem("stitchup.language", "pl"));
+  await page.evaluate(() => window.__stitchup.store.setDialog(null));
+  await page.keyboard.press("Meta+,");
+  await page.getByLabel("Language").selectOption("pl");
+  await page.locator(".modal .modal-actions button").first().click();
+  await page.evaluate(() => window.__stitchup.store.setDialog("about"));
+  await page.locator(".about-icon").click();
+  await page.locator(".about-bubble", { hasText: "Nie bądź pan rura" }).waitFor();
+  await pick(snd);
+  await page.getByRole("button", { name: "Wybierz dźwięk…" }).click();
+  await page.getByRole("button", { name: "Usuń dźwięk" }).waitFor();
+  const got = await ipc("about_sound_get");
+  assert(got && got.mime === "audio/wav" && got.b64.length > 100, "sound kept");
+  // Typography: one-letter words bound to the next word.
+  const t = await page.locator(".about-bubble").innerText();
+  assert(t.includes("i nie"), "non-breaking space after “i”");
+  await page.getByRole("button", { name: "Usuń dźwięk" }).click();
+  assert((await ipc("about_sound_get")) === null, "sound removed");
+  await page.keyboard.press("Escape");
+  await page.evaluate(() => window.__stitchup.store.setDialog(null));
+  await page.keyboard.press("Meta+,");
+  await page.getByLabel("Language").selectOption("en");
+  await page.locator(".modal .modal-actions button").first().click();
+});
+
 // ---- Settings, quit warning, crash recovery (last: it restarts the backend)
 await check("Settings (⌘,): recovery interval, opening zoom and colour scheme are saved", async () => {
   await page.locator(".viewer-scroll").click({ position: { x: 5, y: 5 } });
@@ -1886,7 +1961,7 @@ await check("Settings (⌘,): recovery interval, opening zoom and colour scheme 
   await page.getByLabel("Crash-recovery snapshots").selectOption("30");
   await page.getByLabel("Opening zoom").selectOption("fit-page");
   await page.getByLabel("Colour scheme").selectOption("pastel");
-  await btn("Save").click();
+  await page.locator(".modal").getByRole("button", { name: "Save", exact: true }).click();
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("stitchup.settings")));
   assert(saved.recoverySeconds === 30 && saved.openZoom === "fit-page", JSON.stringify(saved));
   assert((await page.evaluate(() => document.documentElement.dataset.theme)) === "pastel", "scheme applied");

@@ -784,6 +784,17 @@ export function Viewer() {
       <div className="empty-viewer">
         <b>{tr("No document open")}</b>
         <span>{tr("Use File – Open (⌘O) to open a PDF, or drop one here")}</span>
+        {app.recent.length > 0 && (
+          <div className="recent-list" aria-label="Recent files">
+            <span className="muted">{tr("Recent files")}</span>
+            {app.recent.slice(0, 8).map((p) => (
+              <button key={p} className="recent-item" title={p} onClick={() => void store.open(p)}>
+                {p.split(/[\\/]/).pop()}
+                <span className="muted"> — {p.split(/[\\/]/).slice(-2, -1)[0] ?? ""}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     );
   if (app.doc.passwordRequired) return <div className="empty-viewer">{tr("🔒 Password required to view this document")}</div>;

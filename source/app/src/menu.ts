@@ -42,6 +42,15 @@ export async function installMenu(): Promise<void> {
     );
 
     const submenus: Record<string, () => Promise<Item[]>> = {
+      recent: async () => {
+        const list = getState().recent;
+        const its: Item[] = await Promise.all(
+          list.map((p, i) => MenuItem.new({ id: `recent:${i}`, text: p.split(/[\\/]/).pop() ?? p, action: () => void store.open(p) })),
+        );
+        if (list.length) its.push(await sep(), await MenuItem.new({ id: "recent:clear", text: tr("Clear Menu"), action: () => store.clearRecent() }));
+        else its.push(await MenuItem.new({ id: "recent:none", text: tr("No recent files"), enabled: false }));
+        return [await Submenu.new({ text: tr("Open Recent"), items: its })];
+      },
       clipboard: async () => [
         await PredefinedMenuItem.new({ item: "Cut" }),
         await PredefinedMenuItem.new({ item: "Copy" }),

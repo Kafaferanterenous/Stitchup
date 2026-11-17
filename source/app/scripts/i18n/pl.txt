@@ -20,7 +20,7 @@
 19|Wszystkie strony w jednej przewijanej kolumnie
 20|Adnotacje
 21|Kolor adnotacji…
-22|Kolor adnotacji {0} — dla następnego wyróżnienia, podkreślenia, przekreślenia, pióra, kształtu lub pola tekstowego (zaznacz adnotacje, aby zmienić ich kolor)
+22|Kolor adnotacji {0} – dla następnego wyróżnienia, podkreślenia, przekreślenia, pióra, kształtu lub pola tekstowego (zaznacz adnotacje, aby zmienić ich kolor)
 23|Przywrócono domyślne kolory adnotacji
 24|Zastosuj
 25|Zatwierdzono
@@ -116,7 +116,7 @@
 115|Dokument
 116|Właściwości dokumentu…
 117|Właściwości dokumentu
-118|Kliknij dwukrotnie dowolny wiersz (lub Zawartość ▸ Edytuj tekst, a potem kliknij go). Jest edytowany na miejscu, w czcionce dokumentu, jeśli ma ona potrzebne litery. Pasek nad wierszem pokazuje jego czcionkę i rozmiar: zmień tam czcionkę, pogrubienie / kursywę, rozmiar lub kolor, albo użyj Zawartość ▸ Kolor i Czcionka. Enter lub kliknięcie obok zapisuje; Tab przechodzi do następnego wiersza; Esc anuluje; wyczyszczenie tekstu usuwa wiersz.
+118|Kliknij dwukrotnie dowolny wiersz (albo Zawartość ▸ Edytuj tekst, a potem go kliknij). Edytuje się go na miejscu, czcionką samego dokumentu, o ile ta ma potrzebne litery. Pasek nad wierszem ukazuje jego czcionkę i rozmiar: tamże zmienisz czcionkę, pogrubienie / kursywę, rozmiar lub barwę, albo uczynisz to przez Zawartość ▸ Kolor i Czcionka. Enter lub kliknięcie obok zapisuje; Tab wiedzie do następnego wiersza; Esc odwołuje; wyczyszczenie tekstu usuwa wiersz.
 119|Szkic
 120|Przeciągnij ramkę, a potem wpisz tekst
 121|Przeciągnij po tekście
@@ -143,7 +143,7 @@
 142|Co 30 sekund
 143|Co 5 minut
 144|Co minutę
-145|Każda strona ma już tekst — wybierz „Ta strona” lub „Wszystkie strony”, aby mimo to rozpoznać
+145|Każda strona ma już tekst – wybierz „Ta strona” lub „Wszystkie strony”, aby mimo to rozpoznać
 146|Zakończ
 147|Eksportuj
 148|Eksport CSV
@@ -162,8 +162,8 @@
 161|Wypełnienie
 162|Kolor wypełnienia…
 163|Kolor wypełnienia nowych prostokątów i owali (lub bez wypełnienia)
-164|Kolor wypełnienia {0} — dla następnego rysowanego kształtu
-165|Bez wypełnienia — nowe kształty to same obrysy
+164|Kolor wypełnienia {0} – dla następnego rysowanego kształtu
+165|Bez wypełnienia – nowe kształty to same obrysy
 166|Wypełniono „{0}”
 167|Ostateczne
 168|Znajdź
@@ -206,13 +206,13 @@
 205|Wstawiono obraz {0} na stronie {1}
 206|Wstawiono {0} na stronie {1}
 207|Zainstalowane czcionki są osadzane (tylko użyte litery), więc PDF wygląda tak samo na każdym komputerze.
-208|Zainstalowane na tym komputerze — osadzane
+208|Zainstalowane na tym komputerze – osadzane
 209|Kursywa
 210|JPEG
 211|KB
 212|Zachowaj
 213|Zachowaj ten podpis w Stitchup na następny raz
-214|Zachowany bez hasła — każdy, kto używa tego konta, może go umieścić.
+214|Zachowany bez hasła – każdy, kto używa tego konta, może go umieścić.
 215|Klawiatura
 216|Poziomo
 217|Język
@@ -225,7 +225,7 @@
 224|Łącze…
 225|Wczytywanie zainstalowanych czcionek…
 226|Miejsce (opcjonalnie)
-227|Bezstratnie — obrazy bez zmian
+227|Bezstratnie – obrazy bez zmian
 228|Spraw, by zeskanowane strony dało się przeszukiwać: rozpoznaj ich tekst na tym komputerze (Apple Vision w macOS) i dodaj go jako niewidoczną warstwę
 229|Ustaw białe tło jako przezroczyste
 230|Zarządzaj podpisami…
@@ -243,7 +243,7 @@
 242|Następna karta
 243|Następne wystąpienie (F3 / ⌘G)
 244|Następna karta (⌃Tab)
-245|Brak zakładek — kliknij ⭐ na miniaturze, aby dodać zakładkę do strony.
+245|Brak zakładek – kliknij ⭐ na miniaturze, aby dodać zakładkę do strony.
 246|Brak dokumentu
 247|Brak otwartego dokumentu
 248|Żadna czcionka nie pasuje do „
@@ -275,7 +275,7 @@
 274|Otwórz…
 275|Orientacja
 276|Owal: przeciągnij na stronie
-277|Hasło właściciela (opcjonalne — do zmiany uprawnień)
+277|Hasło właściciela (opcjonalne – do zmiany uprawnień)
 278|PNG
 279|Strona
 280|Zakres stron (np. 1-3, 5)
@@ -316,7 +316,7 @@
 315|Poprzednia karta (⌃⇧Tab)
 316|Drukuj
 317|Drukuj dokument, wszystkie strony lub zakres stron (⌘P)
-318|Druk — obrazy 300 dpi
+318|Druk – obrazy 300 dpi
 319|Drukuj…
 320|Producent
 321|Właściwości
@@ -331,7 +331,7 @@
 330|Wczytywanie…
 331|Powód
 332|Otrzymano
-333|Rozpoznano wiersze: {0} na stronach: {2} — można je teraz przeszukiwać
+333|Rozpoznano wiersze: {0} na stronach: {2} – można je teraz przeszukiwać
 334|Rozpoznawanie tekstu: strona {0} z {1}…
 335|Rozpoznaj tekst (OCR)
 336|Zmień kolor zaznaczonego tekstu, kształtów lub adnotacji albo edytowanego wiersza
@@ -389,7 +389,7 @@
 388|Zapisz…
 389|Dopasuj stronę do szerokości okna (⌘2)
 390|Pokaż całą stronę (⌘0)
-391|Ekran — obrazy 150 dpi (zalecane)
+391|Ekran – obrazy 150 dpi (zalecane)
 392|Szukaj w tekście dokumentu (⌘F)
 393|Zabezpieczenia
 394|Zabezpieczenia ▸ QuickSign ▸ Utwórz nowy podpis: wybierz plik JPG, GIF lub PNG z podpisem. Stitchup przycina go i ustawia białe tło jako przezroczyste. Możesz zachować go na następny raz, opcjonalnie zabezpieczony hasłem (przechowywany w postaci zaszyfrowanej; hasło jest wymagane przy każdym użyciu). Potem kliknij na stronie, gdzie ma się znaleźć, lub przeciągnij, aby ustawić szerokość. Zapisane podpisy są na liście pod QuickSign; „Zarządzaj podpisami” pozwala je usuwać.
@@ -427,7 +427,7 @@
 426|Pojedyncza strona
 427|Rozmiar
 428|Rozmiar (pt, puste = bez zmian)
-429|Najmniejszy — obrazy 96 dpi
+429|Najmniejszy – obrazy 96 dpi
 430|Sprzedano
 431|Podziel
 432|Podziel dokument…
@@ -438,13 +438,13 @@
 437|Dodaj tekstowy znak wodny na każdej stronie
 438|Pieczątka „{0}”: kliknij lub przeciągnij na stronie
 439|Pieczątka: kliknij lub przeciągnij, gdzie ma się znaleźć
-440|Standardowe — nieosadzane, najmniejszy plik
+440|Standardowe – nieosadzane, najmniejszy plik
 441|Notatka
 442|Notatka: kliknij, gdzie ma się znaleźć
 443|Stitchup
 444|Stitchup – edytor PDF
-445|Stitchup nie zamknął się poprawnie ostatnim razem. Te dokumenty miały niezapisane zmiany:
-446|Stitchup — instrukcja
+445|Ostatnim razem Stitchup nie pożegnał się, jak należy. Oto dokumenty, w których zmian nie zachowano:
+446|Stitchup – instrukcja obsługi
 447|Przekreśl
 448|Przekreślenie
 449|Przekreślenie: przeciągnij po tekście
@@ -453,13 +453,13 @@
 452|Kolor tekstu…
 453|Pole tekstowe: przeciągnij ramkę (lub kliknij), a potem pisz
 454|Kolor tekstu
-455|Kolor tekstu {0} — zaznacz tekst (lub kliknij wiersz dwukrotnie), aby zmienić jego kolor; używany też do obrysu nowych kształtów
+455|Kolor tekstu {0} – zaznacz tekst (lub kliknij wiersz dwukrotnie), aby zmienić jego kolor; używany też do obrysu nowych kształtów
 456|Rozpoznawanie tekstu nie powiodło się: {0}
 457|Tekst…
 458|Czcionka tego wiersza w PDF
-459|Następnie otworzy się okno drukowania systemu — są tam kopie, drukarka i „Zapisz jako PDF”.
+459|Następnie otworzy się okno drukowania systemu – są tam kopie, drukarka i „Zapisz jako PDF”.
 460|Tu pojawi się podpis
-461|Podpis jest przechowywany w postaci zaszyfrowanej; Stitchup pyta o to hasło przy każdym użyciu. Zapomnianego hasła nie da się odzyskać — trzeba wtedy utworzyć podpis od nowa.
+461|Podpis jest przechowywany w postaci zaszyfrowanej; Stitchup pyta o to hasło przy każdym użyciu. Zapomnianego hasła nie da się odzyskać – trzeba wtedy utworzyć podpis od nowa.
 462|Ten PDF jest zaszyfrowany. Podaj hasło, aby wczytać strony.
 463|Ta strona
 464|Ten dokument nie ma osadzonych plików.
@@ -476,9 +476,9 @@
 475|Cofnij ostatnią zmianę (⌘Z)
 476|Odblokuj
 477|Odblokuj i umieść
-478|Odblokowano — zapisywane kopie nie będą chronione hasłem
+478|Odblokowano – zapisywane kopie nie będą chronione hasłem
 479|Odblokowywanie…
-480|Niezapisane dokumenty są kopiowane do prywatnego folderu programu Stitchup (nigdy na Twoje pliki) i proponowane do odzyskania, jeśli Stitchup zamknie się nieoczekiwanie. Twoje pliki są zapisywane tylko wtedy, gdy zapiszesz.
+480|Niezapisane dokumenty kopiowane są do ustronnego folderu programu Stitchup (nigdy na pliki Waszmości) i ofiarowane do przywrócenia, gdyby Stitchup nagle zakończył pracę. Własne pliki Waszmości zapisywane są jedynie wtedy, gdy sam je zapiszesz.
 481|Pilne
 482|Użyj
 483|Użyj Plik – Otwórz (⌘O), aby otworzyć PDF, lub upuść go tutaj
@@ -502,7 +502,7 @@
 501|Zapisz tekst dokumentu do pliku RTF
 502|Nieprawidłowe hasło
 503|Nieprawidłowe hasło do tego podpisu
-504|Nieprawidłowe hasło — spróbuj ponownie
+504|Nieprawidłowe hasło – spróbuj ponownie
 505|Twoje imię i nazwisko
 506|Powiększenie
 507|Powiększ
@@ -522,7 +522,7 @@
 521|zaznaczone strony
 522|zabezpieczony hasłem
 523|pt
-524|obraz wygląda na pusty — nie znaleziono niczego ciemniejszego od papieru
+524|obraz wygląda na pusty – nie znaleziono niczego ciemniejszego od papieru
 525|odblokowany
 526|ostrzeżenie
 527|{0} KB
@@ -532,20 +532,20 @@
 531|Zaznaczone strony: {0}
 532|Zaznaczone strony: {0}
 533|{0} · {1} pt
-534|{0} — kliknij na stronie, aby go umieścić (przeciągnij, aby ustawić szerokość)
-535|{0} — niezapisane zmiany
+534|{0} – kliknij na stronie, aby go umieścić (przeciągnij, aby ustawić szerokość)
+535|{0} – niezapisane zmiany
 536|· Esc kończy
-537|— szyfrowanie, podpis cyfrowy, QuickSign, zaczernianie, znak wodny.
-538|— wyróżnienie, podkreślenie, przekreślenie, notatki, pola tekstowe, kształty, pieczątki, łącza, pióro; Kolor i Wypełnienie.
-539|— nowy, otwórz, zapisz, właściwości, import stron, eksport (tekst, CSV, obrazy, RTF, DOCX, ODT), drukowanie (z podglądem; „Zapisz jako PDF” jest w oknie drukowania systemu).
-540|— przeglądarka i edytor PDF działający offline. Twoje pliki nigdy nie opuszczają tego komputera, a plik jest zastępowany tylko przy zapisie — najpierw zapisywany do pliku tymczasowego, potem podmieniany, więc nigdy nie jest zapisany w połowie.
-541|— obracanie, usuwanie, dodawanie, wyodrębnianie, dzielenie, autokadrowanie.
-542|— zaznaczanie, edycja tekstu, usuwanie, czcionka, kolor, wstawianie obrazu, OCR.
-543|— sterowanie widokiem.
+537|– szyfrowanie, podpis cyfrowy, QuickSign, zaczernianie, znak wodny.
+538|– wyróżnienie, podkreślenie, przekreślenie, notatki, pola tekstowe, kształty, pieczątki, łącza, pióro; Kolor i Wypełnienie.
+539|– nowy, otwórz, zapisz, właściwości, import stron, eksport (tekst, CSV, obrazy, RTF, DOCX, ODT), drukowanie (z podglądem; „Zapisz jako PDF” jest w oknie drukowania systemu).
+540|– przeglądarka i edytor PDF, co bez sieci pracuje. Pliki Waszmości nigdy tego komputera nie opuszczają, a plik bywa zastąpiony jeno przy zapisie – wpierw pisany do pliku tymczasowego, potem podmieniany, przeto nigdy nie zostaje zapisany do połowy.
+541|– obracanie, usuwanie, dodawanie, wyodrębnianie, dzielenie, autokadrowanie.
+542|– zaznaczanie, edycja tekstu, usuwanie, czcionka, kolor, wstawianie obrazu, OCR.
+543|– sterowanie widokiem.
 544|⚠ Ostrzeżenia
 545|⚠ Ostrzeżenia ({0}): {2}
 546|🔒 Do wyświetlenia tego dokumentu potrzebne jest hasło
-547|🔒 wymagane hasło — odblokuj
+547|🔒 wymagane hasło – odblokuj
 548|＋ Strona
 549|Usunięto wszystkie zakładki
 550|Usunięto zakładkę
@@ -562,7 +562,7 @@
 561|Otwieranie nie powiodło się
 562|Otwarto strony: {0}
 563|Zmieniono kolor wiersza
-564|Odzyskano {0} — użyj „Zapisz jako”, aby zachować
+564|Odzyskano {0} – użyj „Zapisz jako”, aby zachować
 565|Ponowienie nie powiodło się
 566|Zapisywanie nie powiodło się
 567|Zapisano strony ({0}) do {2}
@@ -571,12 +571,53 @@
 570|Tekst pieczątki
 571|Zmieniono tekst
 572|Zmieniono tekst ({0})
-573|Zmieniono tekst — {0}
+573|Zmieniono tekst – {0}
 574|Ten dokument jest chroniony hasłem
 575|Cofnięcie nie powiodło się
 576|Odblokowanie nie powiodło się
 577|Odblokowano strony: {0}
 578|Bez tytułu
-579|Oprogramowanie eksperymentalne
-580|Rozumiem
-581|Stitchup to eksperymentalny edytor PDF, stworzony na własne potrzeby autora i udostępniony jako open source. Używasz go na własne ryzyko: zachowuj kopie zapasowe ważnych dokumentów i sprawdzaj wyniki, zanim na nich polegasz. Brak jakiejkolwiek gwarancji.
+579|Rzecz eksperymentalna
+580|Rozumiem i przyjmuję
+581|Stitchup jest edytorem PDF eksperymentalnym, sporządzonym na własne autora potrzeby i ku pożytkowi ogółu jako open source udostępnionym. Waszmość używasz go na własne ryzyko: miej kopie ważnych dokumentów i sprawdzaj wyniki, nim im zawierzysz. Żadnej rękojmi ani gwarancji się nie daje.
+
+582|Dodaj numery stron, „Strona X z Y”, numery Batesa lub dowolny tekst u góry lub u dołu stron
+583|Wszystkie ({0})
+584|Zapytaj GitHub, czy jest nowsza wersja Stitchup (nic nie jest pobierane ani instalowane)
+585|Cyfry numeru Batesa
+586|Numer Batesa
+587|Przedrostek Batesa
+588|Dół, środek
+589|Dół, lewo
+590|Dół, prawo
+591|Sprawdź aktualizacje
+592|Sprawdź aktualizacje…
+593|Sprawdzanie w GitHub, czy jest nowsza wersja…
+594|Wyczyść menu
+595|Nie można sprawdzić aktualizacji: {0}
+596|Nie można użyć tego dźwięku: {0}
+597|Pola: {page} numer strony · {pages} numer ostatniej strony · {bates} numer Batesa · {date} dzisiejsza data · {file} nazwa pliku
+598|Plik, data i strona
+599|Nagłówek i stopka
+600|Nagłówek i stopka…
+601|Dodano nagłówek / stopkę na stronach: {0}
+602|Nagłówek/stopka
+603|Później
+604|Margines (pt)
+605|Brak ostatnich plików
+606|Otwórz stronę pobierania
+607|Otwórz ostatnie
+608|Strona X z Y
+609|Numery stron
+610|Strona {page} z {pages}
+611|Szybko:
+612|Ostatnie pliki
+613|Rozmiar (pt)
+614|Dźwięk zachowano na tym komputerze – kliknij ikonę
+615|Zacznij od
+616|Dostępny jest Stitchup {0} (masz {1}). Otworzyć stronę pobierania?
+617|Stitchup {0} to najnowsza wersja
+618|Góra, środek
+619|Góra, lewo
+620|Góra, prawo
+621|Dostępna aktualizacja

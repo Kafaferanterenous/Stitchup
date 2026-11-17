@@ -2,15 +2,21 @@
 //! (asks first when unsaved), + for a new tab. Thumbnails dropped on a tab
 //! move those pages to that document.
 
+import { useEffect, useRef } from "react";
 import { useAppState, store } from "../../store";
 
 import { tr } from "../../i18n";
 
 export function TabStrip() {
   const app = useAppState();
+  const strip = useRef<HTMLElement | null>(null);
+  // Keep the active tab in view when there are more tabs than fit.
+  useEffect(() => {
+    strip.current?.querySelector<HTMLElement>(".doc-tab.active")?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [app.activeTab, app.tabs.length]);
   if (!app.doc && app.tabs.length <= 1) return null;
   return (
-    <nav className="tab-strip" role="tablist" aria-label="Open documents">
+    <nav className="tab-strip" role="tablist" aria-label="Open documents" ref={strip}>
       {app.tabs.map((t) => (
         <div
           key={t.id}

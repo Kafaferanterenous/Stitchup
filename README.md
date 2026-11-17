@@ -63,7 +63,8 @@ not notarized. The first time you open it, right-click it and choose
 - **Tabs:** each open document gets its own tab, with its own page, zoom and
   undo (⌘T, ⌘W, ⌃Tab). Drag a page thumbnail onto another tab to move the page.
 - **Pages:** rotate, delete, add, drag to reorder, multi-select, extract,
-  split, merge, import, combine, and auto-crop.
+  split, merge, import, combine, and auto-crop. Headers and footers with page
+  numbers, "Page X of Y", Bates numbers, date and file name.
 - **QuickSign:** place your handwritten signature from a JPG, GIF or PNG
   (trimmed, white paper made transparent), or draw it with the mouse,
   trackpad or pen. Stitchup can keep it for next
@@ -98,7 +99,10 @@ executable (`chmod +x`).
 ## Languages
 
 English, Polski, Italiano, Deutsch, Français and 中文（简体）: File ▸ Settings
-(⌘,) ▸ Language. The first start follows the system language.
+(⌘,) ▸ Language. The first start follows the system language. The Polish
+version follows Polish typesetting (spaced en dash, no one-letter word left
+at a line end) and speaks in a slightly old-fashioned voice in About and
+notices.
 
 ## Build
 
@@ -115,7 +119,7 @@ Tests:
 |---|---|
 | `cd source/core && cargo test --release` | PDF engine: text editing, annotations, redaction, forms, signatures (checked with OpenSSL), page tree |
 | `cd source/app/src-tauri && cargo test --release` | Command layer |
-| `cd source/app && npm run build && npm run test:e2e` | 79 end-to-end checks: the real UI in Chromium driving the real Rust backend, with every ribbon tab, dialog and shortcut |
+| `cd source/app && npm run build && npm run test:e2e` | 82 end-to-end checks: the real UI in Chromium driving the real Rust backend, with every ribbon tab, dialog and shortcut |
 
 ## Layout
 

@@ -2,7 +2,7 @@
 
 Target: the best all-round PDF editor, at feature and look parity with the
 Windows build (github.com/Kafaferanterenous/stitchup-Win v0.12.28), and ahead of it where macOS allows.
-Updated 2026-11-17 (v0.13.0). Status key: ✅ done · 🔨 in progress · ⬜ to do. Every ✅ item is covered by an automated test.
+Updated 2026-11-17 (v0.14.0). Status key: ✅ done · 🔨 in progress · ⬜ to do. Every ✅ item is covered by an automated test.
 
 ## A. Look & navigation (same as Windows)
 | # | Goal | Status |
@@ -80,3 +80,7 @@ Duplicates removed, Nitro / macOS layout: Print Preview and Print to PDF folded 
 | H2 | OCR on Windows (Windows.Media.Ocr) and Linux (Tesseract) | ⬜ |
 | H3 | Interface languages: English, Polish, Italian, German, French, Chinese (Simplified) — 582 strings, Settings ▸ Language, system language on first start, native menus rebuilt on change; stamps printed in the chosen language (not Chinese: standard PDF fonts) | ✅ |
 | H4 | "Experimental — use at your own risk" notice: first start (once), About, README, release notes | ✅ |
+| H5 | Header & Footer (Pages tab): six positions, page numbers, "Page X of Y", Bates (prefix + digits), {date}, {file}, font / size / margin / start number / page range; oriented to rotated pages; undoable | ✅ |
+| H6 | File ▸ Open Recent + recent files on the start screen; tabs shrink with many documents and keep the active one in view | ✅ |
+| H7 | Help ▸ Check for Updates (GitHub releases; only when asked, nothing downloaded) | ✅ |
+| H8 | Polish: typesetting (półpauza, non-breaking space after one-letter words), old-literary tone in About / notices / guide; About icon shows a Kabaret Dudek line and plays the user's own sound file (none shipped) | ✅ |

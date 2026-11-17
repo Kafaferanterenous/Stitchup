@@ -555,3 +555,119 @@ pub fn incremental_update(original: &[u8], current: &PdfDoc) -> Result<Vec<u8>, 
     inc.save_to(&mut out)?;
     Ok(out)
 }
+
+// ------------------------------------------------------- header & footer
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct HfItem {
+    /// "tl" | "tc" | "tr" | "bl" | "bc" | "br" (top / bottom × left / centre / right).
+    pub position: String,
+    /// Text with tokens: {page}, {pages}, {bates}.
+    pub text: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct HeaderFooterSpec {
+    pub items: Vec<HfItem>,
+    #[serde(default = "hf_size")]
+    pub size: f64,
+    /// Distance from the page edge, points.
+    #[serde(default = "hf_margin")]
+    pub margin: f64,
+    #[serde(default)]
+    pub color: [f64; 3],
+    /// Standard family ("Helvetica", "Times-Roman", "Courier", bold variants…).
+    #[serde(default = "hf_family")]
+    pub family: String,
+    /// Number of the first page stamped ({page}, {bates}).
+    #[serde(default = "hf_start")]
+    pub start: u32,
+    #[serde(default)]
+    pub bates_prefix: String,
+    #[serde(default = "hf_digits")]
+    pub bates_digits: u32,
+    /// 1-based pages; empty = every page.
+    #[serde(default)]
+    pub pages: Vec<u32>,
+}
+
+fn hf_size() -> f64 {
+    10.0
+}
+fn hf_margin() -> f64 {
+    28.0
+}
+fn hf_family() -> String {
+    "Helvetica".into()
+}
+fn hf_start() -> u32 {
+    1
+}
+fn hf_digits() -> u32 {
+    6
+}
+
+/// Fill the tokens for one page.
+pub fn hf_text(t: &str, n: u32, total: u32, spec: &HeaderFooterSpec) -> String {
+    let bates = format!("{}{:0width$}", spec.bates_prefix, n, width = spec.bates_digits.clamp(1, 12) as usize);
+    t.replace("{page}", &n.to_string()).replace("{pages}", &total.to_string()).replace("{bates}", &bates)
+}
+
+/// Headers, footers, page numbers and Bates numbers, drawn into the page
+/// content (as printed text, like Nitro's Header & Footer), oriented to how
+/// each page is displayed. Returns the number of pages stamped.
+pub fn header_footer(doc: &mut PdfDoc, spec: &HeaderFooterSpec) -> Result<usize, EngineError> {
+    let items: Vec<&HfItem> = spec.items.iter().filter(|i| !i.text.trim().is_empty()).collect();
+    if items.is_empty() {
+        return Err(crate::err!(ErrorCode::ValidationFailed, "enter some header or footer text"));
+    }
+    let size = spec.size.clamp(4.0, 72.0);
+    let margin = spec.margin.clamp(0.0, 200.0);
+    let all = doc.get_pages();
+    let targets: Vec<ObjectId> = if spec.pages.is_empty() {
+        all.values().copied().collect()
+    } else {
+        spec.pages.iter().filter_map(|n| all.get(n).copied()).collect()
+    };
+    let total = spec.start.saturating_sub(1) + targets.len() as u32;
+    for (idx, &page) in targets.iter().enumerate() {
+        let n = spec.start + idx as u32;
+        let (w, h, cm) = display_space(doc, page);
+        let res = resources_of(doc, page);
+        let taken = sub_dict(doc, &res, b"Font");
+        let mut fonts: Vec<(Vec<u8>, Object)> = vec![];
+        let mut k = 0;
+        let [cr, cg, cb] = spec.color;
+        let mut ops = vec![
+            Operation::new("q", vec![]),
+            Operation::new("cm", cm.iter().map(|v| r(*v)).collect()),
+            Operation::new("rg", vec![r(cr), r(cg), r(cb)]),
+            Operation::new("BT", vec![]),
+        ];
+        for item in &items {
+            let text = hf_text(item.text.trim(), n, total, spec);
+            let mut name = || loop {
+                k += 1;
+                let cand = format!("StHF{k}").into_bytes();
+                if taken.get(&cand).is_err() {
+                    break cand;
+                }
+            };
+            let rep = crate::textedit::replacement_text(doc, &spec.family, &spec.family, &text, size, 0.0, &mut name);
+            let width = rep.advance * size;
+            let pos = item.position.as_bytes();
+            let x = match pos.get(1) {
+                Some(b'l') => margin,
+                Some(b'r') => w - margin - width,
+                _ => (w - width) / 2.0,
+            };
+            let y = if pos.first() == Some(&b't') { h - margin - size * 0.75 } else { margin };
+            ops.push(Operation::new("Tm", vec![r(1.0), r(0.0), r(0.0), r(1.0), r(x), r(y)]));
+            ops.extend(rep.ops);
+            fonts.extend(rep.fonts);
+        }
+        ops.extend([Operation::new("ET", vec![]), Operation::new("Q", vec![])]);
+        append_to_page(doc, page, ops, fonts, vec![])?;
+    }
+    Ok(targets.len())
+}

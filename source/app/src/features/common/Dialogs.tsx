@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { save as saveDialog } from "@tauri-apps/plugin-dialog";
+import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
+import appIcon from "../../../src-tauri/icons/128x128@2x.png";
 import { useAppState, store, getState, docName, isUntitled, rgb, annotColor } from "../../store";
 import { extractTo, parsePages, splitInto } from "../../actions";
-import { cmdSaveCompressed, cmdDiscardRecovery, cmdListAttachments, cmdSaveAttachment, cmdSaveEncrypted, cmdSign, cmdWriteFile, type AttachmentInfo, type RecoveryEntry } from "../../ipc";
+import { cmdAboutSoundClear, cmdAboutSoundGet, cmdAboutSoundSet, cmdSaveCompressed, cmdDiscardRecovery, cmdListAttachments, cmdSaveAttachment, cmdSaveEncrypted, cmdSign, cmdWriteFile, type AttachmentInfo, type RecoveryEntry } from "../../ipc";
 import { loadSettings, saveSettings, type Settings } from "../../settings";
 import { FontPicker, fontName, useSystemFonts, type FontChoice } from "./FontPicker";
 import { THEMES, applyTheme, currentTheme, type ThemeName } from "../../themes/theme";
@@ -57,9 +58,82 @@ const SHIPPED: { id: string; name: string; use: string; license: string }[] = [
 ];
 const NOT_YET: string[] = ["pdf-lib (D-04)", "Konva + react-konva (D-06)", "perfect-freehand (D-07)"];
 
+/** The app icon in About. In Polish it has a little secret: a famous line
+ *  from Kabaret Dudek, and — if the user has chosen their own recording of it
+ *  — that sound. Stitchup ships no audio; the file stays on this computer. */
+function AboutIcon() {
+  const app = useAppState();
+  const polish = app.lang === "pl";
+  const [bubble, setBubble] = useState(false);
+  const [hasSound, setHasSound] = useState<boolean | null>(null);
+  const audio = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    if (polish) cmdAboutSoundGet().then((s) => setHasSound(!!s), () => setHasSound(false));
+  }, [polish]);
+  async function click() {
+    if (!polish) return;
+    setBubble(true);
+    try {
+      const s = await cmdAboutSoundGet();
+      if (s) {
+        audio.current?.pause();
+        audio.current = new Audio(`data:${s.mime};base64,${s.b64}`);
+        await audio.current.play();
+      }
+    } catch {
+      /* no sound: the bubble is enough */
+    }
+  }
+  async function choose() {
+    const p = await openDialog({ multiple: false, filters: [{ name: "Audio", extensions: ["mp3", "m4a", "aac", "wav", "ogg", "oga"] }] });
+    if (typeof p !== "string") return;
+    try {
+      await cmdAboutSoundSet(p);
+      setHasSound(true);
+      store.notify(tr("Sound saved on this computer — click the icon"));
+    } catch (e) {
+      store.notify(tr("Could not use that sound: {0}", (e as { message?: string }).message ?? String(e)));
+    }
+  }
+  return (
+    <div className="about-head">
+      <button className="about-icon" onClick={() => void click()} aria-label="Stitchup" title={polish ? "Kliknij…" : undefined}>
+        <img src={appIcon} alt="" width={72} height={72} />
+      </button>
+      {polish && bubble && (
+        <div className="about-bubble" role="status">
+          „Nie bądź pan rura i&nbsp;nie pękaj pan!”
+          <span className="muted"> — Kabaret Dudek</span>
+        </div>
+      )}
+      {polish && bubble && (
+        <div className="about-sound">
+          <button className="link" onClick={() => void choose()}>
+            {hasSound ? "Zmień dźwięk…" : "Wybierz dźwięk…"}
+          </button>
+          {hasSound && (
+            <button
+              className="link"
+              onClick={() =>
+                void cmdAboutSoundClear().then(() => {
+                  setHasSound(false);
+                  store.notify("Dźwięk usunięto");
+                })
+              }>
+              Usuń dźwięk
+            </button>
+          )}
+          <span className="muted">Własne nagranie (MP3, M4A, WAV…), zostaje tylko na tym komputerze.</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AboutDialog() {
   return (
     <Modal title={tr("About Stitchup")} onClose={() => store.setDialog(null)} wide>
+      <AboutIcon />
       <p>
         <b>{tr("Stitchup")}</b> {tr("— offline PDF viewer & editor. Your files never leave this computer, and a file is only replaced when you save — written to a temporary file first, then swapped in, so it is never half-written.")}
       </p>
@@ -1140,6 +1214,124 @@ export function RiskNotice({ onDone }: { onDone: () => void }) {
           }}>
           {tr("I understand")}
         </button>
+      </div>
+    </Modal>
+  );
+}
+
+
+// ---------------------------------------------------------- header & footer
+
+type Pos = "tl" | "tc" | "tr" | "bl" | "bc" | "br";
+const POSITIONS: { pos: Pos; label: string }[] = [
+  { pos: "tl", label: "Top left" },
+  { pos: "tc", label: "Top centre" },
+  { pos: "tr", label: "Top right" },
+  { pos: "bl", label: "Bottom left" },
+  { pos: "bc", label: "Bottom centre" },
+  { pos: "br", label: "Bottom right" },
+];
+
+/** Pages ▸ Header & Footer: page numbers, "Page X of Y", Bates numbers, any text. */
+export function HeaderFooterDialog() {
+  const app = useAppState();
+  const count = app.doc?.pages.length ?? 0;
+  const [text, setText] = useState<Record<Pos, string>>({ tl: "", tc: "", tr: "", bl: "", bc: "{page}", br: "" });
+  const [size, setSize] = useState("10");
+  const [margin, setMargin] = useState("28");
+  const [start, setStart] = useState("1");
+  const [prefix, setPrefix] = useState("");
+  const [digits, setDigits] = useState("6");
+  const [range, setRange] = useState<"all" | "custom">("all");
+  const [custom, setCustom] = useState("");
+  const [family, setFamily] = useState("Helvetica");
+  const preset = (t: Partial<Record<Pos, string>>) => setText({ tl: "", tc: "", tr: "", bl: "", bc: "", br: "", ...t });
+  const pages = range === "all" ? [] : parsePages(custom, count) ?? null;
+  const ok = Object.values(text).some((t) => t.trim()) && pages !== null && Number(size) >= 4;
+  async function apply() {
+    if (!ok) return;
+    const done = await store.headerFooter({
+      items: POSITIONS.map((p) => ({ position: p.pos, text: text[p.pos] })).filter((i) => i.text.trim()),
+      size: Number(size),
+      margin: Number(margin) || 28,
+      color: [0, 0, 0],
+      family,
+      start: Math.max(1, Math.floor(Number(start) || 1)),
+      bates_prefix: prefix,
+      bates_digits: Math.max(1, Math.min(12, Math.floor(Number(digits) || 6))),
+      pages: pages ?? [],
+    });
+    if (done) close();
+  }
+  return (
+    <Modal title={tr("Header & Footer")} onClose={close}>
+      <div className="hf-presets">
+        <span className="muted">{tr("Quick:")}</span>
+        <button onClick={() => preset({ bc: "{page}" })}>{tr("Page numbers")}</button>
+        <button onClick={() => preset({ bc: tr("Page {page} of {pages}").replace("{0}", "{page}").replace("{1}", "{pages}") })}>{tr("Page X of Y")}</button>
+        <button onClick={() => preset({ br: "{bates}" })}>{tr("Bates number")}</button>
+        <button onClick={() => preset({ tl: "{file}", tr: "{date}", bc: "{page}" })}>{tr("File, date and page")}</button>
+      </div>
+      <div className="hf-grid">
+        {POSITIONS.map((p) => (
+          <label key={p.pos}>
+            {tr(p.label)}
+            <input aria-label={p.label} value={text[p.pos]} onChange={(e) => setText({ ...text, [p.pos]: e.target.value })} />
+          </label>
+        ))}
+      </div>
+      <p className="muted">{tr("Fields: {page} page number · {pages} last page number · {bates} Bates number · {date} today · {file} file name")}</p>
+      <div className="hf-row">
+        <label>
+          {tr("Font")}
+          <select aria-label="Header font" value={family} onChange={(e) => setFamily(e.target.value)}>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Helvetica-Bold">Helvetica Bold</option>
+            <option value="Times-Roman">Times</option>
+            <option value="Courier">Courier</option>
+          </select>
+        </label>
+        <label>
+          {tr("Size (pt)")}
+          <input aria-label="Header size" inputMode="decimal" value={size} onChange={(e) => setSize(e.target.value)} />
+        </label>
+        <label>
+          {tr("Margin (pt)")}
+          <input aria-label="Header margin" inputMode="decimal" value={margin} onChange={(e) => setMargin(e.target.value)} />
+        </label>
+        <label>
+          {tr("Start at")}
+          <input aria-label="Start number" inputMode="numeric" value={start} onChange={(e) => setStart(e.target.value)} />
+        </label>
+      </div>
+      <div className="hf-row">
+        <label>
+          {tr("Bates prefix")}
+          <input aria-label="Bates prefix" value={prefix} onChange={(e) => setPrefix(e.target.value)} placeholder="ABC-" />
+        </label>
+        <label>
+          {tr("Bates digits")}
+          <input aria-label="Bates digits" inputMode="numeric" value={digits} onChange={(e) => setDigits(e.target.value)} />
+        </label>
+        <label>
+          {tr("Pages")}
+          <select aria-label="Header pages" value={range} onChange={(e) => setRange(e.target.value as "all" | "custom")}>
+            <option value="all">{tr("All ({0})", count)}</option>
+            <option value="custom">{tr("Pages…")}</option>
+          </select>
+        </label>
+        {range === "custom" && (
+          <label>
+            {tr("Page range (e.g. 1-3, 5)")}
+            <input aria-label="Header page range" value={custom} onChange={(e) => setCustom(e.target.value)} />
+          </label>
+        )}
+      </div>
+      <div className="modal-actions">
+        <button onClick={() => void apply()} disabled={!ok}>
+          {tr("Apply")}
+        </button>
+        <button onClick={close}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );

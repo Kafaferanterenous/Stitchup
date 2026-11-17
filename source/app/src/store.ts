@@ -41,6 +41,8 @@ import {
   cmdRecolorAnnotations,
   cmdQuickSignList,
   cmdPlatformInfo,
+  cmdHeaderFooter,
+  type HeaderFooterSpec,
   cmdQuickSignLoad,
   type SavedSignature,
   cmdRedact,
@@ -145,6 +147,8 @@ export interface AppState {
   platform: { os: string; ocr: boolean };
   /** Interface language (changing it re-renders every translated string). */
   lang: string;
+  /** Recently opened files, newest first (File ▸ Open Recent). */
+  recent: string[];
   strokeWidth: number;
   /** Select tool: picked content objects ("t12"/"i30") and annotations (obj #). */
   picked: { page: number; objects: string[]; annots: number[] } | null;
@@ -246,6 +250,7 @@ export type Dialog =
   | "quickSignNew"
   | "quickSignUnlock"
   | "quickSignManage"
+  | "headerFooter"
   | "recovery";
 
 let state: AppState = {
@@ -286,6 +291,7 @@ let state: AppState = {
   unlockSignature: null,
   platform: { os: "macos", ocr: true },
   lang: language(),
+  recent: loadRecent(),
   strokeWidth: 2,
   picked: null,
   pendingInput: null,
@@ -371,6 +377,23 @@ function notify(message: string) {
 
 onLanguageChange(() => set({ lang: language() }));
 
+function loadRecent(): string[] {
+  try {
+    const v = JSON.parse(localStorage.getItem("stitchup.recent") ?? "[]");
+    return Array.isArray(v) ? v.filter((x) => typeof x === "string").slice(0, 10) : [];
+  } catch {
+    return [];
+  }
+}
+function saveRecent(list: string[]) {
+  try {
+    localStorage.setItem("stitchup.recent", JSON.stringify(list));
+  } catch {
+    /* not remembered */
+  }
+  window.dispatchEvent(new CustomEvent("stitchup-recent"));
+}
+
 export function getState(): AppState {
   return state;
 }
@@ -455,6 +478,7 @@ export const store = {
           ? tr("This document is password-protected")
           : tr("Opened {0} page{1}", doc.pages.length, doc.pages.length === 1 ? "" : "s"),
       });
+      this.addRecent(path);
       const w = doc.warnings.filter((x) => !/password-protected/.test(x));
       if (!doc.passwordRequired && w.length) {
         notify(tr("⚠ {0} warning{1}: {2}", w.length, w.length > 1 ? "s" : "", w[0]));
@@ -580,6 +604,35 @@ export const store = {
       { kind: "watermark", before: doc.pages.map((p) => p.page_no), data: spec },
       () => cmdWatermark(spec),
       () => ({ status: tr("Watermark added to {0} page(s)", spec.pages?.length || doc.pages.length) }),
+    );
+  },
+
+  // ----------------------------------------------------------- recent files
+
+  addRecent(path: string) {
+    if (!path || path.startsWith(UNTITLED)) return;
+    const recent = [path, ...state.recent.filter((p) => p !== path)].slice(0, 10);
+    set({ recent });
+    saveRecent(recent);
+  },
+
+  clearRecent() {
+    set({ recent: [] });
+    saveRecent([]);
+  },
+
+  /** Headers / footers / page numbers / Bates numbers ({date}, {file} filled in here). */
+  async headerFooter(spec: HeaderFooterSpec) {
+    const doc = state.doc;
+    if (!doc) return false;
+    const date = new Date().toLocaleDateString(language() === "zh" ? "zh-CN" : language());
+    const file = docName(doc).replace(/\.pdf$/i, "");
+    const filled = { ...spec, items: spec.items.map((i) => ({ ...i, text: i.text.replace(/\{date\}/g, date).replace(/\{file\}/g, file) })) };
+    const n = spec.pages.length || doc.pages.length;
+    return this.command(
+      { kind: "object", before: doc.pages.map((p) => p.page_no), data: filled },
+      () => cmdHeaderFooter(filled),
+      () => ({ status: tr("Header / footer added to {0} page(s)", n) }),
     );
   },
 

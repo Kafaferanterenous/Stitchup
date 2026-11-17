@@ -62,7 +62,14 @@ export function onLanguageChange(f: () => void): () => void {
 /** Translate `en` (the English text) into the current language. */
 export function tr(en: string, ...args: unknown[]): string {
   const t = current === "en" ? en : TABLES[current][en] ?? en;
-  return args.length ? t.replace(/\{(\d+)\}/g, (m, i) => (args[Number(i)] !== undefined ? String(args[Number(i)]) : m)) : t;
+  const filled = args.length ? t.replace(/\{(\d+)\}/g, (m, i) => (args[Number(i)] !== undefined ? String(args[Number(i)]) : m)) : t;
+  return current === "pl" ? polishTypography(filled) : filled;
+}
+
+/** Polish typesetting: a one-letter word (a, i, o, u, w, z) never ends a
+ *  line — it is bound to the next word with a non-breaking space. */
+export function polishTypography(s: string): string {
+  return s.replace(/(^|[\s(„«])([aiouwzAIOUWZ]) (?=\S)/g, "$1$2\u00a0");
 }
 
 if (typeof document !== "undefined") document.documentElement.lang = current === "zh" ? "zh-Hans" : current;

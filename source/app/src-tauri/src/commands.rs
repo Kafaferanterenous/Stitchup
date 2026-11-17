@@ -827,6 +827,50 @@ pub fn add_watermark_inner(st: &Mutex<SessionState>, spec: Value) -> Result<Vec<
     logged(&mut g, "Watermark", |doc| docops::watermark(doc, &spec).map(|_| ()))
 }
 
+/// Help ▸ Check for Updates: the newest release on GitHub (only when asked).
+#[derive(Debug, Clone, Serialize)]
+pub struct UpdateInfo {
+    pub current: String,
+    pub latest: String,
+    pub newer: bool,
+    pub url: String,
+}
+
+const RELEASES_API: &str = "https://api.github.com/repos/Kafaferanterenous/stitchup-MacOS/releases/latest";
+
+fn version_tuple(v: &str) -> Vec<u64> {
+    v.trim_start_matches('v').split(|c: char| !c.is_ascii_digit()).filter(|s| !s.is_empty()).filter_map(|s| s.parse().ok()).collect()
+}
+
+#[tauri::command]
+pub fn check_update() -> Result<UpdateInfo, EngineError> {
+    let current = env!("CARGO_PKG_VERSION").to_string();
+    let run = |prog: &str, args: &[&str]| std::process::Command::new(prog).args(args).output().ok().filter(|o| o.status.success()).map(|o| o.stdout);
+    let body = run("curl", &["-fsSL", "--max-time", "15", "-H", "Accept: application/vnd.github+json", "-A", "Stitchup", RELEASES_API])
+        .or_else(|| run("wget", &["-q", "-T", "15", "-O", "-", RELEASES_API]))
+        .ok_or_else(|| EngineError::new(ErrorCode::IoError, "could not reach GitHub (no internet, or curl / wget missing)"))?;
+    let v: Value = serde_json::from_slice(&body).map_err(|e| EngineError::new(ErrorCode::IoError, format!("unexpected answer from GitHub: {e}")))?;
+    let latest = v.get("tag_name").and_then(|t| t.as_str()).unwrap_or("").trim_start_matches('v').to_string();
+    let url = v.get("html_url").and_then(|t| t.as_str()).unwrap_or("https://github.com/Kafaferanterenous/stitchup-MacOS/releases").to_string();
+    if latest.is_empty() {
+        return Err(EngineError::new(ErrorCode::IoError, "no release found on GitHub"));
+    }
+    let newer = version_tuple(&latest) > version_tuple(&current);
+    Ok(UpdateInfo { current, latest, newer, url })
+}
+
+/// Headers, footers, page numbers, Bates numbers (logged; undoable).
+#[tauri::command]
+pub fn header_footer(st: tauri::State<'_, Mutex<SessionState>>, spec: Value) -> Result<Vec<PageMeta>, EngineError> {
+    header_footer_inner(&st, spec)
+}
+
+pub fn header_footer_inner(st: &Mutex<SessionState>, spec: Value) -> Result<Vec<PageMeta>, EngineError> {
+    let spec: docops::HeaderFooterSpec = serde_json::from_value(spec).map_err(validation)?;
+    let mut g = lock(st)?;
+    logged(&mut g, "Header & footer", |doc| docops::header_footer(doc, &spec).map(|_| ()))
+}
+
 /// Set crop boxes: `[[page, x0, y0, x1, y1], ...]` in PDF user space (logged).
 #[tauri::command]
 pub fn set_crop(st: tauri::State<'_, Mutex<SessionState>>, boxes: Vec<[f64; 5]>) -> Result<Vec<PageMeta>, EngineError> {
@@ -1507,6 +1551,50 @@ pub static SIGNATURE_DIR: Mutex<Option<PathBuf>> = Mutex::new(None);
 
 fn signature_dir() -> PathBuf {
     SIGNATURE_DIR.lock().ok().and_then(|g| g.clone()).unwrap_or_else(|| std::env::temp_dir().join("stitchup-signatures"))
+}
+
+// About ▸ the user's own sound for the app-icon easter egg (never shipped:
+// the user picks a file they have; it is copied into the private app folder).
+fn about_sound_dir() -> PathBuf {
+    signature_dir().parent().map(|p| p.join("AboutSound")).unwrap_or_else(|| std::env::temp_dir().join("stitchup-about-sound"))
+}
+
+const SOUND_TYPES: [(&str, &str); 6] = [("mp3", "audio/mpeg"), ("m4a", "audio/mp4"), ("aac", "audio/aac"), ("wav", "audio/wav"), ("ogg", "audio/ogg"), ("oga", "audio/ogg")];
+
+#[tauri::command]
+pub fn about_sound_set(path: String) -> Result<(), EngineError> {
+    let p = PathBuf::from(&path);
+    let ext = p.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
+    if !SOUND_TYPES.iter().any(|(e, _)| *e == ext) {
+        return Err(EngineError::new(ErrorCode::ValidationFailed, "choose an MP3, M4A, AAC, WAV or OGG file"));
+    }
+    if std::fs::metadata(&p)?.len() > 5 * 1024 * 1024 {
+        return Err(EngineError::new(ErrorCode::ValidationFailed, "the sound file is larger than 5 MB"));
+    }
+    let dir = about_sound_dir();
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir)?;
+    std::fs::copy(&p, dir.join(format!("sound.{ext}")))?;
+    Ok(())
+}
+
+#[tauri::command]
+pub fn about_sound_get() -> Option<HashMap<String, String>> {
+    let rd = std::fs::read_dir(about_sound_dir()).ok()?;
+    for e in rd.flatten() {
+        let p = e.path();
+        let ext = p.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
+        if let Some((_, mime)) = SOUND_TYPES.iter().find(|(e, _)| *e == ext) {
+            let bytes = std::fs::read(&p).ok()?;
+            return Some(HashMap::from([("b64".to_string(), B64.encode(bytes)), ("mime".to_string(), mime.to_string())]));
+        }
+    }
+    None
+}
+
+#[tauri::command]
+pub fn about_sound_clear() {
+    let _ = std::fs::remove_dir_all(about_sound_dir());
 }
 
 #[tauri::command]

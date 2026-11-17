@@ -580,3 +580,43 @@
 579|Logiciel expérimental
 580|J’ai compris
 581|Stitchup est un éditeur PDF expérimental, créé pour les besoins de son auteur et partagé en open source. Vous l’utilisez à vos propres risques : gardez des copies de sauvegarde des documents importants et vérifiez les résultats avant de vous y fier. Aucune garantie d’aucune sorte.
+582|Ajouter des numéros de page, « Page X sur Y », des numéros Bates ou tout texte en haut ou en bas des pages
+583|Toutes ({0})
+584|Demander à GitHub si une version plus récente de Stitchup existe (rien n’est téléchargé ni installé)
+585|Chiffres Bates
+586|Numéro Bates
+587|Préfixe Bates
+588|En bas, au centre
+589|En bas, à gauche
+590|En bas, à droite
+591|Rechercher des mises à jour
+592|Rechercher des mises à jour…
+593|Recherche d’une version plus récente sur GitHub…
+594|Effacer le menu
+595|Impossible de rechercher des mises à jour : {0}
+596|Impossible d’utiliser ce son : {0}
+597|Champs : {page} numéro de page · {pages} numéro de la dernière page · {bates} numéro Bates · {date} aujourd’hui · {file} nom du fichier
+598|Fichier, date et page
+599|En-tête et pied de page
+600|En-tête et pied de page…
+601|En-tête / pied de page ajouté sur {0} page(s)
+602|En-tête/pied
+603|Plus tard
+604|Marge (pt)
+605|Aucun fichier récent
+606|Ouvrir la page de téléchargement
+607|Ouvrir un fichier récent
+608|Page X sur Y
+609|Numéros de page
+610|Page {page} sur {pages}
+611|Rapide :
+612|Fichiers récents
+613|Taille (pt)
+614|Son enregistré sur cet ordinateur — cliquez sur l’icône
+615|Commencer à
+616|Stitchup {0} est disponible (vous avez la {1}). Ouvrir la page de téléchargement ?
+617|Stitchup {0} est la version la plus récente
+618|En haut, au centre
+619|En haut, à gauche
+620|En haut, à droite
+621|Mise à jour disponible

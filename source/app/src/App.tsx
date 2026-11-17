@@ -23,6 +23,7 @@ import {
   RecoveryDialog,
   SettingsDialog,
   RiskNotice,
+  HeaderFooterDialog,
   riskAccepted,
   CompressDialog,
   FontDialog,
@@ -115,7 +116,13 @@ export default function App() {
   // Native menu + files handed to us by Finder / the Dock / the command line.
   useEffect(() => {
     void installMenu();
-    const off = onLanguageChange(() => void installMenu());
+    const offLang = onLanguageChange(() => void installMenu());
+    const onRecent = () => void installMenu();
+    window.addEventListener("stitchup-recent", onRecent);
+    const off = () => {
+      offLang();
+      window.removeEventListener("stitchup-recent", onRecent);
+    };
     const openFirst = (paths: string[]) => {
       const pdf = paths.find((p) => p.toLowerCase().endsWith(".pdf"));
       if (pdf) void store.open(pdf);
@@ -245,6 +252,7 @@ export default function App() {
       {app.dialog === "settings" && <SettingsDialog />}
       {app.dialog === "compress" && <CompressDialog />}
       {app.dialog === "quickSignNew" && <QuickSignNewDialog />}
+      {app.dialog === "headerFooter" && <HeaderFooterDialog />}
       {app.dialog === "quickSignUnlock" && <QuickSignUnlockDialog />}
       {app.dialog === "quickSignManage" && <QuickSignManageDialog />}
       {recovered && !risk && <RecoveryDialog entries={recovered} onDone={() => setRecovered(null)} />}

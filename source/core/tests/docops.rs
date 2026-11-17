@@ -98,3 +98,43 @@ fn attachments_are_listed_and_extracted() {
     assert!(attachment_bytes(&doc, 99).is_err());
     let _ = Object::Null;
 }
+
+#[test]
+fn headers_footers_page_and_bates_numbers() {
+    use stitchup_core::docops::{header_footer, HeaderFooterSpec, HfItem};
+    let mut doc = stitchup_core::docops::new_blank(612.0, 792.0).unwrap();
+    // Three pages; the second displayed rotated.
+    for _ in 0..2 {
+        stitchup_core::ops::insert_blank(&mut doc, 1, 612.0, 792.0).ok();
+    }
+    let pages = doc.get_pages();
+    assert_eq!(pages.len(), 3);
+    let p2 = pages[&2];
+    let mut d2 = doc.get_object(p2).unwrap().as_dict().unwrap().clone();
+    d2.set("Rotate", 90);
+    doc.objects.insert(p2, lopdf::Object::Dictionary(d2));
+
+    let item = |p: &str, t: &str| HfItem { position: p.into(), text: t.into() };
+    let spec = HeaderFooterSpec {
+        items: vec![item("tc", "Umowa — Łódź"), item("bc", "Page {page} of {pages}"), item("br", "{bates}")],
+        size: 10.0, margin: 28.0, color: [0.0, 0.0, 0.0], family: "Helvetica".into(),
+        start: 5, bates_prefix: "ABC".into(), bates_digits: 4, pages: vec![],
+    };
+    assert_eq!(header_footer(&mut doc, &spec).unwrap(), 3);
+    let mut bytes = vec![];
+    doc.save_to(&mut bytes).unwrap();
+    let back = lopdf::Document::load_mem(&bytes).unwrap();
+    let text = back.extract_text(&[1, 2, 3]).unwrap();
+    for want in ["Page 5 of 7", "Page 7 of 7", "ABC0005", "ABC0007", "Umowa — Łódź"] {
+        assert!(text.contains(want), "{want} in {text}");
+    }
+    // Positions: footer centred near the bottom of page 1; on the rotated page
+    // the text runs along the displayed width (vertical in PDF space).
+    let o1 = stitchup_core::objects::list(&back, 1).unwrap();
+    let f1 = o1.iter().find(|o| o.text.contains("Page 5")).unwrap();
+    let cx = (f1.rect[0] + f1.rect[2]) / 2.0;
+    assert!((cx - 306.0).abs() < 2.0 && f1.rect[1] < 40.0, "{:?}", f1.rect);
+    let o2 = stitchup_core::objects::list(&back, 2).unwrap();
+    let f2 = o2.iter().find(|o| o.text.contains("Page 6")).unwrap();
+    assert!(f2.rect[3] - f2.rect[1] > f2.rect[2] - f2.rect[0], "rotated with the page: {:?}", f2.rect);
+}

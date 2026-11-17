@@ -1315,6 +1315,9 @@ kbd {
   display: flex;
   align-items: center;
   gap: 6px;
+  /* Tabs shrink like a browser's when many are open (names get "…"). */
+  flex: 0 1 200px;
+  min-width: 64px;
   max-width: 220px;
   height: 26px;
   padding: 0 6px 0 12px;
@@ -1337,6 +1340,8 @@ kbd {
 }
 
 .doc-tab-name {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1713,4 +1718,97 @@ kbd {
   border-left: 3px solid #f5a623;
   background: color-mix(in srgb, #f5a623 10%, transparent);
   font-size: 13px;
+}
+
+.hf-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.hf-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0 10px;
+}
+.hf-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 10px;
+}
+.hf-row label {
+  flex: 1;
+  min-width: 90px;
+}
+
+.recent-list {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  margin-top: 18px;
+  min-width: 320px;
+  max-width: 560px;
+}
+.recent-item {
+  text-align: left;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--fg);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.recent-item:hover {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.about-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 4px;
+}
+.about-icon {
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.about-icon:active img {
+  transform: scale(0.94);
+}
+.about-bubble {
+  position: relative;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-modal));
+  font-style: italic;
+  animation: bubble-in 0.25s ease-out;
+}
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+.about-sound {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.about-sound .link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent);
+  text-decoration: underline;
+  cursor: pointer;
 }
