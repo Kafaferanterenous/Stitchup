@@ -13,7 +13,7 @@
 
 import { chromium } from "playwright";
 import { spawn, execFileSync } from "node:child_process";
-import { mkdir, readFile, writeFile, rm, copyFile, readdir, stat } from "node:fs/promises";
+import { mkdir, readFile, writeFile, rm, copyFile, readdir, stat, chmod } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import os from "node:os";
@@ -1972,6 +1972,79 @@ await check("opening a slow (large) PDF shows “Keep your pants on, mate — it
   } finally {
     await ipc("test_set_open_delay", { ms: 0 });
   }
+  await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
+  await waitStatus(/main\.pdf/);
+  openPath = MAIN;
+});
+
+await check("QuickSign: if the signature can't be kept (folder blocked), Save & Place still places it", async () => {
+  const f = path.join(WORK, "blocked-sign.pdf");
+  await makePdf(f, [LETTER]);
+  await openViaRibbon(f);
+  const png = path.join(WORK, "my-signature.png");
+  await mkdir(SIGNATURES, { recursive: true });
+  await chmod(SIGNATURES, 0o500); // read-only, like a blocked / locked folder
+  try {
+    await tab("Security");
+    await rb("quickSign").click();
+    await page.locator(".rb-choices").getByRole("menuitem", { name: "Create New Signature…" }).click();
+    await pick(png);
+    await btn("Choose Image…").click();
+    await page.locator(".qs-preview img").waitFor();
+    await btn("Save & Place Signature").click();
+    await waitNotice(/Could not keep the signature .*placing it this once/);
+    const [x, y] = await emptySpot(1, 0.5, 0.6);
+    await page.mouse.click(x, y);
+    await page.waitForFunction(async () => true);
+    for (let i = 0; i < 40; i++) {
+      if ((await ipc("list_objects", { page: 1 })).some((o) => o.kind === "image")) break;
+      await page.waitForTimeout(200);
+    }
+    assert((await ipc("list_objects", { page: 1 })).some((o) => o.kind === "image"), "signature placed anyway");
+  } finally {
+    await chmod(SIGNATURES, 0o700);
+  }
+  await pick("Close");
+  await page.locator(".doc-tab.active .doc-tab-close").click();
+  await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
+  await waitStatus(/main\.pdf/);
+  openPath = MAIN;
+});
+
+await check("Annotate ▸ Type Text and ✓ / ✗ fill in a form that has no fields", async () => {
+  const local = path.resolve(APP, "..", "..", "fixtures", "fillable-form.pdf");
+  const f = existsSync(local) ? local : path.join(WORK, "paper-form.pdf");
+  if (f !== local) await makePdf(f, [LETTER]);
+  await openViaRibbon(f);
+  await tab("Annotate");
+  await rb("annType").click();
+  await page.locator(".rb-choices").getByRole("menuitem", { name: /Normal \(11 pt\)/ }).click();
+  const [x, y] = await emptySpot(1, 0.45, 0.35);
+  await page.mouse.click(x, y);
+  const input = page.getByLabel("Type text");
+  await input.waitFor();
+  await input.fill("Zofia Łukasiewicz");
+  await input.press("Enter");
+  await waitStatus(/Added text_box|text box|Text/i).catch(() => {});
+  await page.waitForTimeout(500);
+  await rb("annMark").click();
+  await page.locator(".rb-choices").getByRole("menuitem", { name: "✓ Check mark" }).click();
+  const [x2, y2] = await emptySpot(1, 0.2, 0.55);
+  await page.mouse.click(x2, y2);
+  await page.waitForTimeout(500);
+  await rb("annMark").click();
+  await page.locator(".rb-choices").getByRole("menuitem", { name: "✗ Cross" }).click();
+  const [x3, y3] = await emptySpot(1, 0.3, 0.55);
+  await page.mouse.click(x3, y3);
+  for (let i = 0; i < 30 && (await annotsOn(1)).filter((a) => a.subtype === "Ink").length < 2; i++) await page.waitForTimeout(200);
+  const ann = await annotsOn(1);
+  const typed = ann.find((a) => a.subtype === "FreeText");
+  assert(typed && typed.contents === "Zofia Łukasiewicz", JSON.stringify(ann.map((a) => [a.subtype, a.contents])));
+  assert(ann.filter((a) => a.subtype === "Ink").length === 2, "✓ and ✗ marks");
+  await page.keyboard.press("Escape");
+  await page.screenshot({ path: path.join(OUT, "type-text.png") });
+  await pick("Close");
+  await page.locator(".doc-tab.active .doc-tab-close").click();
   await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
   await waitStatus(/main\.pdf/);
   openPath = MAIN;

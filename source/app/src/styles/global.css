@@ -1839,3 +1839,14 @@ kbd {
     transform: rotate(360deg);
   }
 }
+
+.type-text-input {
+  position: absolute;
+  z-index: 20;
+  padding: 0 2px;
+  border: 1px dashed color-mix(in srgb, var(--accent) 70%, transparent);
+  background: color-mix(in srgb, #ffffff 85%, transparent);
+  font-family: Helvetica, Arial, sans-serif;
+  line-height: 1.2;
+  outline: none;
+}

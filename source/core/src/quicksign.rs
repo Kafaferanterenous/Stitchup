@@ -77,13 +77,18 @@ fn read(dir: &Path, id: &str) -> Result<Stored, EngineError> {
 
 fn write_private(path: &Path, bytes: &[u8]) -> Result<(), EngineError> {
     let tmp = path.with_extension("tmp");
-    std::fs::write(&tmp, bytes)?;
+    std::fs::write(&tmp, bytes).map_err(|e| crate::err!(ErrorCode::IoError, "could not write {}: {e}", tmp.display()))?;
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
         let _ = std::fs::set_permissions(&tmp, std::fs::Permissions::from_mode(0o600));
     }
-    std::fs::rename(&tmp, path)?;
+    // Windows: retried while the new file is being scanned. A signature file
+    // is always new, so if the rename still fails, write it in place instead.
+    if let Err(e) = crate::ops::rename_retry(&tmp, path) {
+        let _ = std::fs::remove_file(&tmp);
+        std::fs::write(path, bytes).map_err(|e2| crate::err!(ErrorCode::IoError, "could not save the signature in {} (rename: {e}; write: {e2})", path.display()))?;
+    }
     Ok(())
 }
 
@@ -108,7 +113,7 @@ pub fn save(dir: &Path, name: &str, png: &[u8], password: Option<&str>) -> Resul
     }
     let name = name.trim();
     let name = if name.is_empty() { "Signature" } else { name };
-    std::fs::create_dir_all(dir)?;
+    std::fs::create_dir_all(dir).map_err(|e| crate::err!(ErrorCode::IoError, "could not create the signature folder {}: {e}", dir.display()))?;
     let id: String = rand_bytes::<16>()?.iter().map(|b| format!("{b:02x}")).collect();
     let created = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0);
     let mut st = Stored { version: 1, id: id.clone(), name: name.into(), created, png: None, salt: None, nonce: None, data: None, rounds: 0 };

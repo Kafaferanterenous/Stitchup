@@ -80,9 +80,14 @@ export function QuickSignNewDialog() {
       if (!sig) return;
       let note: string | undefined;
       if (keep) {
-        await cmdQuickSignSave(name, sig.png, lock ? pw1 : undefined);
-        await store.loadSignatures();
-        note = lock ? `Signature “${name}” saved, locked with a password` : `Signature “${name}” saved for next time`;
+        try {
+          await cmdQuickSignSave(name, sig.png, lock ? pw1 : undefined);
+          await store.loadSignatures();
+          note = lock ? tr("Signature “{0}” saved, locked with a password", name) : tr("Signature “{0}” saved for next time", name);
+        } catch (e) {
+          // Keeping it failed (e.g. the folder is blocked): still let the user sign.
+          note = tr("Could not keep the signature ({0}) — placing it this once", errText(e));
+        }
       }
       close();
       store.placeSignature(sig, name, note);

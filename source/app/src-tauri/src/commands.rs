@@ -979,7 +979,7 @@ fn write_atomic(target: &std::path::Path, bytes: &[u8]) -> Result<CommitResult, 
         f.write_all(bytes)?;
         f.sync_all()?;
     }
-    if let Err(e) = std::fs::rename(&tmp, target) {
+    if let Err(e) = stitchup_core::ops::rename_retry(&tmp, target) {
         let _ = std::fs::remove_file(&tmp);
         return Err(EngineError::new(ErrorCode::AtomicPublishFailed, e.to_string()));
     }

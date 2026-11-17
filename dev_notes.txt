@@ -1197,3 +1197,20 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
 - Regression: core test (junk tail), e2e with fixtures/protected.pdf when present (sample files are
   third-party → kept local, /fixtures/*.pdf ignored).
 - TESTS: core 65, command layer 9, e2e 84/84.
+
+2026-11-17 — v0.14.3: WINDOWS "ACCESS IS DENIED (OS ERROR 5)" IN QUICKSIGN
+- User (portable Windows build): saving a password-protected QuickSign signature failed with
+  "Access is denied (os error 5)", and Save & Place did nothing. Not reproducible on the GitHub
+  Windows runner (same tests pass there) → most likely Defender / the search indexer briefly opening
+  a just-written file, which makes the temp→final rename fail on a real PC.
+- ops::rename_retry: on Windows, retry renames for ~2.5 s on error 5 / 32; used by every atomic save
+  (documents, exports, signatures). Signatures fall back to writing the (always new) file in place.
+- Save & Place now places the signature even if keeping it fails, with the reason shown; signature
+  errors name the step and folder.
+- Portable Windows zip added to the workflow (Stitchup.exe + README).
+- TESTS: core 65, command layer 9, e2e 85/85 (incl. read-only signature folder).
+- User: "fillable-form.pdf" (Canva export) could not be filled — it has NO form fields (no /AcroForm,
+  PDFKit finds 0 widgets; only 2 links). Added Annotate ▸ Type Text (inline input → borderless
+  FreeText sized to the text, sizes 9/11/14/18) and Marks ✓ / ✗ (ink strokes), default near-black
+  ink ("form" colour). e2e uses the local fixture when present.
+- TESTS: core 65, command layer 9, e2e 86/86.

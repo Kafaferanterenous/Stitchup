@@ -57,6 +57,8 @@ not notarized. The first time you open it, right-click it and choose
   Recolour text, change its font and size, insert images (PNG with
   transparency, JPEG, HEIC…) and draw vector shapes.
 - **Forms:** fill text fields, checkboxes, radio buttons and drop-downs.
+  Forms without real fields (scans, Canva exports): **Type Text** anywhere
+  and tick boxes with ✓ / ✗ (Annotate tab).
 - **OCR:** Content ▸ OCR reads scanned pages with Apple's Vision framework, on
   your Mac (macOS 10.15 or later), and adds the text as an invisible layer.
   The page looks the same, but you can now search, select and copy its text.
@@ -119,7 +121,7 @@ Tests:
 |---|---|
 | `cd source/core && cargo test --release` | PDF engine: text editing, annotations, redaction, forms, signatures (checked with OpenSSL), page tree |
 | `cd source/app/src-tauri && cargo test --release` | Command layer |
-| `cd source/app && npm run build && npm run test:e2e` | 84 end-to-end checks: the real UI in Chromium driving the real Rust backend, with every ribbon tab, dialog and shortcut |
+| `cd source/app && npm run build && npm run test:e2e` | 86 end-to-end checks: the real UI in Chromium driving the real Rust backend, with every ribbon tab, dialog and shortcut |
 
 ## Layout
 

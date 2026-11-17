@@ -623,3 +623,20 @@
 621|Dostępna aktualizacja
 622|Trzymaj portki, Waćpan – ładuje się…
 623|{0} s
+624|Podpis „{0}” zachowano, zabezpieczony hasłem
+625|Podpis „{0}” zachowano na następny raz
+626|Nie udało się zachować podpisu ({0}) – umieszczam go tylko tym razem
+627|Zaznaczenie / krzyżyk
+628|Zaznaczenie: kliknij pole, aby je odhaczyć
+629|Krzyżyk: kliknij pole, aby je oznaczyć
+630|Wypełniaj formularze bez pól: kliknij w dowolnym miejscu strony i pisz (Enter umieszcza, Esc anuluje)
+631|Znaczniki
+632|Odhacz wydrukowane pole: ✓ lub ✗ w miejscu kliknięcia
+633|Wpisz tekst
+634|Wpisz tekst: kliknij, gdzie ma być tekst, pisz, Enter
+635|✓ Ptaszek
+636|✗ Krzyżyk
+637|Mały ({0} pt)
+638|Zwykły ({0} pt)
+639|Duży ({0} pt)
+640|Bardzo duży ({0} pt)

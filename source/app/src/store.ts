@@ -151,6 +151,8 @@ export interface AppState {
   recent: string[];
   /** A file being opened (for the "it's loading" message on slow files). */
   loading: { name: string; since: number } | null;
+  /** Type Text size (points). */
+  typeSize: number;
   strokeWidth: number;
   /** Select tool: picked content objects ("t12"/"i30") and annotations (obj #). */
   picked: { page: number; objects: string[]; annots: number[] } | null;
@@ -200,6 +202,9 @@ export interface PendingImage {
 }
 
 export type Tool =
+  | "typetext"
+  | "check"
+  | "cross"
   | "highlight"
   | "underline"
   | "strikeout"
@@ -295,6 +300,7 @@ let state: AppState = {
   lang: language(),
   recent: loadRecent(),
   loading: null,
+  typeSize: 11,
   strokeWidth: 2,
   picked: null,
   pendingInput: null,
@@ -342,8 +348,9 @@ export interface EditingLine {
 
 const HIGHLIGHT_DEFAULT = "#ffeb3b";
 /** Colour for an annotation tool: Annotate ▸ Colour if chosen, else its default. */
-export function annotColor(s: AppState, tool: "highlight" | "other"): string {
-  return s.annColor ?? (tool === "highlight" ? HIGHLIGHT_DEFAULT : s.foreColor);
+export function annotColor(s: AppState, tool: "highlight" | "other" | "form"): string {
+  // Filling in a form (Type Text, ✓, ✗) defaults to near-black ink.
+  return s.annColor ?? (tool === "highlight" ? HIGHLIGHT_DEFAULT : tool === "form" ? "#111111" : s.foreColor);
 }
 
 export function rgb(hex: string): [number, number, number] {
@@ -714,6 +721,10 @@ export const store = {
     const next = state.tool === tool ? null : tool;
     set({ tool: next, picked: null, editMode: false, pendingInput: null });
     if (next === "select") notify(tr("Select: click an object or drag a box · drag to move · ⌫ deletes"));
+  },
+
+  setTypeSize(pt: number) {
+    set({ typeSize: pt });
   },
 
   setStampLabel(label: string) {

@@ -622,5 +622,22 @@
  "Top right",
  "Update available",
  "Keep your pants on, mate \u2014 it's loadin'\u2026",
- "{0} s"
+ "{0} s",
+ "Signature \u201c{0}\u201d saved, locked with a password",
+ "Signature \u201c{0}\u201d saved for next time",
+ "Could not keep the signature ({0}) \u2014 placing it this once",
+ "Check / Cross Mark",
+ "Check mark: click the box to tick",
+ "Cross: click the box to mark",
+ "Fill in forms that have no fields: click anywhere on the page and type (Enter places it, Esc cancels)",
+ "Marks",
+ "Tick a printed checkbox: \u2713 or \u2717 where you click",
+ "Type Text",
+ "Type Text: click where the text goes, type, Enter",
+ "\u2713 Check mark",
+ "\u2717 Cross",
+ "Small ({0} pt)",
+ "Normal ({0} pt)",
+ "Large ({0} pt)",
+ "Extra large ({0} pt)"
 ]

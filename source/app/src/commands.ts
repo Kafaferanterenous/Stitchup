@@ -240,6 +240,22 @@ export const COMMANDS: Command[] = [
   { id: "selectAll", label: "Select All", menu: "Select All Pages", tip: "Select every page (⌘A)", icon: "thumbnails", accel: "CmdOrCtrl+A", enabled: hasDoc, run: () => store.selectAllPages(), textFallback: "selectAll" },
 
   // ---------------------------------------------------------------- Annotate
+  { id: "annType", label: "Type Text", menu: "Type Text", tip: "Fill in forms that have no fields: click anywhere on the page and type (Enter places it, Esc cancels)", icon: "text", tab: "Annotate", enabled: hasDoc,
+    active: isTool("typetext"),
+    choices: () => [9, 11, 14, 18].map((pt) => ({
+      label: tr(pt === 9 ? "Small ({0} pt)" : pt === 11 ? "Normal ({0} pt)" : pt === 14 ? "Large ({0} pt)" : "Extra large ({0} pt)", pt),
+      active: getState().tool === "typetext" && getState().typeSize === pt,
+      run: () => {
+        store.setTypeSize(pt);
+        if (getState().tool !== "typetext") store.setTool("typetext");
+      },
+    })), run: () => {} },
+  { id: "annMark", label: "Marks", menu: "Check / Cross Mark", tip: "Tick a printed checkbox: ✓ or ✗ where you click", icon: "pen", tab: "Annotate", enabled: hasDoc,
+    active: (s) => s.tool === "check" || s.tool === "cross",
+    choices: () => [
+      { label: tr("✓ Check mark"), active: getState().tool === "check", run: () => store.setTool("check") },
+      { label: tr("✗ Cross"), active: getState().tool === "cross", run: () => store.setTool("cross") },
+    ], run: () => {} },
   { id: "annHighlight", label: "Highlight", tip: "Drag across text to highlight it", icon: "highlight", tab: "Annotate", enabled: hasDoc, active: isTool("highlight"), run: toolCmd("highlight") },
   { id: "annUnderline", label: "Underline", tip: "Drag across text to underline it (Fore colour)", icon: "underline", tab: "Annotate", enabled: hasDoc, active: isTool("underline"), run: toolCmd("underline") },
   { id: "annStrike", label: "Strike", menu: "Strike-out", tip: "Drag across text to strike it out (Fore colour)", icon: "strike", tab: "Annotate", enabled: hasDoc, active: isTool("strikeout"), run: toolCmd("strikeout") },
@@ -378,7 +394,7 @@ export const MENUS: { title: string; items: (string | "-" | { submenu: string })
   { title: "File", items: ["new", "open", { submenu: "recent" }, "-", "newTab", "closeTab", "-", "save", "saveAs", { submenu: "export" }, "-", "combineNew", "compress", "properties", "-", "print"] },
   { title: "Edit", items: ["undo", "redo", "-", { submenu: "clipboard" }, "-", "find", "findNext", "findPrev", "-", "select", "editText", "objDelete", "fore", "font", "image", "ocr"] },
   { title: "Pages", items: ["import", "addPage", "delete", "-", "rotateCw", "rotateCcw", "rotateAll", "-", "extract", "split", "autoCrop", "headerFooter", "-", "selectAll"] },
-  { title: "Annotate", items: ["annHighlight", "annUnderline", "annStrike", "annNote", "annText", "annShape", "annStamp", "annLink", "annPen", "-", "annFore", "back"] },
+  { title: "Annotate", items: ["annType", "annMark", "-", "annHighlight", "annUnderline", "annStrike", "annNote", "annText", "annShape", "annStamp", "annLink", "annPen", "-", "annFore", "back"] },
   { title: "Security", items: ["encrypt", "sign", "quickSign", "annRedact", "watermark"] },
   { title: "View", items: ["zoomIn", "zoomOut", "zoom100", "fitWidth", "fitPage", "-", "prev", "next", "-", "spread", "single", "continuous", "sidebar", "-", { submenu: "ribbonTabs" }, { submenu: "schemes" }] },
   { title: "Help", items: ["guide", "checkUpdate"] },

@@ -622,3 +622,20 @@
 621|Mise à jour disponible
 622|Garde ton pantalon, mon pote — ça charge…
 623|{0} s
+624|Signature « {0} » enregistrée, protégée par un mot de passe
+625|Signature « {0} » enregistrée pour la prochaine fois
+626|Impossible de garder la signature ({0}) — elle est placée cette fois seulement
+627|Coche / croix
+628|Coche : cliquez sur la case pour la cocher
+629|Croix : cliquez sur la case pour la marquer
+630|Remplir des formulaires sans champs : cliquez n’importe où sur la page et tapez (Entrée place le texte, Échap annule)
+631|Marques
+632|Cocher une case imprimée : ✓ ou ✗ à l’endroit du clic
+633|Saisir du texte
+634|Saisir du texte : cliquez à l’endroit voulu, tapez, Entrée
+635|✓ Coche
+636|✗ Croix
+637|Petit ({0} pt)
+638|Normal ({0} pt)
+639|Grand ({0} pt)
+640|Très grand ({0} pt)

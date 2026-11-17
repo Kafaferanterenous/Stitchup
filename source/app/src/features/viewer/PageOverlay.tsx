@@ -29,6 +29,7 @@ interface PdfAnnot {
 type Box = [number, number, number, number]; // css px x0,y0,x1,y1
 
 const DRAW_TOOLS: Tool[] = [
+  "typetext", "check", "cross",
   "highlight", "underline", "strikeout", "note", "textbox", "rect", "oval", "line", "arrow", "pen", "stamp", "link", "redact",
   "shape-rect", "shape-oval", "shape-line", "shape-arrow", "sign", "image",
 ];
@@ -58,6 +59,8 @@ export function PageOverlay({
   const [ink, setInk] = useState<[number, number][]>([]);
   const [note, setNote] = useState<PdfAnnot | null>(null);
   const [fields, setFields] = useState<FormField[]>([]);
+  // Type Text: where the inline input is (CSS px) and its PDF anchor point.
+  const [typing, setTyping] = useState<{ x: number; y: number; pt: [number, number]; size: number } | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
 
   // Viewport (zoom + rotation) for coordinate conversion.
@@ -164,6 +167,21 @@ export function PageOverlay({
         if (!boxes.length) return store.notify(tr("Drag across some text"));
         const kind = t === "strikeout" ? "strike_out" : t;
         void store.annotate(page, { kind, boxes, color: rgb(annotColor(app, t === "highlight" ? "highlight" : "other")) });
+        return;
+      }
+      case "typetext":
+        setTyping({ x: box[0], y: box[1], pt, size: app.typeSize });
+        return;
+      case "check":
+      case "cross": {
+        // A small hand-drawn-looking mark, centred on the click (PDF points).
+        const s = 11;
+        const [cx, cy] = pt;
+        const strokes: [number, number][][] =
+          t === "check"
+            ? [[[cx - 0.45 * s, cy + 0.02 * s], [cx - 0.12 * s, cy - 0.38 * s], [cx + 0.5 * s, cy + 0.45 * s]]]
+            : [[[cx - 0.4 * s, cy - 0.4 * s], [cx + 0.4 * s, cy + 0.4 * s]], [[cx - 0.4 * s, cy + 0.4 * s], [cx + 0.4 * s, cy - 0.4 * s]]];
+        void store.annotate(page, { kind: "ink", strokes, color: rgb(annotColor(app, "form")), width: 1.6 });
         return;
       }
       case "note":
@@ -367,6 +385,24 @@ export function PageOverlay({
       onPointerDown={tool ? down : undefined}
       onPointerMove={tool ? move : undefined}
       onPointerUp={tool ? up : undefined}>
+      {typing && (
+        <TypeTextInput
+          at={typing}
+          zoom={zoom}
+          color={annotColor(app, "form")}
+          onDone={(text) => {
+            const t = text.trim();
+            const at = typing;
+            setTyping(null);
+            if (!t) return;
+            // Box sized to the text; the click is the left end of the line, mid-height.
+            const w = measureHelvetica(t, at.size) + 6;
+            const h = at.size * 1.35 + 6;
+            const top = at.pt[1] + at.size * 0.62 + 3;
+            void store.annotate(pageNo, { kind: "text_box", rect: [at.pt[0] - 3, top - h, at.pt[0] - 3 + w, top], text: t, size: at.size, color: rgb(annotColor(app, "form")) });
+          }}
+        />
+      )}
       {/* Reading mode: links and notes */}
       {!tool &&
         annots
@@ -575,4 +611,43 @@ function TextField({ f, style }: { f: FormField; style: React.CSSProperties }) {
 function optionLabel(f: FormField, on: string | null): string {
   if (!on) return "";
   return /^\d+$/.test(on) && f.options[Number(on)] ? f.options[Number(on)] : on;
+}
+
+
+let measureCtx: CanvasRenderingContext2D | null = null;
+/** Width in points of `text` in Helvetica at `size` points. */
+function measureHelvetica(text: string, size: number): number {
+  measureCtx ??= document.createElement("canvas").getContext("2d");
+  if (!measureCtx) return text.length * size * 0.55;
+  measureCtx.font = `${size * 10}px Helvetica, Arial, sans-serif`;
+  return measureCtx.measureText(text).width / 10;
+}
+
+/** Type Text: an inline box at the click; Enter places, Esc cancels. */
+function TypeTextInput({ at, zoom, color, onDone }: { at: { x: number; y: number; size: number }; zoom: number; color: string; onDone: (t: string) => void }) {
+  const [v, setV] = useState("");
+  const done = useRef(false);
+  const finish = (t: string) => {
+    if (done.current) return;
+    done.current = true;
+    onDone(t);
+  };
+  const px = at.size * zoom;
+  return (
+    <input
+      className="type-text-input"
+      aria-label="Type text"
+      autoFocus
+      value={v}
+      style={{ left: at.x - 3, top: at.y - px * 0.7, fontSize: px, color, minWidth: px * 6, width: Math.max(px * 6, (v.length + 2) * px * 0.58) }}
+      onChange={(e) => setV(e.target.value)}
+      onPointerDown={(e) => e.stopPropagation()}
+      onKeyDown={(e) => {
+        e.stopPropagation();
+        if (e.key === "Enter") finish(v);
+        if (e.key === "Escape") finish("");
+      }}
+      onBlur={() => finish(v)}
+    />
+  );
 }

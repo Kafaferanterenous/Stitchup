@@ -622,3 +622,20 @@
 621|Aggiornamento disponibile
 622|Tieniti i pantaloni, amico — sta caricando…
 623|{0} s
+624|Firma «{0}» salvata, protetta da password
+625|Firma «{0}» salvata per la prossima volta
+626|Impossibile conservare la firma ({0}) — viene posizionata solo questa volta
+627|Spunta / croce
+628|Spunta: fai clic sulla casella per spuntarla
+629|Croce: fai clic sulla casella per segnarla
+630|Compila moduli senza campi: fai clic in qualsiasi punto della pagina e digita (Invio posiziona il testo, Esc annulla)
+631|Segni
+632|Spunta una casella stampata: ✓ o ✗ dove fai clic
+633|Scrivi testo
+634|Scrivi testo: fai clic dove va il testo, digita, Invio
+635|✓ Spunta
+636|✗ Croce
+637|Piccolo ({0} pt)
+638|Normale ({0} pt)
+639|Grande ({0} pt)
+640|Molto grande ({0} pt)

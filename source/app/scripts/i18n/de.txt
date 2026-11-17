@@ -622,3 +622,20 @@
 621|Update verfügbar
 622|Behalt die Hose an, Kumpel — lädt noch…
 623|{0} s
+624|Unterschrift „{0}“ gespeichert, mit Passwort geschützt
+625|Unterschrift „{0}“ für das nächste Mal gespeichert
+626|Unterschrift konnte nicht gespeichert werden ({0}) — sie wird nur dieses Mal platziert
+627|Häkchen / Kreuz
+628|Häkchen: das Kästchen anklicken
+629|Kreuz: das Kästchen anklicken
+630|Formulare ohne Felder ausfüllen: irgendwo auf die Seite klicken und tippen (Eingabe setzt den Text, Esc bricht ab)
+631|Zeichen
+632|Ein gedrucktes Kästchen ankreuzen: ✓ oder ✗ an der Klickstelle
+633|Text eingeben
+634|Text eingeben: dorthin klicken, wo der Text hin soll, tippen, Eingabe
+635|✓ Häkchen
+636|✗ Kreuz
+637|Klein ({0} pt)
+638|Normal ({0} pt)
+639|Groß ({0} pt)
+640|Sehr groß ({0} pt)

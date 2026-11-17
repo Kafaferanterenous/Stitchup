@@ -639,6 +639,29 @@ pub struct CommitResult {
     pub published_path: PathBuf,
 }
 
+/// Rename `from` → `to`. On Windows a file that was just written is often
+/// opened for a moment by Defender / the search indexer, and renaming it then
+/// fails with "Access is denied (os error 5)" or a sharing violation (32):
+/// retry for up to ~2.5 s before giving up. Elsewhere: a single attempt.
+pub fn rename_retry(from: &Path, to: &Path) -> std::io::Result<()> {
+    let mut wait = 25u64;
+    let mut spent = 0u64;
+    loop {
+        match std::fs::rename(from, to) {
+            Ok(()) => return Ok(()),
+            Err(e) => {
+                let busy = cfg!(windows) && (e.kind() == std::io::ErrorKind::PermissionDenied || matches!(e.raw_os_error(), Some(5) | Some(32)));
+                if !busy || spent >= 2500 {
+                    return Err(e);
+                }
+                std::thread::sleep(std::time::Duration::from_millis(wait));
+                spent += wait;
+                wait = (wait * 2).min(400);
+            }
+        }
+    }
+}
+
 /// Serialize through lopdf to the target dir as a temp file, fsync, then rename
 /// (same volume) and hash the published bytes. Callers must not pass a source path.
 pub fn commit_export(doc: &mut PdfDoc, target: &Path) -> Result<CommitResult, EngineError> {
@@ -655,7 +678,7 @@ pub fn commit_export(doc: &mut PdfDoc, target: &Path) -> Result<CommitResult, En
         f.write_all(&data)?;
         f.sync_all()?;
     }
-    if let Err(e) = std::fs::rename(&tmp_path, target) {
+    if let Err(e) = rename_retry(&tmp_path, target) {
         let _ = std::fs::remove_file(&tmp_path);
         return Err(EngineError::new(ErrorCode::AtomicPublishFailed, e.to_string()));
     }
