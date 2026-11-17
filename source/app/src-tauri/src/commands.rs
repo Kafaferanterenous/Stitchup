@@ -1627,7 +1627,30 @@ pub fn clear_recovery() -> Result<(), EngineError> {
 }
 
 fn process_alive(pid: u32) -> bool {
+    #[cfg(windows)]
+    {
+        // tasklist prints the process line only when that PID exists.
+        return std::process::Command::new("tasklist")
+            .args(["/FI", &format!("PID eq {pid}"), "/NH", "/FO", "CSV"])
+            .output()
+            .map(|o| String::from_utf8_lossy(&o.stdout).contains(&format!("\"{pid}\"")))
+            .unwrap_or(false);
+    }
+    #[cfg(not(windows))]
     std::process::Command::new("kill").args(["-0", &pid.to_string()]).stderr(std::process::Stdio::null()).status().map(|s| s.success()).unwrap_or(false)
+}
+
+/// What this build can do on this computer (some features are per-OS).
+#[derive(Debug, Clone, Serialize)]
+pub struct PlatformInfo {
+    pub os: &'static str,
+    /// Text recognition helper present (Apple Vision on macOS).
+    pub ocr: bool,
+}
+
+#[tauri::command]
+pub fn platform_info() -> PlatformInfo {
+    PlatformInfo { os: std::env::consts::OS, ocr: ocr_helper().is_some() }
 }
 
 /// Snapshots left behind by a Stitchup that crashed or was killed.

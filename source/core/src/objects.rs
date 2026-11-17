@@ -243,7 +243,7 @@ fn rebuild(ops: &[Operation], repl: HashMap<usize, Vec<Operation>>) -> Vec<Opera
 // ------------------------------------------------- content scopes (page + groups)
 
 /// Nesting depth of grouped drawings (form XObjects) opened for selection.
-const MAX_DEPTH: usize = 4;
+const MAX_DEPTH: usize = 16;
 
 /// One content stream: the page itself (`chain` empty) or a form XObject
 /// reached by the draw ops in `chain` (page op, then op inside that form, …).

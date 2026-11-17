@@ -212,3 +212,10 @@ export const cmdQuickSignList = () => cmd<SavedSignature[]>("quicksign_list");
 export const cmdQuickSignSave = (name: string, png_b64: string, password?: string) => cmd<SavedSignature>("quicksign_save", { name, png_b64, password });
 export const cmdQuickSignLoad = (id: string, password?: string) => cmd<string>("quicksign_load", { id, password });
 export const cmdQuickSignDelete = (id: string, password?: string) => cmd<void>("quicksign_delete", { id, password });
+
+// ---- platform
+export interface PlatformInfo {
+  os: string;
+  ocr: boolean;
+}
+export const cmdPlatformInfo = () => cmd<PlatformInfo>("platform_info");

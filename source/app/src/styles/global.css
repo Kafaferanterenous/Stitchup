@@ -1663,3 +1663,47 @@ kbd {
 .modal:not(.wide) {
   max-width: min(560px, 92vw);
 }
+.qs-modes {
+  display: inline-flex;
+  margin: 4px 0 8px;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.qs-modes button {
+  padding: 4px 16px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+.qs-modes button.on {
+  color: var(--on-accent);
+  background: var(--accent);
+}
+.qs-pad {
+  position: relative;
+  margin: 6px 0;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  background: #fff;
+  cursor: crosshair;
+}
+.sig-pad {
+  display: block;
+}
+.qs-pad-line {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 24%;
+  border-bottom: 1px dashed #c3c8d4;
+  pointer-events: none;
+}
+.qs-pad-tools {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.qs-pad-tools button {
+  margin-left: auto;
+}

@@ -94,6 +94,7 @@ fn dispatch(st: &Mutex<SessionState>, cmd: &str, a: &Value) -> Result<Value, Val
         "quicksign_load" => go!(quicksign_load(arg(a, "id").map_err(bad)?, arg(a, "password").unwrap_or(None))),
         "quicksign_delete" => go!(quicksign_delete(arg(a, "id").map_err(bad)?, arg(a, "password").unwrap_or(None))),
         "recolor_annotations" => go!(recolor_annotations_inner(st, arg(a, "page").map_err(bad)?, arg(a, "objs").map_err(bad)?, arg(a, "color").map_err(bad)?)),
+        "platform_info" => go!(Ok::<_, stitchup_core::EngineError>(platform_info())),
         "list_system_fonts" => go!(Ok::<_, stitchup_core::EngineError>(list_system_fonts())),
         "ocr_recognize" => go!(ocr_recognize(arg(a, "b64").map_err(bad)?, arg(a, "languages").ok())),
         "ocr_apply" => go!(ocr_apply_inner(st, arg(a, "pages").map_err(bad)?)),

@@ -1,7 +1,8 @@
 //! QuickSign dialogs: create a signature from an image, unlock a
 //! password-protected one, and manage the saved ones.
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { INKS, SignaturePad, type SignaturePadHandle } from "./SignaturePad";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { store, useAppState } from "../../store";
 import { cmdQuickSignDelete, cmdQuickSignLoad, cmdQuickSignSave, cmdReadImage, type SavedSignature } from "../../ipc";
@@ -21,10 +22,14 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   );
 }
 
-/** QuickSign ▸ Create New Signature: from a JPG, GIF or PNG file. */
+/** QuickSign ▸ Create New Signature: from a JPG, GIF or PNG file, or drawn. */
 export function QuickSignNewDialog() {
+  const [mode, setMode] = useState<"file" | "draw">("file");
+  const pad = useRef<SignaturePadHandle | null>(null);
+  const [ink, setInk] = useState(INKS[1].color);
+  const [drawn, setDrawn] = useState(false);
   const [file, setFile] = useState<{ b64: string; name: string } | null>(null);
-  const [sig, setSig] = useState<PreparedSignature | null>(null);
+  const [sigFile, setSig] = useState<PreparedSignature | null>(null);
   const [removeWhite, setRemoveWhite] = useState(true);
   const [name, setName] = useState("My signature");
   const [keep, setKeep] = useState(true);
@@ -61,9 +66,16 @@ export function QuickSignNewDialog() {
   const pwProblem = keep && lock ? (pw1.length < 4 ? "Use a password of at least 4 characters" : pw1 !== pw2 ? "The passwords don't match" : null) : null;
 
   async function place() {
-    if (!sig || pwProblem) return;
+    if (pwProblem) return;
     setBusy(true);
     try {
+      let sig = mode === "file" ? sigFile : null;
+      if (mode === "draw") {
+        const png = await pad.current?.png();
+        if (!png) throw new Error("draw your signature first");
+        sig = await prepareSignature(png, false);
+      }
+      if (!sig) return;
       let note: string | undefined;
       if (keep) {
         await cmdQuickSignSave(name, sig.png, lock ? pw1 : undefined);
@@ -81,25 +93,55 @@ export function QuickSignNewDialog() {
 
   return (
     <Modal title="Create New Signature" onClose={close}>
-      <p className="muted">Choose a photo or scan of your handwritten signature (JPG, GIF or PNG). Sign on white paper with a dark pen for the best result.</p>
-      <div className="qs-pick">
-        <button onClick={() => void choose()}>{file ? "Choose Another Image…" : "Choose Image…"}</button>
-        <span className="muted">{file?.name ?? "No image chosen"}</span>
+      <div className="qs-modes" role="tablist" aria-label="Signature source">
+        <button role="tab" aria-selected={mode === "file"} className={mode === "file" ? "on" : ""} onClick={() => setMode("file")}>
+          From File
+        </button>
+        <button role="tab" aria-selected={mode === "draw"} className={mode === "draw" ? "on" : ""} onClick={() => setMode("draw")}>
+          Draw
+        </button>
       </div>
-      <div className="qs-preview" aria-label="Signature preview">
-        {sig ? <img src={`data:image/png;base64,${sig.png}`} alt="Signature preview" /> : <span className="muted">The signature appears here</span>}
-      </div>
-      <label className="inline-check">
-        <input
-          type="checkbox"
-          checked={removeWhite}
-          onChange={(e) => {
-            setRemoveWhite(e.target.checked);
-            if (file) void prepare(file.b64, e.target.checked);
-          }}
-        />{" "}
-        Make the white background transparent
-      </label>
+      {mode === "file" ? (
+        <>
+          <p className="muted">Choose a photo or scan of your handwritten signature (JPG, GIF or PNG). Sign on white paper with a dark pen for the best result.</p>
+          <div className="qs-pick">
+            <button onClick={() => void choose()}>{file ? "Choose Another Image…" : "Choose Image…"}</button>
+            <span className="muted">{file?.name ?? "No image chosen"}</span>
+          </div>
+          <div className="qs-preview" aria-label="Signature preview">
+            {sigFile ? <img src={`data:image/png;base64,${sigFile.png}`} alt="Signature preview" /> : <span className="muted">The signature appears here</span>}
+          </div>
+          <label className="inline-check">
+            <input
+              type="checkbox"
+              checked={removeWhite}
+              onChange={(e) => {
+                setRemoveWhite(e.target.checked);
+                if (file) void prepare(file.b64, e.target.checked);
+              }}
+            />{" "}
+            Make the white background transparent
+          </label>
+        </>
+      ) : (
+        <>
+          <p className="muted">Sign in the box with your mouse, trackpad or pen.</p>
+          <div className="qs-pad">
+            <SignaturePad ref={pad} ink={ink} onChange={(empty) => setDrawn(!empty)} />
+            <span className="qs-pad-line" aria-hidden="true" />
+          </div>
+          <div className="qs-pad-tools">
+            {INKS.map((k) => (
+              <label key={k.color} className="inline-check">
+                <input type="radio" name="ink" checked={ink === k.color} onChange={() => setInk(k.color)} /> {k.label} ink
+              </label>
+            ))}
+            <button onClick={() => pad.current?.clear()} disabled={!drawn}>
+              Clear
+            </button>
+          </div>
+        </>
+      )}
       <label>
         Name
         <input aria-label="Signature name" value={name} onChange={(e) => setName(e.target.value)} />
@@ -120,9 +162,9 @@ export function QuickSignNewDialog() {
         </div>
       )}
       {keep && !lock && <p className="muted">Kept without a password, anyone using this Mac account can place it.</p>}
-      {(error || (sig && pwProblem)) && <p className="qs-error" role="alert">{error ?? pwProblem}</p>}
+      {(error || ((mode === "file" ? sigFile : drawn) && pwProblem)) && <p className="qs-error" role="alert">{error ?? pwProblem}</p>}
       <div className="modal-actions">
-        <button onClick={() => void place()} disabled={!sig || !!pwProblem || busy}>
+        <button onClick={() => void place()} disabled={!(mode === "file" ? sigFile : drawn) || !!pwProblem || busy}>
           {keep ? "Save & Place Signature" : "Place Signature"}
         </button>
         <button onClick={close}>Cancel</button>

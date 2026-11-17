@@ -38,15 +38,45 @@ pub fn font_dirs() -> Vec<PathBuf> {
     if let Ok(v) = std::env::var("STITCHUP_FONT_DIRS") {
         return v.split(':').filter(|s| !s.is_empty()).map(PathBuf::from).collect();
     }
-    let mut d = vec![
-        PathBuf::from("/System/Library/Fonts"),
-        PathBuf::from("/System/Library/Fonts/Supplemental"),
-        PathBuf::from("/Library/Fonts"),
-    ];
-    if let Ok(home) = std::env::var("HOME") {
-        d.push(Path::new(&home).join("Library/Fonts"));
+    let mut d = vec![];
+    if cfg!(target_os = "macos") {
+        d.push(PathBuf::from("/System/Library/Fonts"));
+        d.push(PathBuf::from("/System/Library/Fonts/Supplemental"));
+        d.push(PathBuf::from("/Library/Fonts"));
+        if let Ok(home) = std::env::var("HOME") {
+            d.push(Path::new(&home).join("Library/Fonts"));
+        }
+    } else if cfg!(windows) {
+        let win = std::env::var("WINDIR").unwrap_or_else(|_| "C:\\Windows".into());
+        d.push(Path::new(&win).join("Fonts"));
+        if let Ok(local) = std::env::var("LOCALAPPDATA") {
+            d.push(Path::new(&local).join("Microsoft").join("Windows").join("Fonts"));
+        }
+    } else {
+        // Linux / BSD: fonts live in sub-folders (scanned recursively).
+        d.push(PathBuf::from("/usr/share/fonts"));
+        d.push(PathBuf::from("/usr/local/share/fonts"));
+        if let Ok(home) = std::env::var("HOME") {
+            d.push(Path::new(&home).join(".local/share/fonts"));
+            d.push(Path::new(&home).join(".fonts"));
+        }
     }
     d
+}
+
+/// Font files under `dir` (sub-folders too, a few levels deep).
+fn font_files(dir: &Path, depth: u32, out: &mut Vec<PathBuf>) {
+    let Ok(rd) = std::fs::read_dir(dir) else { return };
+    for e in rd.flatten() {
+        let p = e.path();
+        if p.is_dir() {
+            if depth < 4 {
+                font_files(&p, depth + 1, out);
+            }
+        } else if matches!(p.extension().and_then(|e| e.to_str()).map(|e| e.to_ascii_lowercase()).as_deref(), Some("ttf" | "otf" | "ttc" | "otc")) {
+            out.push(p);
+        }
+    }
 }
 
 /// Name record text: Unicode records, and Mac Roman records (Apple's .ttc
@@ -123,16 +153,15 @@ fn scan_file(path: &Path, out: &mut Vec<SystemFace>) {
 
 fn scan() -> Vec<SystemFace> {
     let mut out = vec![];
+    let mut files = vec![];
     for dir in font_dirs() {
-        let Ok(rd) = std::fs::read_dir(&dir) else { continue };
-        let mut files: Vec<PathBuf> = rd.flatten().map(|e| e.path()).collect();
-        files.sort();
-        for f in files {
-            let ext = f.extension().and_then(|e| e.to_str()).unwrap_or("").to_ascii_lowercase();
-            if matches!(ext.as_str(), "ttf" | "otf" | "ttc" | "otc") {
-                scan_file(&f, &mut out);
-            }
-        }
+        // The macOS Supplemental folder is listed separately: don't descend twice.
+        font_files(&dir, if cfg!(target_os = "macos") { 4 } else { 0 }, &mut files);
+    }
+    files.sort();
+    files.dedup();
+    for f in files {
+        scan_file(&f, &mut out);
     }
     // One entry per PostScript name (the same font may be installed twice).
     out.sort_by(|a, b| a.family.to_lowercase().cmp(&b.family.to_lowercase()).then(a.weight.cmp(&b.weight)).then(a.italic.cmp(&b.italic)));
@@ -165,11 +194,11 @@ pub fn face_in_family(family: &str, bold: bool, italic: bool) -> Option<&'static
 /// (Cyrillic, Greek, CJK…): same look (serif / sans / mono, bold, italic) where possible.
 pub fn fallback_face(text: &str, serif: bool, mono: bool, bold: bool, italic: bool) -> Option<&'static SystemFace> {
     let families: &[&str] = if mono {
-        &["Menlo", "Courier New", "PT Mono", "Andale Mono"]
+        &["Menlo", "Consolas", "Courier New", "DejaVu Sans Mono", "Liberation Mono", "PT Mono", "Andale Mono"]
     } else if serif {
-        &["Times New Roman", "Georgia", "PT Serif", "Times"]
+        &["Times New Roman", "Georgia", "Liberation Serif", "DejaVu Serif", "Noto Serif", "PT Serif", "Times"]
     } else {
-        &["Helvetica Neue", "Arial", "Helvetica", "PT Sans", "Lucida Grande"]
+        &["Helvetica Neue", "Arial", "Helvetica", "Segoe UI", "Liberation Sans", "DejaVu Sans", "Noto Sans", "PT Sans", "Lucida Grande"]
     };
     let covers = |f: &SystemFace| -> bool {
         let Ok(data) = std::fs::read(&f.path) else { return false };
@@ -186,15 +215,15 @@ pub fn fallback_face(text: &str, serif: bool, mono: bool, bold: bool, italic: bo
     // Any face that covers the text (CJK: Hiragino / PingFang / Arial Unicode…).
     let has = |lo: char, hi: char| text.chars().any(|c| (lo..=hi).contains(&c));
     let preferred: &[&str] = if has('\u{2e80}', '\u{9fff}') || has('\u{ac00}', '\u{d7af}') {
-        &["Hiragino Sans", "Hiragino Sans GB", "PingFang SC", "Apple SD Gothic Neo", "Arial Unicode MS"]
+        &["Hiragino Sans", "Hiragino Sans GB", "PingFang SC", "Apple SD Gothic Neo", "Microsoft YaHei", "Yu Gothic", "Malgun Gothic", "Noto Sans CJK SC", "Noto Sans CJK JP", "Arial Unicode MS"]
     } else if has('\u{0600}', '\u{06ff}') {
-        &["Geeza Pro", "Arial", "Times New Roman", "Baghdad", "Damascus"]
+        &["Geeza Pro", "Arial", "Times New Roman", "Segoe UI", "Noto Sans Arabic", "DejaVu Sans", "Baghdad", "Damascus"]
     } else if has('\u{0590}', '\u{05ff}') {
-        &["Arial Hebrew", "Arial", "Times New Roman", "Lucida Grande"]
+        &["Arial Hebrew", "Arial", "Times New Roman", "Segoe UI", "Noto Sans Hebrew", "DejaVu Sans", "Lucida Grande"]
     } else if has('\u{0900}', '\u{097f}') {
-        &["Kohinoor Devanagari", "ITF Devanagari", "Devanagari Sangam MN", "Devanagari MT"]
+        &["Kohinoor Devanagari", "ITF Devanagari", "Devanagari Sangam MN", "Nirmala UI", "Noto Sans Devanagari", "Devanagari MT"]
     } else if has('\u{0e00}', '\u{0e7f}') {
-        &["Thonburi", "Ayuthaya", "Sukhumvit Set"]
+        &["Thonburi", "Ayuthaya", "Sukhumvit Set", "Leelawadee UI", "Noto Sans Thai"]
     } else {
         &["Arial Unicode MS"]
     };
@@ -212,11 +241,11 @@ pub fn fallback_face(text: &str, serif: bool, mono: bool, bold: bool, italic: bo
 /// if it lacks some letters — fallback fonts fill those in per character.
 pub fn primary_face(serif: bool, mono: bool, bold: bool, italic: bool) -> Option<&'static SystemFace> {
     let families: &[&str] = if mono {
-        &["Menlo", "Courier New", "PT Mono", "Andale Mono"]
+        &["Menlo", "Consolas", "Courier New", "DejaVu Sans Mono", "Liberation Mono", "PT Mono", "Andale Mono"]
     } else if serif {
-        &["Times New Roman", "Georgia", "PT Serif", "Times"]
+        &["Times New Roman", "Georgia", "Liberation Serif", "DejaVu Serif", "Noto Serif", "PT Serif", "Times"]
     } else {
-        &["Helvetica Neue", "Arial", "Helvetica", "PT Sans", "Lucida Grande"]
+        &["Helvetica Neue", "Arial", "Helvetica", "Segoe UI", "Liberation Sans", "DejaVu Sans", "Noto Sans", "PT Sans", "Lucida Grande"]
     };
     families.iter().find_map(|f| face_in_family(f, bold, italic))
 }

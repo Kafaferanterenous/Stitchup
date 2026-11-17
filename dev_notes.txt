@@ -1125,3 +1125,20 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
   through the Image tool at 160 pt by click (drag sets width) with a signature hint.
 - Fixed: every dialog checkbox was a full-width block (.modal label/input beat .inline-check).
 - TESTS: core 63 (quicksign 3), command layer 9, e2e 78/78.
+
+2026-11-17 — v0.12.0: QUICKSIGN DRAW, DEEPER GROUPS, WINDOWS / LINUX GROUNDWORK
+- SignaturePad: pointer events (mouse / trackpad / pen pressure), quadratic smoothing through
+  midpoints, width from speed, drawn at 2× on a transparent canvas → prepareSignature(trim only).
+  Create New Signature has From File / Draw tabs (Nitro: From File / Draw).
+- Group depth 4 → 16 (cycle guard unchanged).
+- Windows: `cargo check --target x86_64-pc-windows-msvc` passes for core and app (tauri-winres
+  needs llvm-rc on macOS: a temp stub for type-checking only). externalBin (OCR) moved to
+  tauri.macos.conf.json. Per-OS: font folders (Windows Fonts + per-user; Linux /usr/share/fonts
+  recursive, ~/.local/share/fonts) and fallback families (Segoe UI, Microsoft YaHei, Nirmala UI,
+  Leelawadee UI, DejaVu / Liberation / Noto), process_alive via tasklist on Windows, platform_info
+  (os, ocr) → OCR button disabled without the helper, no macOS app menu on Windows/Linux (About in
+  Help, Settings + Quit in File), tooltips show Ctrl+… instead of ⌘.
+- .github/workflows/windows-linux.yml: workflow_dispatch only; Windows NSIS/MSI, Ubuntu deb/AppImage,
+  engine tests; OpenSSL cross-check in sign tests skips only when openssl is missing.
+- Linux could not be compiled here (WebKitGTK system libraries; no Docker on this Mac).
+- TESTS: core 63, command layer 9, e2e 78/78.

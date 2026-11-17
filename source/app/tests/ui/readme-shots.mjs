@@ -226,6 +226,19 @@ await page.getByLabel("Signature password").fill("example");
 await page.getByLabel("Repeat password").fill("example");
 await settle();
 await shot("quicksign-blue.png");
+// Draw mode (checked visually; not in the README).
+await page.getByRole("tab", { name: "Draw" }).click();
+const pad = await page.getByLabel("Draw your signature here").boundingBox();
+const stroke = async (pts) => {
+  await page.mouse.move(pad.x + pts[0][0] * pad.width, pad.y + pts[0][1] * pad.height);
+  await page.mouse.down();
+  for (const [x, y] of pts.slice(1)) await page.mouse.move(pad.x + x * pad.width, pad.y + y * pad.height, { steps: 4 });
+  await page.mouse.up();
+};
+await stroke([[0.12, 0.7], [0.18, 0.25], [0.22, 0.2], [0.24, 0.65], [0.3, 0.45], [0.36, 0.62], [0.42, 0.4], [0.48, 0.6], [0.55, 0.38], [0.62, 0.58], [0.7, 0.42], [0.85, 0.5]]);
+await stroke([[0.15, 0.82], [0.5, 0.86], [0.88, 0.78]]);
+await settle();
+await page.screenshot({ path: process.env.DRAW_SHOT ?? path.join(WORK, "draw.png") });
 await page.keyboard.press("Escape");
 
 await browser.close();

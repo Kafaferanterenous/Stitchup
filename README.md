@@ -59,7 +59,8 @@ not notarized. The first time you open it, right-click it and choose
 - **Pages:** rotate, delete, add, drag to reorder, multi-select, extract,
   split, merge, import, combine, and auto-crop.
 - **QuickSign:** place your handwritten signature from a JPG, GIF or PNG
-  (trimmed, white paper made transparent). Stitchup can keep it for next
+  (trimmed, white paper made transparent), or draw it with the mouse,
+  trackpad or pen. Stitchup can keep it for next
   time, optionally locked with a password (stored encrypted), like Nitro's
   QuickSign.
 - **Security:** AES-256 password protection, watermarks, and digital signatures
@@ -77,6 +78,14 @@ not notarized. The first time you open it, right-click it and choose
   dragging onto the window, or from the Dock.
 
 Progress against the Windows build: [GOALS.md](GOALS.md).
+
+## Windows and Linux
+
+The same code base targets Windows and Linux (Tauri). The engine and app
+compile for Windows; installers are built by the manual GitHub Actions
+workflow **Windows & Linux builds** (Windows: NSIS / MSI, Linux: deb /
+AppImage). These builds are not yet tested on real machines, and OCR is
+macOS-only for now.
 
 ## Build
 

@@ -9,6 +9,20 @@ import { COMMANDS, runCommand, type Command } from "../../commands";
 import { Icon } from "./icons";
 import { ColorPalette } from "../common/ColorPalette";
 
+/** Shortcut hints in tooltips: Mac symbols on macOS, "Ctrl+…" elsewhere. */
+const MAC = /Mac/i.test(navigator.userAgent);
+export function osTip(tip: string): string {
+  if (MAC) return tip;
+  return tip
+    .replace(/⌘⇧/g, "Ctrl+Shift+")
+    .replace(/⌘/g, "Ctrl+")
+    .replace(/⌃⇧/g, "Ctrl+Shift+")
+    .replace(/⌃/g, "Ctrl+")
+    .replace(/⇧/g, "Shift+")
+    .replace(/⌥/g, "Alt+")
+    .replace(/⌫/g, "Backspace");
+}
+
 function RibbonButton({ cmd }: { cmd: Command }) {
   const app = useAppState();
   const [open, setOpen] = useState(false);
@@ -61,7 +75,7 @@ function RibbonButton({ cmd }: { cmd: Command }) {
         aria-haspopup={cmd.choices || cmd.swatch ? "menu" : undefined}
         aria-expanded={cmd.choices || cmd.swatch ? open : undefined}
         data-cmd={cmd.id}
-        title={dirty ? `${cmd.tip} — unsaved changes` : cmd.tip}>
+        title={osTip(dirty ? `${cmd.tip} — unsaved changes` : cmd.tip)}>
         <span className="rb-icon">
           {cmd.swatch ? (
             <span className={`rb-swatch${swatchColor ? "" : " none"}`} style={{ background: swatchColor ?? undefined }} />

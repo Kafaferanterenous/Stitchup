@@ -10,7 +10,9 @@ use commands::SessionState;
 
 use std::sync::Mutex;
 
-use tauri::{Emitter, Manager};
+use tauri::Manager;
+#[cfg(target_os = "macos")]
+use tauri::Emitter;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -65,6 +67,7 @@ pub fn run() {
             commands::tab_close,
             commands::move_pages_to_tab,
             commands::list_system_fonts,
+            commands::platform_info,
             commands::recolor_annotations,
             commands::quicksign_list,
             commands::quicksign_save,
@@ -103,6 +106,9 @@ pub fn run() {
         .build(tauri::generate_context!())
         .expect("error while building Stitchup")
         .run(|app, event| {
+            // Windows / Linux pass files on the command line (read at start-up).
+            #[cfg(not(target_os = "macos"))]
+            let _ = (app, event);
             // Finder double-click / "Open With" / drop on the Dock icon.
             #[cfg(target_os = "macos")]
             if let tauri::RunEvent::Opened { urls } = event {

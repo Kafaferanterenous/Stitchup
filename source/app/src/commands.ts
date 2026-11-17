@@ -236,7 +236,7 @@ export const COMMANDS: Command[] = [
     enabled: (s) => hasDoc(s) && (!!s.picked?.objects.length || !!s.editingLine), run: () => store.setDialog("font") },
   { id: "fore", label: "Colour", menu: "Text Colour…", tip: "Recolour the selected text, shapes or annotations, or the line being edited", icon: "palette", tab: "Content", swatch: "fore", run: () => {} },
   { id: "image", label: "Image", menu: "Insert Image…", tip: "Insert a picture (PNG, JPEG, GIF, WebP, HEIC…): choose it, then click or drag on the page", icon: "image", tab: "Content", enabled: hasDoc, active: isTool("image"), run: insertImage },
-  { id: "ocr", label: "OCR", menu: "Recognize Text (OCR)", tip: "Make scanned pages searchable: recognise their text on this Mac (Apple Vision) and add it as an invisible layer", icon: "find", tab: "Content", enabled: hasDoc,
+  { id: "ocr", label: "OCR", menu: "Recognize Text (OCR)", tip: "Make scanned pages searchable: recognise their text on this computer (Apple Vision on macOS) and add it as an invisible layer", icon: "find", tab: "Content", enabled: (st) => hasDoc(st) && st.platform.ocr,
     choices: () => [
       { label: "Pages Without Text", run: () => void store.recognizeText("untexted") },
       { label: "This Page", run: () => void store.recognizeText("current") },

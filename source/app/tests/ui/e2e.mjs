@@ -1323,6 +1323,26 @@ await check("Security ▸ QuickSign: a signature from a PNG, kept locked with a 
   await page.mouse.click(x3, y3);
   assert((await waitImages(3)) === 3 && (await ipc("quicksign_list")).length === 0, "placed once, not stored");
 
+  // Draw: sign with the mouse, keep it (no password), place it.
+  await rb("quickSign").click();
+  await page.locator(".rb-choices").getByRole("menuitem", { name: "Create New Signature…" }).click();
+  await page.getByRole("tab", { name: "Draw" }).click();
+  assert(await btn("Save & Place Signature").isDisabled(), "nothing drawn yet");
+  const padBox = await page.getByLabel("Draw your signature here").boundingBox();
+  await page.mouse.move(padBox.x + 40, padBox.y + padBox.height * 0.6);
+  await page.mouse.down();
+  for (let i = 0; i <= 40; i++) await page.mouse.move(padBox.x + 40 + i * 9, padBox.y + padBox.height * (0.6 - Math.sin(i / 3) * 0.25));
+  await page.mouse.up();
+  await page.getByLabel("Signature name").fill("Drawn");
+  await btn("Save & Place Signature").click();
+  await waitNotice(/“Drawn” saved for next time/);
+  const [x4, y4] = await emptySpot(1, 0.3, 0.4);
+  await page.mouse.click(x4, y4);
+  assert((await waitImages(4)) === 4, "drawn signature placed");
+  const kept = await ipc("quicksign_list");
+  assert(kept.length === 1 && kept[0].name === "Drawn" && !kept[0].protected && kept[0].preview, JSON.stringify(kept.map((k) => k.name)));
+  await ipc("quicksign_delete", { id: kept[0].id });
+
   await pick("Close");
   await page.locator(".doc-tab.active .doc-tab-close").click();
   await page.locator(".doc-tab", { hasText: "main.pdf" }).click();

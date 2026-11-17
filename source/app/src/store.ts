@@ -40,6 +40,7 @@ import {
   cmdMoveAnnotation,
   cmdRecolorAnnotations,
   cmdQuickSignList,
+  cmdPlatformInfo,
   cmdQuickSignLoad,
   type SavedSignature,
   cmdRedact,
@@ -138,6 +139,8 @@ export interface AppState {
   /** QuickSign: saved signatures, and the locked one waiting for its password. */
   signatures: SavedSignature[];
   unlockSignature: SavedSignature | null;
+  /** OS and per-OS features (OCR uses Apple Vision on macOS). */
+  platform: { os: string; ocr: boolean };
   strokeWidth: number;
   /** Select tool: picked content objects ("t12"/"i30") and annotations (obj #). */
   picked: { page: number; objects: string[]; annots: number[] } | null;
@@ -277,6 +280,7 @@ let state: AppState = {
   editingLine: null,
   signatures: [],
   unlockSignature: null,
+  platform: { os: "macos", ocr: true },
   strokeWidth: 2,
   picked: null,
   pendingInput: null,
@@ -724,6 +728,14 @@ export const store = {
   },
 
   // ------------------------------------------------------------ QuickSign
+
+  async loadPlatform() {
+    try {
+      set({ platform: await cmdPlatformInfo() });
+    } catch {
+      /* keep the defaults */
+    }
+  },
 
   async loadSignatures() {
     try {

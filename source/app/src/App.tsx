@@ -58,6 +58,7 @@ export default function App() {
   // QuickSign: the saved signatures (names, lock state, previews).
   useEffect(() => {
     void store.loadSignatures();
+    void store.loadPlatform();
   }, []);
 
   // Crash recovery: offer snapshots left by a Stitchup that crashed…

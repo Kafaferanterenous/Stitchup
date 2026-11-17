@@ -58,7 +58,10 @@ export async function installMenu(): Promise<void> {
       ],
     };
 
-    const bar: Submenu[] = [
+    // macOS has an app menu (About / Settings / Services / Hide / Quit);
+    // Windows and Linux put About in Help, Settings and Quit in File.
+    const mac = /Mac/i.test(navigator.userAgent);
+    const bar: Submenu[] = !mac ? [] : [
       await Submenu.new({
         text: "Stitchup",
         items: [
@@ -87,6 +90,8 @@ export async function installMenu(): Promise<void> {
         // Standard macOS full-screen entry.
         its.push(await sep(), await PredefinedMenuItem.new({ item: "Fullscreen" }));
       }
+      if (!mac && m.title === "File") its.push(await sep(), await make("settings"), await sep(), await make("exit"));
+      if (!mac && m.title === "Help") its.push(await sep(), await make("about"));
       if (m.title === "Help")
         bar.push(
           await Submenu.new({
