@@ -28,7 +28,7 @@ replaced when you save.
 ## Download
 
 Get the latest `Stitchup-macOS-universal-*.zip` from
-[Releases](https://github.com/Kafaferanterenous/stitchup-MacOS/releases),
+[Releases](https://github.com/Kafaferanterenous/Stitchup/releases),
 unzip it and drag **Stitchup.app** to Applications. The app is ad-hoc signed,
 not notarized. The first time you open it, right-click it and choose
 **Open**, or run `xattr -dr com.apple.quarantine Stitchup.app`.

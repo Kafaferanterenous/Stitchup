@@ -834,7 +834,7 @@ pub struct UpdateInfo {
     pub url: String,
 }
 
-const RELEASES_API: &str = "https://api.github.com/repos/Kafaferanterenous/stitchup-MacOS/releases/latest";
+const RELEASES_API: &str = "https://api.github.com/repos/Kafaferanterenous/Stitchup/releases/latest";
 
 fn version_tuple(v: &str) -> Vec<u64> {
     v.trim_start_matches('v').split(|c: char| !c.is_ascii_digit()).filter(|s| !s.is_empty()).filter_map(|s| s.parse().ok()).collect()
@@ -849,7 +849,7 @@ pub fn check_update() -> Result<UpdateInfo, EngineError> {
         .ok_or_else(|| EngineError::new(ErrorCode::IoError, "could not reach GitHub (no internet, or curl / wget missing)"))?;
     let v: Value = serde_json::from_slice(&body).map_err(|e| EngineError::new(ErrorCode::IoError, format!("unexpected answer from GitHub: {e}")))?;
     let latest = v.get("tag_name").and_then(|t| t.as_str()).unwrap_or("").trim_start_matches('v').to_string();
-    let url = v.get("html_url").and_then(|t| t.as_str()).unwrap_or("https://github.com/Kafaferanterenous/stitchup-MacOS/releases").to_string();
+    let url = v.get("html_url").and_then(|t| t.as_str()).unwrap_or("https://github.com/Kafaferanterenous/Stitchup/releases").to_string();
     if latest.is_empty() {
         return Err(EngineError::new(ErrorCode::IoError, "no release found on GitHub"));
     }
