@@ -116,7 +116,7 @@
 115|Document
 116|Propriétés du document…
 117|Propriétés du document
-118|Double-cliquez sur une ligne (ou Contenu ▸ Modifier le texte, puis cliquez dessus). Elle est modifiée sur place, dans la police du document quand celle-ci contient les lettres nécessaires. Une barre au-dessus de la ligne indique sa police et sa taille : changez-y la police, gras / italique, taille ou couleur, ou utilisez Contenu ▸ Couleur et Police. Entrée ou un clic ailleurs enregistre ; Tab passe à la ligne suivante ; Échap annule ; vider le texte supprime la ligne.
+118|Double-cliquez sur une ligne (ou Pages ▸ Modifier le texte, puis cliquez dessus). Elle est modifiée sur place, dans la police du document quand celle-ci contient les lettres nécessaires. Une barre au-dessus de la ligne indique sa police et sa taille : changez-y la police, gras / italique, taille ou couleur, ou utilisez Contenu ▸ Couleur et Police. Entrée ou un clic ailleurs enregistre ; Tab passe à la ligne suivante ; Échap annule ; vider le texte supprime la ligne.
 119|Brouillon
 120|Tracez un cadre, puis tapez le texte
 121|Faites glisser sur du texte
@@ -398,7 +398,7 @@
 397|Tout sélectionner
 398|Sélectionner toutes les pages
 399|Sélectionner toutes les pages (⌘A)
-400|Sélectionnez d’abord du texte (Contenu ▸ Sélectionner, puis cliquez sur une ligne)
+400|Sélectionnez d’abord du texte (Pages ▸ Sélectionner, puis cliquez sur une ligne)
 401|Sélection : cliquez sur un objet ou tracez un cadre · faites glisser pour déplacer · ⌫ supprime
 402|Sélection : cliquez ou tracez un cadre · ⌘-clic ajoute · faites glisser pour déplacer · ⌫ supprime
 403|{0} page(s) envoyée(s) à l’impression
@@ -539,7 +539,7 @@
 538|— surligner, souligner, barrer, notes, zones de texte, formes, tampons, liens, crayon ; Couleur et Remplissage.
 539|— nouveau, ouvrir, enregistrer, propriétés, importer des pages, exports (texte, CSV, images, RTF, DOCX, ODT), imprimer (avec aperçu ; « Enregistrer au format PDF » est dans la fenêtre d’impression du système).
 540|— visionneuse et éditeur PDF hors ligne. Vos fichiers ne quittent jamais cet ordinateur, et un fichier n’est remplacé que lorsque vous enregistrez — écrit d’abord dans un fichier temporaire, puis échangé, donc jamais à moitié écrit.
-541|— pivoter, supprimer, ajouter, extraire, scinder, recadrage auto.
+541|— pivoter, supprimer, ajouter, extraire, scinder, recadrage auto ; sélectionner, modifier le texte, supprimer, police, couleur, insérer une image, OCR.
 542|— sélectionner, modifier le texte, supprimer, police, couleur, insérer une image, OCR.
 543|— commandes d’affichage.
 544|⚠ Avertissements
@@ -639,3 +639,9 @@
 638|Normal ({0} pt)
 639|Grand ({0} pt)
 640|Très grand ({0} pt)
+641|Pivoter
+642|Pivoter la ou les pages actuelles vers la gauche ou la droite, ou toutes les pages
+643|Enregistrer le document en texte, CSV, images, RTF, DOCX ou ODT
+644|Supprimer {0} pages
+645|Extraire {0} pages…
+646|Ajouter une page vierge après

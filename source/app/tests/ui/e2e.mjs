@@ -169,6 +169,11 @@ const tab = (name) => page.locator(".ribbon-tabs").getByRole("tab", { name, exac
 const btn = (name) => page.getByRole("button", { name, exact: true });
 /** A ribbon button by command id (labels repeat across tabs, ids don't). */
 const rb = (id) => page.locator(`.rb-btn[data-cmd="${id}"]`);
+/** Open a ribbon drop-down and pick an entry. */
+const choose = async (id, name) => {
+  await rb(id).click();
+  await page.locator(".rb-choices").getByRole("menuitem", { name, exact: true }).click();
+};
 const run = (id) => page.evaluate((i) => window.__stitchup.run(i), id);
 const status = () => page.locator(".status-bar").innerText();
 const calls = (cmd) => page.evaluate((c) => window.__calls.filter((x) => x === c).length, cmd);
@@ -351,9 +356,9 @@ await page.goto(BASE);
 
 console.log("Stitchup E2E");
 
-await check("starts like Windows: 7 ribbon tabs, empty-state hint, status bar", async () => {
+await check("starts like Windows: 6 ribbon tabs, empty-state hint, status bar", async () => {
   const tabs = await page.locator(".ribbon-tabs [role=tab]").allInnerTexts();
-  assert(tabs.join() === "Document,Pages,Annotate,Content,Zoom,Navigate,Security", tabs.join());
+  assert(tabs.join() === "Document,Pages,Annotate,Zoom,Navigate,Security", tabs.join());
   assert((await page.locator(".empty-viewer").innerText()).includes("No document open"), "empty hint");
   assert(/Stitchup PDF Editor/.test(await status()), await status());
   assert((await page.locator(".pages-pane").count()) === 0, "no sidebar without a document");
@@ -361,7 +366,7 @@ await check("starts like Windows: 7 ribbon tabs, empty-state hint, status bar", 
 
 await check("Document tab has the Windows button set", async () => {
   const labels = await page.locator(".ribbon-card .rb-text").allInnerTexts();
-  const want = "New,Open,Save,Save As,Properties,Import,Export Text,Export CSV,Images,RTF,DOCX,ODT,Print";
+  const want = "New,Open,Save,Save As,Properties,Import,Export ▾,Print";
   assert(labels.join() === want, labels.join());
 });
 
@@ -462,10 +467,10 @@ await check("select text and ⌘C puts exact text on the clipboard", async () =>
 // ---- Pages + undo/redo
 await check("Pages ▸ Rotate CW / CCW, ⌘R / ⌘⇧R", async () => {
   await tab("Pages");
-  await rb("rotateCw").click();
+  await choose("rotate", "Rotate Right");
   await waitStatus(/rotation/);
   assert((await state()).pages[0].rotation === 90, "page 1 rotation 90");
-  await rb("rotateCcw").click();
+  await choose("rotate", "Rotate Left");
   await page.waitForFunction(async () => true);
   await page.waitForTimeout(400);
   assert((await state()).pages[0].rotation === 0, "back to 0");
@@ -531,6 +536,28 @@ await check("Pages ▸ Delete removes the current page; ⌫ too", async () => {
   await waitStatus(/of 4/);
 });
 
+await check("right-click a thumbnail: Delete Page / Extract Page… act on that page or the selection", async () => {
+  await page.locator('[data-thumb="2"] .thumb').click({ button: "right" });
+  await page.locator(".context-menu").getByRole("menuitem", { name: "Delete Page" }).click();
+  await waitStatus(/of 3/);
+  await page.keyboard.press("Meta+z");
+  await waitStatus(/of 4/);
+  const one = path.join(WORK, "thumb-extract.pdf");
+  await pick(one);
+  await page.locator('[data-thumb="3"] .thumb').click({ button: "right" });
+  await page.locator(".context-menu").getByRole("menuitem", { name: "Extract Page…" }).click();
+  await waitNotice(/Saved 1 page/);
+  assert((await pdfText(one)).length === 1, "one page extracted");
+  // Several selected, right-click one of them: the menu acts on all of them.
+  await page.locator('[data-thumb="1"] .thumb').click();
+  await page.locator('[data-thumb="2"] .thumb').click({ modifiers: ["Shift"] });
+  await page.locator('[data-thumb="2"] .thumb').click({ button: "right" });
+  assert(await page.locator(".context-menu").getByRole("menuitem", { name: "Delete 2 Pages" }).isVisible(), "acts on the selection");
+  await page.keyboard.press("Escape");
+  await page.locator('[data-thumb="4"] .thumb').click();
+  await waitStatus(/Page 4 of 4/);
+});
+
 await check("drag a thumbnail to reorder pages", async () => {
   // Drag the A5 page (3) above page 2; both must be on screen.
   const src = page.locator('[data-thumb="3"] .thumb');
@@ -556,7 +583,7 @@ await check("multi-select (⌘-click, ⌘A) acts on the selection; status shows 
   assert((await page.locator(".thumb.picked").count()) === 2, "two picked");
   assert(/2 pages selected/.test(await status()), await status());
   await tab("Pages");
-  await rb("rotateCw").click();
+  await choose("rotate", "Rotate Right");
   await waitStatus(/rotation/);
   const s = await state();
   assert(s.pages[0].rotation === 90 && s.pages[1].rotation === 90 && s.pages[2].rotation === 0, "both rotated");
@@ -600,7 +627,7 @@ async function editRun(oldText, newText, key = "Enter") {
 
 await check("Content ▸ Edit Text: click a line, type, Enter — edited in the ORIGINAL font", async () => {
   await page.locator('[data-thumb="1"] .thumb').click();
-  await tab("Content");
+  await tab("Pages");
   await rb("editText").click();
   await page.waitForSelector(".text-run.editable");
   await editRun("Heading for page 1", "Edited héading");
@@ -613,7 +640,7 @@ await check("Content ▸ Edit Text: click a line, type, Enter — edited in the 
 });
 
 await check("double-click a line edits it without Edit Text mode", async () => {
-  await tab("Content");
+  await tab("Pages");
   await rb("editText").click(); // turn Edit Text mode OFF
   assert(!(await rb("editText").evaluate((el) => el.classList.contains("active"))), "mode should be off");
   await page.locator('[data-page="1"] .text-run', { hasText: "Edited héading" }).first().dblclick();
@@ -658,7 +685,7 @@ await check("right-click empty page area: page actions work, Esc closes", async 
   assert((await state()).pages[0].rotation === 90, "rotated from the context menu");
   await page.keyboard.press("Meta+z");
   await waitStatus(/Undid/);
-  await tab("Content");
+  await tab("Pages");
   await rb("editText").click(); // back ON for the following checks
 });
 
@@ -812,7 +839,7 @@ await check("Security ▸ Redact removes the text under the box for real", async
 
 // ---- Content tab
 await check("Content ▸ Select: click a line, drag to move it, ⌫ deletes it", async () => {
-  await tab("Content");
+  await tab("Pages");
   await rb("select").click();
   await page.waitForSelector('[data-page="4"] .obj-box.text');
   const b = await runBox(4, "Heading for page 4");
@@ -871,7 +898,7 @@ await check("Content ▸ Colour and Font change the selected text", async () => 
 });
 
 await check("Content ▸ Select picks a vector shape in the page; Colour recolours it, Delete removes it", async () => {
-  await tab("Content");
+  await tab("Pages");
   await rb("fore").click();
   await page.locator('.color-palette [aria-label="#1a7f37"]').click();
   assert((await page.evaluate(() => window.__stitchup.state().foreColor)) === "#1a7f37", "fore colour set");
@@ -1014,7 +1041,7 @@ await check("Content ▸ OCR makes a scanned (image-only) page searchable; Undo 
   await writeFile(scan, await doc.save());
   await openViaRibbon(scan);
   assert(!(await pdfText(scan)).join(" ").trim(), "fixture has no text");
-  await tab("Content");
+  await tab("Pages");
   await rb("ocr").click();
   await page.getByRole("menuitem", { name: "Pages Without Text" }).click();
   await waitStatus(/Recognised \d+ lines? on 1 page/, 60000);
@@ -1047,7 +1074,7 @@ await check("colour palettes: Fore / Back / Annotate ▸ Colour open a palette a
   const f = path.join(WORK, "colours.pdf");
   await makePdf(f, [LETTER, LETTER]);
   await openViaRibbon(f);
-  await tab("Content");
+  await tab("Pages");
   await rb("fore").click();
   await page.locator(".color-palette").waitFor();
   await page.locator('.color-palette [aria-label="#1d5fd0"]').click();
@@ -1062,7 +1089,7 @@ await check("colour palettes: Fore / Back / Annotate ▸ Colour open a palette a
   await page.locator(".color-palette").getByLabel("Colour code").fill("#123456");
   await page.locator(".color-palette").getByRole("button", { name: "Use" }).click();
   assert((await page.evaluate(() => window.__stitchup.state().backColor)) === "#123456", "custom back");
-  await tab("Content");
+  await tab("Pages");
   // Select a line, Fore recolours it straight away.
   await rb("select").click();
   await page.waitForSelector('[data-page="1"] .obj-box.text');
@@ -1113,7 +1140,7 @@ await check("editing a line shows its font & size; the bar changes size, colour 
   await line.scrollIntoViewIfNeeded();
   await line.dblclick();
   await page.locator(".edit-bar").waitFor();
-  assert((await page.locator(".ribbon-tab.active").innerText()) === "Content", "switched to the Content tab");
+  assert((await page.locator(".ribbon-tab.active").innerText()) === "Pages", "switched to the Pages tab");
   await page.waitForFunction(() => /^Helvetica · 14 pt$/.test(document.querySelector(".edit-bar-font")?.textContent ?? ""));
   assert(await rb("font").isEnabled(), "Font button live while editing");
   const find = async (t) => (await ipc("list_objects", { page: 2 })).find((o) => o.text.startsWith(t));
@@ -1355,7 +1382,7 @@ await check("Security ▸ QuickSign: a signature from a PNG, kept locked with a 
 await check("every button on every ribbon tab is live with a document open", async () => {
   const needsSelection = new Set(["objDelete", "recolor", "font"]);
   const dead = [];
-  for (const t of ["Document", "Pages", "Annotate", "Content", "Zoom", "Navigate", "Security"]) {
+  for (const t of ["Document", "Pages", "Annotate", "Zoom", "Navigate", "Security"]) {
     await tab(t);
     for (const el of await page.locator(".ribbon-card .rb-btn").all()) {
       const id = await el.getAttribute("data-cmd");
@@ -1421,13 +1448,18 @@ await check("Document ▸ Properties shows and edits metadata", async () => {
 async function exportVia(id, file) {
   const target = path.join(WORK, file);
   await pick(target);
-  await rb(id).click();
+  const menu = { exportText: "Text…", exportCsv: "CSV…", exportRtf: "RTF…", exportDocx: "DOCX…", exportOdt: "ODT…" };
+  await choose("exportMenu", menu[id]);
   // Wait for THIS export's notice (it names the file).
   await waitNotice(new RegExp(file.replace(".", "\\.")));
   return target;
 }
 
 await check("Export Text / CSV / RTF", async () => {
+  await rb("exportMenu").click();
+  const items = await page.locator(".rb-choices [role=menuitem]").allInnerTexts();
+  assert(items.join() === "Text…,CSV…,Images (JPG / PNG)…,RTF…,DOCX…,ODT…", items.join());
+  await page.keyboard.press("Escape");
   const txt = (await readFile(await exportVia("exportText", "out.txt"), "utf8")).replace(/^﻿/, "");
   // (page 4's heading and second line were deleted/redacted by earlier checks)
   assert(txt.includes("Edited héading") && txt.includes("page 3") && txt.includes("\f"), txt.slice(0, 80));
@@ -1449,7 +1481,7 @@ await check("Export DOCX / ODT are valid packages with the text", async () => {
 });
 
 await check("Export Images writes one PNG per page", async () => {
-  await rb("exportImages").click();
+  await choose("exportMenu", "Images (JPG / PNG)…");
   await page.getByLabel("Resolution").selectOption("72");
   const target = path.join(WORK, "img", "page.png");
   await mkdir(path.dirname(target), { recursive: true });
@@ -1518,7 +1550,7 @@ await check("Save As writes a copy and makes it the current document", async () 
   assert((await pdfText(target)).length === 4, "copy");
   openPath = target;
   await tab("Pages");
-  await rb("rotateCw").click();
+  await choose("rotate", "Rotate Right");
   await waitStatus(/rotation/);
   await page.keyboard.press("Meta+s");
   await waitNotice(/Saved saved-as\.pdf/);
@@ -1679,7 +1711,7 @@ await check("Content ▸ Image inserts a PNG (with transparency) and a JPEG", as
   await makePng(png);
   execFileSync("sips", ["-s", "format", "jpeg", png, "--out", jpg], { stdio: "pipe" });
   const before = (await ipc("list_objects", { page: 1 })).filter((o) => o.kind === "image").length;
-  await tab("Content");
+  await tab("Pages");
   await pick(png);
   await rb("image").click();
   await waitNotice(/place pic\.png/);
@@ -1866,7 +1898,7 @@ if (existsSync(REAL)) {
     await waitStatus(new RegExp(`of ${n - 1}`));
     assert((await state()).pages.length === n - 1, "exactly one page removed");
     await page.locator('[data-thumb="1"] .thumb').click();
-    await tab("Content");
+    await tab("Pages");
     await rb("editText").click();
     await page.waitForSelector('[data-page="1"] .text-run.editable');
     await page.locator('[data-page="1"] .text-run.editable', { hasText: "ENGLISH" }).first().click();
@@ -2091,7 +2123,7 @@ await check("quitting with unsaved changes asks first (Cancel keeps running)", a
   await makePdf(f, [LETTER, LETTER]);
   await openViaRibbon(f);
   await tab("Pages");
-  await rb("rotateCw").click();
+  await choose("rotate", "Rotate Right");
   await waitStatus(/rotation/);
   const before = await calls("quit_app");
   await pick("Cancel");
@@ -2137,7 +2169,7 @@ await check("Settings ▸ Language: Polish, German, Chinese, back to English", a
   };
   const tabs = () => page.locator(".ribbon-tabs [role=tab]").allInnerTexts();
   await setLang("pl");
-  assert((await tabs()).join() === "Dokument,Strony,Adnotacje,Zawartość,Powiększenie,Nawigacja,Zabezpieczenia", (await tabs()).join());
+  assert((await tabs()).join() === "Dokument,Strony,Adnotacje,Powiększenie,Nawigacja,Zabezpieczenia", (await tabs()).join());
   await page.locator(".ribbon-tabs [role=tab]", { hasText: "Dokument" }).click();
   assert((await page.locator(".ribbon-card .rb-text").allInnerTexts()).includes("Zapisz jako"), "Polish ribbon labels");
   assert((await rb("save").getAttribute("title")).startsWith("Zapisz zmiany"), "Polish tooltip");
@@ -2145,11 +2177,11 @@ await check("Settings ▸ Language: Polish, German, Chinese, back to English", a
   await page.locator(".ribbon-tabs [role=tab]", { hasText: "Kommentieren" }).click();
   await page.screenshot({ path: path.join(OUT, "lang-de.png") });
   await setLang("zh");
-  assert((await tabs()).join() === "文档,页面,注释,内容,缩放,导航,安全", (await tabs()).join());
+  assert((await tabs()).join() === "文档,页面,注释,缩放,导航,安全", (await tabs()).join());
   await page.locator(".ribbon-tabs [role=tab]", { hasText: "安全" }).click();
   await page.screenshot({ path: path.join(OUT, "lang-zh.png") });
   await setLang("en");
-  assert((await tabs()).join() === "Document,Pages,Annotate,Content,Zoom,Navigate,Security", "back to English");
+  assert((await tabs()).join() === "Document,Pages,Annotate,Zoom,Navigate,Security", "back to English");
   await page.locator(".ribbon-tabs [role=tab]", { hasText: "Document" }).click();
 });
 

@@ -233,8 +233,8 @@ export interface PendingInput {
   rect: [number, number, number, number];
 }
 
-export type RibbonTabName = "Document" | "Pages" | "Annotate" | "Content" | "Zoom" | "Navigate" | "Security";
-export const RIBBON_TABS: RibbonTabName[] = ["Document", "Pages", "Annotate", "Content", "Zoom", "Navigate", "Security"];
+export type RibbonTabName = "Document" | "Pages" | "Annotate" | "Zoom" | "Navigate" | "Security";
+export const RIBBON_TABS: RibbonTabName[] = ["Document", "Pages", "Annotate", "Zoom", "Navigate", "Security"];
 
 export type Dialog =
   | null
@@ -997,7 +997,7 @@ export const store = {
     const doc = state.doc;
     if ((!p || !p.objects.length) && state.editingLine) return state.editingLine.apply(data);
     if (!p || !doc || !p.objects.length) {
-      notify(tr("Select text first (Content ▸ Select, then click a line)"));
+      notify(tr("Select text first (Pages ▸ Select, then click a line)"));
       return false;
     }
     const ok = await this.command(

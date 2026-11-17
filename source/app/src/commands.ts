@@ -26,6 +26,8 @@ export interface Command {
   keys?: string[];
   /** Ribbon tab the button lives on. */
   tab?: RibbonTabName;
+  /** Ribbon buttons are split by a divider where the group changes. */
+  group?: string;
   run: () => unknown;
   enabled?: (s: AppState) => boolean;
   active?: (s: AppState) => boolean;
@@ -43,6 +45,14 @@ export const STAMPS = ["Approved", "Not Approved", "Draft", "Final", "Confidenti
 
 const toolCmd = (tool: Tool) => () => store.setTool(tool);
 const isTool = (tool: Tool) => (s: AppState) => s.tool === tool;
+
+/** Drop-down entries that run other commands (Export ▾, Rotate ▾). */
+function subCommands(ids: string[]) {
+  return ids.map((id) => {
+    const c = COMMANDS.find((x) => x.id === id)!;
+    return { label: tr(c.menu ?? c.label), run: () => void runCommand(id) };
+  });
+}
 const shapeChoices = (prefix: "" | "shape-") => () => {
   const s = getState();
   const items: [string, Tool][] = [
@@ -208,12 +218,14 @@ export const COMMANDS: Command[] = [
       const list = Array.isArray(chosen) ? chosen : typeof chosen === "string" ? [chosen] : [];
       for (const p of list) if (!(await store.importPdf(p))) break;
     }, enabled: hasDoc },
-  { id: "exportText", label: "Export Text", menu: "Text…", tip: "Write the document text out to a .txt file", icon: "export-text", tab: "Document", enabled: hasDoc, run: () => exportBytes("txt", "Text", async () => exp.toText(await lines())) },
-  { id: "exportCsv", label: "Export CSV", menu: "CSV…", tip: "Write page data out to a .csv file", icon: "csv", tab: "Document", enabled: hasDoc, run: () => exportBytes("csv", "CSV", async () => exp.toCsv(getState().session!, await lines())) },
-  { id: "exportImages", label: "Images", menu: "Images (JPG / PNG)…", tip: "Export each page as a JPG or PNG image", icon: "image", tab: "Document", enabled: hasDoc, run: () => store.setDialog("exportImages") },
-  { id: "exportRtf", label: "RTF", menu: "RTF…", tip: "Write the document text out to an RTF file", icon: "rtf", tab: "Document", enabled: hasDoc, run: () => exportBytes("rtf", "RTF", async () => exp.toRtf(await lines())) },
-  { id: "exportDocx", label: "DOCX", menu: "DOCX…", tip: "Write the document text out to a Word .docx file", icon: "docx", tab: "Document", enabled: hasDoc, run: () => exportBytes("docx", "Word document", async () => exp.toDocx(await lines())) },
-  { id: "exportOdt", label: "ODT", menu: "ODT…", tip: "Write the document text out to an OpenDocument .odt file", icon: "odt", tab: "Document", enabled: hasDoc, run: () => exportBytes("odt", "OpenDocument text", async () => exp.toOdt(await lines())) },
+  { id: "exportMenu", label: "Export", menu: "Export", tip: "Save the document as text, CSV, images, RTF, DOCX or ODT", icon: "export-text", tab: "Document", enabled: hasDoc,
+    choices: () => subCommands(["exportText", "exportCsv", "exportImages", "exportRtf", "exportDocx", "exportOdt"]), run: () => {} },
+  { id: "exportText", label: "Export Text", menu: "Text…", tip: "Write the document text out to a .txt file", icon: "export-text", enabled: hasDoc, run: () => exportBytes("txt", "Text", async () => exp.toText(await lines())) },
+  { id: "exportCsv", label: "Export CSV", menu: "CSV…", tip: "Write page data out to a .csv file", icon: "csv", enabled: hasDoc, run: () => exportBytes("csv", "CSV", async () => exp.toCsv(getState().session!, await lines())) },
+  { id: "exportImages", label: "Images", menu: "Images (JPG / PNG)…", tip: "Export each page as a JPG or PNG image", icon: "image", enabled: hasDoc, run: () => store.setDialog("exportImages") },
+  { id: "exportRtf", label: "RTF", menu: "RTF…", tip: "Write the document text out to an RTF file", icon: "rtf", enabled: hasDoc, run: () => exportBytes("rtf", "RTF", async () => exp.toRtf(await lines())) },
+  { id: "exportDocx", label: "DOCX", menu: "DOCX…", tip: "Write the document text out to a Word .docx file", icon: "docx", enabled: hasDoc, run: () => exportBytes("docx", "Word document", async () => exp.toDocx(await lines())) },
+  { id: "exportOdt", label: "ODT", menu: "ODT…", tip: "Write the document text out to an OpenDocument .odt file", icon: "odt", enabled: hasDoc, run: () => exportBytes("odt", "OpenDocument text", async () => exp.toOdt(await lines())) },
   { id: "print", label: "Print", menu: "Print…", tip: "Print the document, all pages or a page range (⌘P)", icon: "print", accel: "CmdOrCtrl+P", tab: "Document", enabled: hasDoc, run: () => store.setDialog("print") },
   { id: "combineNew", label: "Combine", menu: "Combine into New…", tip: "Combine several PDFs into a new document", icon: "merge", run: combineNew },
   { id: "compress", label: "Compress", menu: "Compress PDF…", tip: "Save a smaller copy: unused data removed, streams compressed, large images downsampled", icon: "compress", enabled: hasDoc, run: compress },
@@ -225,8 +237,10 @@ export const COMMANDS: Command[] = [
   { id: "exit", label: "Exit", menu: "Quit Stitchup", tip: "Quit (⌘Q)", icon: "exit", accel: "CmdOrCtrl+Q", run: () => store.exitApp() },
 
   // ------------------------------------------------------------------- Pages
-  { id: "rotateCcw", label: "Rotate CCW", menu: "Rotate Left", tip: "Rotate the current page(s) 90° counter-clockwise (⌘⇧R)", icon: "rotate-ccw", accel: "CmdOrCtrl+Shift+R", tab: "Pages", enabled: hasDoc, run: () => store.rotate(store.targets(), false) },
-  { id: "rotateCw", label: "Rotate CW", menu: "Rotate Right", tip: "Rotate the current page(s) 90° clockwise (⌘R)", icon: "rotate-cw", accel: "CmdOrCtrl+R", tab: "Pages", enabled: hasDoc, run: () => store.rotate(store.targets(), true) },
+  { id: "rotate", label: "Rotate", menu: "Rotate", tip: "Rotate the current page(s) left or right, or every page", icon: "rotate-cw", tab: "Pages", enabled: hasDoc,
+    choices: () => subCommands(["rotateCcw", "rotateCw", "rotateAll"]), run: () => {} },
+  { id: "rotateCcw", label: "Rotate CCW", menu: "Rotate Left", tip: "Rotate the current page(s) 90° counter-clockwise (⌘⇧R)", icon: "rotate-ccw", accel: "CmdOrCtrl+Shift+R", enabled: hasDoc, run: () => store.rotate(store.targets(), false) },
+  { id: "rotateCw", label: "Rotate CW", menu: "Rotate Right", tip: "Rotate the current page(s) 90° clockwise (⌘R)", icon: "rotate-cw", accel: "CmdOrCtrl+R", enabled: hasDoc, run: () => store.rotate(store.targets(), true) },
   { id: "rotateAll", label: "Rotate All", menu: "Rotate All Pages Right", tip: "Rotate every page 90° clockwise", icon: "rotate-cw", enabled: hasDoc, run: () => store.rotate(getState().doc!.pages.map((p) => p.page_no), true) },
   { id: "delete", label: "Delete", menu: "Delete Page(s)", tip: "Delete the current page(s) (⌫)", icon: "trash", keys: ["Delete", "Backspace"], tab: "Pages",
     enabled: (s) => hasDoc(s) && (!!s.picked || (s.selection.length || 1) < (s.doc?.pages.length ?? 0)),
@@ -270,19 +284,19 @@ export const COMMANDS: Command[] = [
   { id: "back", label: "Fill", menu: "Fill Colour…", tip: "Fill colour for new rectangles and ovals (or no fill)", icon: "palette", tab: "Annotate", swatch: "back", run: () => {} },
 
   // ----------------------------------------------------------------- Content
-  { id: "select", label: "Select", menu: "Select / Move Content Object", tip: "Click text, images or annotations to select (⌘-click adds, drag a box for many); drag to move; ⌫ deletes", icon: "select", tab: "Content", enabled: hasDoc, active: isTool("select"), run: toolCmd("select") },
-  { id: "editText", label: "Edit Text", menu: "Edit Text", tip: "Click any line of text to edit it in place, in its own font (or just double-click a line)", icon: "text", tab: "Content", enabled: hasDoc, active: (s) => s.editMode, run: () => {
+  { id: "select", label: "Select", menu: "Select / Move Content Object", tip: "Click text, images or annotations to select (⌘-click adds, drag a box for many); drag to move; ⌫ deletes", icon: "select", tab: "Pages", group: "edit", enabled: hasDoc, active: isTool("select"), run: toolCmd("select") },
+  { id: "editText", label: "Edit Text", menu: "Edit Text", tip: "Click any line of text to edit it in place, in its own font (or just double-click a line)", icon: "text", tab: "Pages", group: "edit", enabled: hasDoc, active: (s) => s.editMode, run: () => {
       const on = getState().editMode;
       store.setTool(null); // (also leaves Edit Text mode)
       store.setEditMode(!on);
     } },
-  { id: "objDelete", label: "Delete", menu: "Delete Selected Object", tip: "Remove the selected objects (⌫)", icon: "trash", tab: "Content",
+  { id: "objDelete", label: "Delete", menu: "Delete Selected Object", tip: "Remove the selected objects (⌫)", icon: "trash", tab: "Pages", group: "edit",
     enabled: (s) => hasDoc(s) && !!s.picked && s.picked.objects.length + s.picked.annots.length > 0, run: () => store.deletePicked() },
-  { id: "font", label: "Font", menu: "Font and Size…", tip: "Change the font family and size of the selected text or the line being edited", icon: "font", tab: "Content",
+  { id: "font", label: "Font", menu: "Font and Size…", tip: "Change the font family and size of the selected text or the line being edited", icon: "font", tab: "Pages", group: "edit",
     enabled: (s) => hasDoc(s) && (!!s.picked?.objects.length || !!s.editingLine), run: () => store.setDialog("font") },
-  { id: "fore", label: "Colour", menu: "Text Colour…", tip: "Recolour the selected text, shapes or annotations, or the line being edited", icon: "palette", tab: "Content", swatch: "fore", run: () => {} },
-  { id: "image", label: "Image", menu: "Insert Image…", tip: "Insert a picture (PNG, JPEG, GIF, WebP, HEIC…): choose it, then click or drag on the page", icon: "image", tab: "Content", enabled: hasDoc, active: isTool("image"), run: insertImage },
-  { id: "ocr", label: "OCR", menu: "Recognize Text (OCR)", tip: "Make scanned pages searchable: recognise their text on this computer (Apple Vision on macOS) and add it as an invisible layer", icon: "find", tab: "Content", enabled: (st) => hasDoc(st) && st.platform.ocr,
+  { id: "fore", label: "Colour", menu: "Text Colour…", tip: "Recolour the selected text, shapes or annotations, or the line being edited", icon: "palette", tab: "Pages", group: "edit", swatch: "fore", run: () => {} },
+  { id: "image", label: "Image", menu: "Insert Image…", tip: "Insert a picture (PNG, JPEG, GIF, WebP, HEIC…): choose it, then click or drag on the page", icon: "image", tab: "Pages", group: "edit", enabled: hasDoc, active: isTool("image"), run: insertImage },
+  { id: "ocr", label: "OCR", menu: "Recognize Text (OCR)", tip: "Make scanned pages searchable: recognise their text on this computer (Apple Vision on macOS) and add it as an invisible layer", icon: "find", tab: "Pages", group: "edit", enabled: (st) => hasDoc(st) && st.platform.ocr,
     choices: () => [
       { label: "Pages Without Text", run: () => void store.recognizeText("untexted") },
       { label: "This Page", run: () => void store.recognizeText("current") },

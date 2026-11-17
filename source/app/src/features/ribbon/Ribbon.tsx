@@ -196,8 +196,11 @@ export function Ribbon() {
       </div>
       <div className="ribbon-body" role="tabpanel" aria-label={tab}>
         <div className="ribbon-card">
-          {buttons.map((c) => (
-            <RibbonButton key={c.id} cmd={c} />
+          {buttons.map((c, i) => (
+            <span key={c.id} className="rb-item">
+              {i > 0 && buttons[i - 1].group !== c.group && <span className="rb-sep" role="separator" />}
+              <RibbonButton cmd={c} />
+            </span>
           ))}
           {tab === "Navigate" && <PageBox />}
           {tab === "Zoom" && <span className="ribbon-readout">{Math.round(app.zoom * 100)}%</span>}

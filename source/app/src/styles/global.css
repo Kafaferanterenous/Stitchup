@@ -1850,3 +1850,14 @@ kbd {
   line-height: 1.2;
   outline: none;
 }
+
+.rb-item {
+  display: contents;
+}
+
+.rb-sep {
+  align-self: stretch;
+  width: 1px;
+  margin: 4px 6px;
+  background: var(--card-border);
+}

@@ -116,7 +116,7 @@
 115|Dokument
 116|Dokumenteigenschaften…
 117|Dokumenteigenschaften
-118|Doppelklicken Sie auf eine Zeile (oder Inhalt ▸ Text bearbeiten und dann anklicken). Sie wird direkt bearbeitet, in der Schrift des Dokuments, wenn diese die nötigen Buchstaben hat. Eine Leiste über der Zeile zeigt Schriftart und -größe: Ändern Sie dort Schrift, fett / kursiv, Größe oder Farbe, oder mit Inhalt ▸ Farbe und Schrift. Eingabetaste oder Wegklicken speichert; Tab geht zur nächsten Zeile; Esc bricht ab; Leeren des Texts löscht die Zeile.
+118|Doppelklicken Sie auf eine Zeile (oder Seiten ▸ Text bearbeiten und dann anklicken). Sie wird direkt bearbeitet, in der Schrift des Dokuments, wenn diese die nötigen Buchstaben hat. Eine Leiste über der Zeile zeigt Schriftart und -größe: Ändern Sie dort Schrift, fett / kursiv, Größe oder Farbe, oder mit Inhalt ▸ Farbe und Schrift. Eingabetaste oder Wegklicken speichert; Tab geht zur nächsten Zeile; Esc bricht ab; Leeren des Texts löscht die Zeile.
 119|Entwurf
 120|Rahmen ziehen, dann Text eingeben
 121|Über Text ziehen
@@ -398,7 +398,7 @@
 397|Alles auswählen
 398|Alle Seiten auswählen
 399|Alle Seiten auswählen (⌘A)
-400|Zuerst Text auswählen (Inhalt ▸ Auswählen, dann eine Zeile anklicken)
+400|Zuerst Text auswählen (Seiten ▸ Auswählen, dann eine Zeile anklicken)
 401|Auswählen: Objekt anklicken oder Rahmen ziehen · ziehen zum Verschieben · ⌫ löscht
 402|Auswählen: klicken oder Rahmen ziehen · ⌘-Klick fügt hinzu · ziehen zum Verschieben · ⌫ löscht
 403|{0} Seite(n) an das Druckfenster gesendet
@@ -539,7 +539,7 @@
 538|— hervorheben, unterstreichen, durchstreichen, Notizen, Textfelder, Formen, Stempel, Links, Stift; Farbe und Füllung.
 539|— neu, öffnen, speichern, Eigenschaften, Seiten importieren, Exporte (Text, CSV, Bilder, RTF, DOCX, ODT), drucken (mit Vorschau; „Als PDF sichern“ ist im Druckfenster des Systems).
 540|— PDF-Betrachter und -Editor, offline. Ihre Dateien verlassen nie diesen Computer, und eine Datei wird nur beim Speichern ersetzt — zuerst in eine temporäre Datei geschrieben, dann ausgetauscht, also nie halb geschrieben.
-541|— drehen, löschen, hinzufügen, extrahieren, teilen, automatisch zuschneiden.
+541|— drehen, löschen, hinzufügen, extrahieren, teilen, automatisch zuschneiden; auswählen, Text bearbeiten, löschen, Schrift, Farbe, Bild einfügen, OCR.
 542|— auswählen, Text bearbeiten, löschen, Schrift, Farbe, Bild einfügen, OCR.
 543|— Ansichtssteuerung.
 544|⚠ Warnungen
@@ -639,3 +639,9 @@
 638|Normal ({0} pt)
 639|Groß ({0} pt)
 640|Sehr groß ({0} pt)
+641|Drehen
+642|Die aktuelle(n) Seite(n) nach links oder rechts drehen, oder alle Seiten
+643|Das Dokument als Text, CSV, Bilder, RTF, DOCX oder ODT speichern
+644|{0} Seiten löschen
+645|{0} Seiten extrahieren…
+646|Leere Seite danach einfügen

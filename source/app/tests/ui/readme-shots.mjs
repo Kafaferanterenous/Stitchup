@@ -110,7 +110,7 @@ await shot("annotate-light-grey.png");
 
 // 3. Inline text editing (Blue)
 await theme("blue");
-await tab("Content");
+await tab("Pages");
 const line = page.locator('[data-page="1"] .text-run', { hasText: "Double-click any line" }).first();
 await line.dblclick();
 await page.locator(".inline-editor").fill("Double-click any line to rewrite it — it stays in the original font.");
@@ -163,7 +163,7 @@ await run("open");
 await page.waitForSelector(".doc-tab:nth-child(2)");
 await settle();
 await run("fitPage");
-await tab("Content");
+await tab("Pages");
 await page.locator('[data-cmd="ocr"]').click();
 await settle();
 await shot("tabs-ocr-pastel-2.png");

@@ -116,7 +116,7 @@
 115|Dokument
 116|Właściwości dokumentu…
 117|Właściwości dokumentu
-118|Kliknij dwukrotnie dowolny wiersz (albo Zawartość ▸ Edytuj tekst, a potem go kliknij). Edytuje się go na miejscu, czcionką samego dokumentu, o ile ta ma potrzebne litery. Pasek nad wierszem ukazuje jego czcionkę i rozmiar: tamże zmienisz czcionkę, pogrubienie / kursywę, rozmiar lub barwę, albo uczynisz to przez Zawartość ▸ Kolor i Czcionka. Enter lub kliknięcie obok zapisuje; Tab wiedzie do następnego wiersza; Esc odwołuje; wyczyszczenie tekstu usuwa wiersz.
+118|Kliknij dwukrotnie dowolny wiersz (albo Strony ▸ Edytuj tekst, a potem go kliknij). Edytuje się go na miejscu, czcionką samego dokumentu, o ile ta ma potrzebne litery. Pasek nad wierszem ukazuje jego czcionkę i rozmiar: tamże zmienisz czcionkę, pogrubienie / kursywę, rozmiar lub barwę, albo uczynisz to przez Zawartość ▸ Kolor i Czcionka. Enter lub kliknięcie obok zapisuje; Tab wiedzie do następnego wiersza; Esc odwołuje; wyczyszczenie tekstu usuwa wiersz.
 119|Szkic
 120|Przeciągnij ramkę, a potem wpisz tekst
 121|Przeciągnij po tekście
@@ -398,7 +398,7 @@
 397|Zaznacz wszystko
 398|Zaznacz wszystkie strony
 399|Zaznacz wszystkie strony (⌘A)
-400|Najpierw zaznacz tekst (Zawartość ▸ Zaznacz, a potem kliknij wiersz)
+400|Najpierw zaznacz tekst (Strony ▸ Zaznacz, a potem kliknij wiersz)
 401|Zaznaczanie: kliknij obiekt lub przeciągnij ramkę · przeciągnij, aby przenieść · ⌫ usuwa
 402|Zaznaczanie: kliknij lub przeciągnij ramkę · ⌘-klik dodaje · przeciągnij, aby przenieść · ⌫ usuwa
 403|Wysłano strony do drukowania: {0}
@@ -539,7 +539,7 @@
 538|– wyróżnienie, podkreślenie, przekreślenie, notatki, pola tekstowe, kształty, pieczątki, łącza, pióro; Kolor i Wypełnienie.
 539|– nowy, otwórz, zapisz, właściwości, import stron, eksport (tekst, CSV, obrazy, RTF, DOCX, ODT), drukowanie (z podglądem; „Zapisz jako PDF” jest w oknie drukowania systemu).
 540|– przeglądarka i edytor PDF, co bez sieci pracuje. Pliki Waszmości nigdy tego komputera nie opuszczają, a plik bywa zastąpiony jeno przy zapisie – wpierw pisany do pliku tymczasowego, potem podmieniany, przeto nigdy nie zostaje zapisany do połowy.
-541|– obracanie, usuwanie, dodawanie, wyodrębnianie, dzielenie, autokadrowanie.
+541|– obracanie, usuwanie, dodawanie, wyodrębnianie, dzielenie, autokadrowanie; zaznaczanie, edycja tekstu, usuwanie, czcionka, kolor, wstawianie obrazu, OCR.
 542|– zaznaczanie, edycja tekstu, usuwanie, czcionka, kolor, wstawianie obrazu, OCR.
 543|– sterowanie widokiem.
 544|⚠ Ostrzeżenia
@@ -640,3 +640,9 @@
 638|Zwykły ({0} pt)
 639|Duży ({0} pt)
 640|Bardzo duży ({0} pt)
+641|Obróć
+642|Obróć bieżącą stronę (strony) w lewo lub w prawo albo wszystkie strony
+643|Zapisz dokument jako tekst, CSV, obrazy, RTF, DOCX lub ODT
+644|Usuń strony ({0})
+645|Wyodrębnij strony ({0})…
+646|Dodaj pustą stronę za nią

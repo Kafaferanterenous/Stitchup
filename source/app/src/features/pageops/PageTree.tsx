@@ -17,6 +17,7 @@ import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { extractTo } from "../../actions";
 import { Icon } from "../ribbon/icons";
 import { useAppState, store } from "../../store";
+import { ContextMenu, type MenuItem } from "../viewer/Viewer";
 import { renderPage, type RenderSession } from "../../adapters/renderAdapter";
 
 import { tr } from "../../i18n";
@@ -93,10 +94,12 @@ function Thumb({
   pageNo,
   picked,
   onPick,
+  onMenu,
 }: {
   pageNo: number;
   picked: boolean;
   onPick: (pageNo: number, e: MouseEvent) => void;
+  onMenu: (pageNo: number, e: MouseEvent) => void;
 }) {
   const app = useAppState();
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -119,6 +122,10 @@ function Thumb({
       className={`thumb${selected ? " selected" : ""}${picked ? " picked" : ""}${bookmarked ? " bookmarked" : ""}`}
       aria-pressed={picked}
       onClick={(e) => onPick(pageNo, e)}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        onMenu(pageNo, e);
+      }}
       title={`Page ${pageNo}${base?.rotation ? ` · rotated ${base.rotation}°` : ""} · ⌘-click / Shift-click to select several`}
     >
       {app.session ? (
@@ -158,6 +165,18 @@ function PagesContent() {
   const setSel = (next: number[] | ((s: number[]) => number[])) =>
     store.setPageSelection(typeof next === "function" ? next(app.selection) : next);
   const [anchor, setAnchor] = useState<number | null>(null);
+  // Right-click menu on a thumbnail: acts on the selection when the clicked
+  // page is part of it, otherwise on the clicked page alone.
+  const [menu, setMenu] = useState<{ x: number; y: number; pages: number[] } | null>(null);
+  function openMenu(pageNo: number, e: MouseEvent) {
+    const pages = sel.length > 1 && sel.includes(pageNo) ? sel : [pageNo];
+    if (pages.length === 1) {
+      setSel([pageNo]);
+      setAnchor(pageNo);
+      store.goToPage(pageNo);
+    }
+    setMenu({ x: e.clientX, y: e.clientY, pages });
+  }
   // Optimistic order while a drag is being applied; dropped on any doc change.
   const [pendingOrder, setPendingOrder] = useState<number[] | null>(null);
   const docOrder = app.doc?.pages.map((p) => p.page_no) ?? [];
@@ -234,6 +253,27 @@ function PagesContent() {
 
   return (
     <>
+      {menu && (
+        <ContextMenu
+          x={menu.x}
+          y={menu.y}
+          onClose={() => setMenu(null)}
+          items={((): (MenuItem | "-")[] => {
+            const ps = menu.pages;
+            const n = ps.length;
+            const all = n >= (app.doc?.pages.length ?? 0);
+            return [
+              { label: n === 1 ? tr("Delete Page") : tr("Delete {0} Pages", n), disabled: locked || all, run: () => void store.deletePages(ps) },
+              { label: n === 1 ? tr("Extract Page…") : tr("Extract {0} Pages…", n), disabled: locked, run: () => void extractTo(ps) },
+              "-",
+              { label: tr("Rotate Left"), disabled: locked, run: () => void store.rotate(ps, false) },
+              { label: tr("Rotate Right"), disabled: locked, run: () => void store.rotate(ps, true) },
+              "-",
+              { label: tr("Add a Blank Page After"), disabled: locked, run: () => void store.insertBlank(ps[n - 1]) },
+            ];
+          })()}
+        />
+      )}
       <div className="pages-tools" role="toolbar" aria-label="Page tools">
         <button onClick={() => void store.rotate(targets, false)} disabled={locked} title={`Rotate ${what} 90° counter-clockwise`} aria-label="Rotate left">
           <Icon name="rotate-ccw" size={16} />
@@ -269,7 +309,8 @@ function PagesContent() {
           <div className="thumb-list">
             {order.map((pageNo) => (
               <div key={pageNo} data-thumb={pageNo}>
-                <Thumb pageNo={pageNo} picked={sel.length > 1 && sel.includes(pageNo)} onPick={pick} />
+                <Thumb pageNo={pageNo} picked={sel.length > 1 && sel.includes(pageNo)} onPick={pick}
+                onMenu={openMenu} />
               </div>
             ))}
           </div>

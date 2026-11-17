@@ -35,7 +35,7 @@ not notarized. The first time you open it, right-click it and choose
 
 ## What it does
 
-- **Edit text in place:** double-click a line, or use Content ▸ Edit Text. The
+- **Edit text in place:** double-click a line, or use Pages ▸ Edit Text. The
   text is changed in the PDF in the original font. If that font lacks a letter,
   the line is redrawn in the closest standard font, with full Polish and other
   Central European letters (ą ć ę ł ń ó ś ź ż). Letters no standard font
@@ -50,7 +50,7 @@ not notarized. The first time you open it, right-click it and choose
   links and freehand pen. All are real PDF annotations, so they look the same
   in Preview and Acrobat.
 - **Redact:** what is under the box is removed from the file, not just covered.
-- **Content tools:** select, move and delete text, images, shapes (lines,
+- **Content tools (Pages tab):** select, move and delete text, images, shapes (lines,
   rectangles, filled areas) and annotations — also inside grouped drawings,
   where text can be edited in place too.
   Recolour selected text, shapes and existing annotations.
@@ -59,7 +59,7 @@ not notarized. The first time you open it, right-click it and choose
 - **Forms:** fill text fields, checkboxes, radio buttons and drop-downs.
   Forms without real fields (scans, Canva exports): **Type Text** anywhere
   and tick boxes with ✓ / ✗ (Annotate tab).
-- **OCR:** Content ▸ OCR reads scanned pages with Apple's Vision framework, on
+- **OCR:** Pages ▸ OCR reads scanned pages with Apple's Vision framework, on
   your Mac (macOS 10.15 or later), and adds the text as an invisible layer.
   The page looks the same, but you can now search, select and copy its text.
 - **Tabs:** each open document gets its own tab, with its own page, zoom and
@@ -121,7 +121,7 @@ Tests:
 |---|---|
 | `cd source/core && cargo test --release` | PDF engine: text editing, annotations, redaction, forms, signatures (checked with OpenSSL), page tree |
 | `cd source/app/src-tauri && cargo test --release` | Command layer |
-| `cd source/app && npm run build && npm run test:e2e` | 86 end-to-end checks: the real UI in Chromium driving the real Rust backend, with every ribbon tab, dialog and shortcut |
+| `cd source/app && npm run build && npm run test:e2e` | 87 end-to-end checks: the real UI in Chromium driving the real Rust backend, with every ribbon tab, dialog and shortcut |
 
 ## Layout
 

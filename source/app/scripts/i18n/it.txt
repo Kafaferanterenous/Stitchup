@@ -116,7 +116,7 @@
 115|Documento
 116|Proprietà documento…
 117|Proprietà documento
-118|Fai doppio clic su una riga (oppure Contenuto ▸ Modifica testo, poi fai clic su di essa). Viene modificata sul posto, nel carattere del documento se contiene le lettere necessarie. Una barra sopra la riga mostra carattere e dimensione: cambia lì carattere, grassetto / corsivo, dimensione o colore, oppure usa Contenuto ▸ Colore e Carattere. Invio o un clic altrove salva; Tab passa alla riga successiva; Esc annulla; svuotare il testo elimina la riga.
+118|Fai doppio clic su una riga (oppure Pagine ▸ Modifica testo, poi fai clic su di essa). Viene modificata sul posto, nel carattere del documento se contiene le lettere necessarie. Una barra sopra la riga mostra carattere e dimensione: cambia lì carattere, grassetto / corsivo, dimensione o colore, oppure usa Contenuto ▸ Colore e Carattere. Invio o un clic altrove salva; Tab passa alla riga successiva; Esc annulla; svuotare il testo elimina la riga.
 119|Bozza
 120|Trascina un riquadro, poi digita il testo
 121|Trascina sul testo
@@ -398,7 +398,7 @@
 397|Seleziona tutto
 398|Seleziona tutte le pagine
 399|Seleziona tutte le pagine (⌘A)
-400|Seleziona prima il testo (Contenuto ▸ Seleziona, poi fai clic su una riga)
+400|Seleziona prima il testo (Pagine ▸ Seleziona, poi fai clic su una riga)
 401|Selezione: fai clic su un oggetto o trascina un riquadro · trascina per spostare · ⌫ elimina
 402|Selezione: fai clic o trascina un riquadro · ⌘-clic aggiunge · trascina per spostare · ⌫ elimina
 403|Pagine inviate alla stampa: {0}
@@ -539,7 +539,7 @@
 538|— evidenziazione, sottolineatura, barratura, note, caselle di testo, forme, timbri, collegamenti, penna; Colore e Riempimento.
 539|— nuovo, apri, salva, proprietà, importa pagine, esportazioni (testo, CSV, immagini, RTF, DOCX, ODT), stampa (con anteprima; «Salva come PDF» è nella finestra di stampa del sistema).
 540|— visualizzatore ed editor PDF offline. I tuoi file non lasciano mai questo computer, e un file viene sostituito solo quando salvi — scritto prima in un file temporaneo, poi scambiato, quindi mai scritto a metà.
-541|— ruota, elimina, aggiungi, estrai, dividi, ritaglio automatico.
+541|— ruota, elimina, aggiungi, estrai, dividi, ritaglio automatico; seleziona, modifica testo, elimina, carattere, colore, inserisci immagine, OCR.
 542|— seleziona, modifica testo, elimina, carattere, colore, inserisci immagine, OCR.
 543|— controlli di visualizzazione.
 544|⚠ Avvisi
@@ -639,3 +639,9 @@
 638|Normale ({0} pt)
 639|Grande ({0} pt)
 640|Molto grande ({0} pt)
+641|Ruota
+642|Ruota la pagina o le pagine correnti a sinistra o a destra, oppure tutte le pagine
+643|Salva il documento come testo, CSV, immagini, RTF, DOCX o ODT
+644|Elimina {0} pagine
+645|Estrai {0} pagine…
+646|Aggiungi una pagina vuota dopo

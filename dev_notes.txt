@@ -1214,3 +1214,11 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
   FreeText sized to the text, sizes 9/11/14/18) and Marks ✓ / ✗ (ink strokes), default near-black
   ink ("form" colour). e2e uses the local fixture when present.
 - TESTS: core 65, command layer 9, e2e 86/86.
+
+2026-11-17 — v0.14.4: RIBBON TIDY-UP (user request)
+- Document: six export buttons → one "Export ▾" (Text, CSV, Images, RTF, DOCX, ODT).
+- Content tab merged into Pages (after a divider: Command.group draws .rb-sep). 6 ribbon tabs now.
+- Rotate ▾ (Left / Right / All Pages Right); ⌘R / ⌘⇧R unchanged.
+- Thumbnail right-click: Delete Page / Extract Page… / Rotate / Add Blank Page After — acts on the
+  right-clicked page, or on the whole selection when it is part of it.
+- TESTS: e2e 87/87.

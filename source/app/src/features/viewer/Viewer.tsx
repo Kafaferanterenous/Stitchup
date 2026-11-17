@@ -257,14 +257,14 @@ function InlineEditor({
 
 // ------------------------------------------------------------- context menu
 
-interface MenuItem {
+export interface MenuItem {
   label: string;
   run?: () => void;
   disabled?: boolean;
 }
 
 /** Right-click menu (fixed position; closes on click-away, Esc, scroll). */
-function ContextMenu({ x, y, items, onClose }: { x: number; y: number; items: (MenuItem | "-")[]; onClose: () => void }) {
+export function ContextMenu({ x, y, items, onClose }: { x: number; y: number; items: (MenuItem | "-")[]; onClose: () => void }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [pos, setPos] = useState({ x, y });
   useLayoutEffect(() => {
@@ -480,13 +480,13 @@ function PageView({ session, pageNo }: { session: RenderSession; pageNo: number 
   const applyRef = useRef(applyFormat);
   applyRef.current = applyFormat;
 
-  // While a line is open: Content tab, and Fore / Font / Recolor target it.
+  // While a line is open: Pages tab, and Fore / Font / Recolor target it.
   const editingOpen = !!editing && editing.pending === null;
   useEffect(() => {
     if (!editingOpen) return;
     const line: EditingLine = { page: pageNo, apply: (d) => applyRef.current(d) };
     store.setEditingLine(line);
-    if (getState().ribbonTab !== "Content") store.setRibbonTab("Content");
+    if (getState().ribbonTab !== "Pages") store.setRibbonTab("Pages");
     return () => {
       if (getState().editingLine === line) store.setEditingLine(null);
     };
