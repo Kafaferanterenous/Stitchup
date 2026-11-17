@@ -2,7 +2,7 @@
 
 Target: the best all-round PDF editor, at feature and look parity with the
 Windows build (github.com/Kafaferanterenous/stitchup-Win v0.12.28), and ahead of it where macOS allows.
-Updated 2026-11-17 (v0.14.5). Status key: ✅ done · 🔨 in progress · ⬜ to do. Every ✅ item is covered by an automated test.
+Updated 2026-11-17 (v0.15.0). Status key: ✅ done · 🔨 in progress · ⬜ to do. Every ✅ item is covered by an automated test.
 
 ## A. Look & navigation (same as Windows)
 | # | Goal | Status |
@@ -86,3 +86,5 @@ Duplicates removed, Nitro / macOS layout: Print Preview and Print to PDF folded 
 | H8 | Polish: typesetting (półpauza, non-breaking space after one-letter words), old-literary tone in About / notices / guide; About icon shows a Kabaret Dudek line and plays the user's own sound file (none shipped) | ✅ |
 | H9 | Slow / large PDFs: "Keep your pants on, mate — it's loadin'…" card with spinner, file name and seconds while opening | ✅ |
 | H10 | Type Text (click anywhere, type; 9–18 pt) and ✓ / ✗ marks, for forms without real fields — like Nitro's Type Text / Acrobat Fill & Sign | ✅ |
+| H11 | Underline selected lines (⌘U); proper plural forms (Polish 1/2–4/5+); ~30 more strings translated | ✅ |
+| H12 | Form creation: Forms tab — text, multi-line, check box, radio group, drop-down, signature fields; Edit Fields (move, properties, required / read-only, delete); undoable; read by pdf-lib | ✅ |

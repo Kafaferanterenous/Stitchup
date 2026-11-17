@@ -682,3 +682,50 @@
 681|Legal (8,5 × 14 po)
 682|{0} ligne‖{0} lignes
 683|sur {0} page‖sur {0} pages
+684|Un nom de champ ne peut pas contenir de point
+685|Ajouter le champ
+686|Ajoutez au moins un choix (un par ligne)
+687|Champ « {0} » ajouté
+688|Les boutons qui ont le même nom de groupe vont ensemble : un seul peut être choisi.
+689|Case à cocher
+690|Choix {0}
+691|Choix (un par ligne)
+692|Supprimer le champ
+693|Champ « {0} » supprimé
+694|Tracez un cadre sur la page pour le nouveau champ (ou cliquez pour la taille habituelle)
+695|Tracer une zone où signer (Acrobat et d’autres applications peuvent y signer)
+696|Tracer une case à cocher
+697|Tracer une liste déroulante de choix
+698|Tracer un champ de texte sur une ligne (faites glisser un cadre ou cliquez pour la taille habituelle)
+699|Tracer un bouton radio ; les boutons du même groupe n’autorisent qu’un seul choix
+700|Tracer un champ de texte sur plusieurs lignes (commentaires, adresses)
+701|Liste déroulante
+702|Liste déroulante
+703|Modifier les champs
+704|Modifier les champs : faites glisser un champ pour le déplacer · double-cliquez pour ses propriétés · ⌫ supprime
+705|Ajuster au cadre
+706|Formulaires
+707|Donnez un nom au champ
+708|Nom du groupe
+709|Déplacer les champs, modifier leurs noms et options, ou les supprimer
+710|Champ « {0} » déplacé
+711|Champ de texte multiligne
+712|Nouveau : {0}
+713|Bouton radio
+714|Lecture seule (ne peut pas être rempli)
+715|Obligatoire
+716|Champ de signature
+717|Zone de texte
+718|Champ de texte
+719|Taille du texte
+720|Valeur de ce bouton
+721|Champ « {0} » mis à jour
+722|Propriétés : {0}
+723|Bouton
+724|Champ de texte : tracez un cadre (ou cliquez)
+725|Zone de texte : tracez un cadre (ou cliquez)
+726|Case à cocher : cliquez à l’endroit voulu
+727|Bouton radio : cliquez à l’endroit voulu
+728|Liste déroulante : tracez un cadre (ou cliquez)
+729|Champ de signature : tracez un cadre (ou cliquez)
+730|Modifier les champs : glissez pour déplacer · double-clic pour les propriétés · ⌫ supprime

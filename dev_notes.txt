@@ -1231,3 +1231,16 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
   separated by "‖" (pl one‖few‖many, de/fr/it one‖other, zh one). Collector picks up trn keys.
 - ~30 visible strings wrapped (QuickSign checks, font picker, shortcut table, thumbnail tooltips,
   palette "No fill"…); help text key mismatch from v0.14.4 fixed.
+
+2026-11-18 — v0.15.0: FORM CREATION
+- core/src/formedit.rs: add_field (text / multiline / checkbox / radio group + join / choice (combo) /
+  signature), update_field (rename, required, read-only, choices, text size → redraw), move_field,
+  remove_field; touched_ids for undo (catalog, AcroForm, Fields, field + parent). AcroForm gets DR
+  fonts Helv + ZaDb. Appearances: border from /MK /BC, check mark, radio dot, drop-down arrow
+  (forms::Deco; existing forms with /MK /BC now keep their border when filled).
+- Command form_field_op(op, data) → {pages, name}.
+- UI: Forms ribbon tab + menu; drawing tools field-*; FieldDialog (new / properties, auto names
+  Text1, Check1, Group1…, radio joins last group, "Choice n"); Edit Fields layer (drag move,
+  double-click properties, ⌫ deletes the field — never pages; Delete enabled for a picked field even
+  on a one-page document).
+- TESTS: core forms_create (2), e2e 89/89 (pdf-lib reads the made form).

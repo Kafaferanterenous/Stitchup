@@ -236,6 +236,15 @@ export const COMMANDS: Command[] = [
   { id: "prevTab", label: "Previous Tab", tip: "Previous tab (⌃⇧Tab)", icon: "prev", accel: "Ctrl+Shift+Tab", enabled: (s) => s.tabs.length > 1, run: () => store.cycleTab(-1) },
   { id: "exit", label: "Exit", menu: "Quit Stitchup", tip: "Quit (⌘Q)", icon: "exit", accel: "CmdOrCtrl+Q", run: () => store.exitApp() },
 
+  // ------------------------------------------------------------------- Forms
+  { id: "formText", label: "Text Field", menu: "Text Field", tip: "Draw a one-line text field (drag a box, or click for the usual size)", icon: "f-text", tab: "Forms", enabled: hasDoc, active: isTool("field-text"), run: toolCmd("field-text") },
+  { id: "formMulti", label: "Text Area", menu: "Multi-line Text Field", tip: "Draw a text field for several lines (comments, addresses)", icon: "f-multi", tab: "Forms", enabled: hasDoc, active: isTool("field-multiline"), run: toolCmd("field-multiline") },
+  { id: "formCheck", label: "Check Box", menu: "Check Box", tip: "Draw a check box", icon: "f-check", tab: "Forms", enabled: hasDoc, active: isTool("field-checkbox"), run: toolCmd("field-checkbox") },
+  { id: "formRadio", label: "Radio Button", menu: "Radio Button", tip: "Draw a radio button; buttons with the same group name allow one choice", icon: "f-radio", tab: "Forms", enabled: hasDoc, active: isTool("field-radio"), run: toolCmd("field-radio") },
+  { id: "formChoice", label: "Drop-down", menu: "Drop-down List", tip: "Draw a drop-down list of choices", icon: "f-choice", tab: "Forms", enabled: hasDoc, active: isTool("field-choice"), run: toolCmd("field-choice") },
+  { id: "formSign", label: "Signature Field", menu: "Signature Field", tip: "Draw a box where someone signs (Acrobat and other apps can sign into it)", icon: "f-sign", tab: "Forms", enabled: hasDoc, active: isTool("field-signature"), run: toolCmd("field-signature") },
+  { id: "formEdit", label: "Edit Fields", menu: "Edit Fields", tip: "Move fields, change their names and options, or delete them", icon: "f-edit", tab: "Forms", group: "edit", enabled: hasDoc, active: isTool("field-edit"), run: toolCmd("field-edit") },
+
   // ------------------------------------------------------------------- Pages
   { id: "rotate", label: "Rotate", menu: "Rotate", tip: "Rotate the current page(s) left or right, or every page", icon: "rotate-cw", tab: "Pages", enabled: hasDoc,
     choices: () => subCommands(["rotateCcw", "rotateCw", "rotateAll"]), run: () => {} },
@@ -243,9 +252,14 @@ export const COMMANDS: Command[] = [
   { id: "rotateCw", label: "Rotate CW", menu: "Rotate Right", tip: "Rotate the current page(s) 90° clockwise (⌘R)", icon: "rotate-cw", accel: "CmdOrCtrl+R", enabled: hasDoc, run: () => store.rotate(store.targets(), true) },
   { id: "rotateAll", label: "Rotate All", menu: "Rotate All Pages Right", tip: "Rotate every page 90° clockwise", icon: "rotate-cw", enabled: hasDoc, run: () => store.rotate(getState().doc!.pages.map((p) => p.page_no), true) },
   { id: "delete", label: "Delete", menu: "Delete Page(s)", tip: "Delete the current page(s) (⌫)", icon: "trash", keys: ["Delete", "Backspace"], tab: "Pages",
-    enabled: (s) => hasDoc(s) && (!!s.picked || (s.selection.length || 1) < (s.doc?.pages.length ?? 0)),
-    // ⌫ with objects selected (Select tool) deletes those, not pages.
-    run: () => (getState().picked ? store.deletePicked() : store.deletePages(store.targets())) },
+    enabled: (s) => hasDoc(s) && ((s.tool === "field-edit" && !!s.fieldSel) || !!s.picked || (s.selection.length || 1) < (s.doc?.pages.length ?? 0)),
+    // ⌫ with objects selected (Select tool) deletes those, not pages;
+    // in Forms ▸ Edit Fields it deletes the picked field (never pages).
+    run: () => {
+      const s = getState();
+      if (s.tool === "field-edit") return s.fieldSel ? store.formField("remove", { name: s.fieldSel }) : undefined;
+      return s.picked ? store.deletePicked() : store.deletePages(store.targets());
+    } },
   { id: "addPage", label: "Add Page", menu: "Add Page…", tip: "Add a blank page after the current page", icon: "insert-blank", tab: "Pages", enabled: hasDoc, run: () => store.setDialog("addPage") },
   { id: "extract", label: "Extract", menu: "Extract Selected Page(s)…", tip: "Save the selected page(s) as their own PDF file", icon: "extract", tab: "Pages", enabled: hasDoc, run: () => (getState().selection.length ? extractTo(store.targets()) : store.setDialog("extract")) },
   { id: "split", label: "Split", menu: "Split Document…", tip: "Split the document into several files", icon: "split", tab: "Pages", enabled: (s) => hasDoc(s) && (s.doc?.pages.length ?? 0) > 1, run: () => store.setDialog("split") },
@@ -411,6 +425,7 @@ export const MENUS: { title: string; items: (string | "-" | { submenu: string })
   { title: "Edit", items: ["undo", "redo", "-", { submenu: "clipboard" }, "-", "find", "findNext", "findPrev", "-", "select", "editText", "objDelete", "fore", "font", "underline", "image", "ocr"] },
   { title: "Pages", items: ["import", "addPage", "delete", "-", "rotateCw", "rotateCcw", "rotateAll", "-", "extract", "split", "autoCrop", "headerFooter", "-", "selectAll"] },
   { title: "Annotate", items: ["annType", "annMark", "-", "annHighlight", "annUnderline", "annStrike", "annNote", "annText", "annShape", "annStamp", "annLink", "annPen", "-", "annFore", "back"] },
+  { title: "Forms", items: ["formText", "formMulti", "formCheck", "formRadio", "formChoice", "formSign", "-", "formEdit"] },
   { title: "Security", items: ["encrypt", "sign", "quickSign", "annRedact", "watermark"] },
   { title: "View", items: ["zoomIn", "zoomOut", "zoom100", "fitWidth", "fitPage", "-", "prev", "next", "-", "spread", "single", "continuous", "sidebar", "-", { submenu: "ribbonTabs" }, { submenu: "schemes" }] },
   { title: "Help", items: ["guide", "checkUpdate"] },

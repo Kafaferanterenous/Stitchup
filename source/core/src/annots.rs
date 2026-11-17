@@ -417,7 +417,7 @@ fn build(doc: &mut PdfDoc, page_id: ObjectId, spec: &AnnotSpec) -> Result<Dictio
 }
 
 /// The page's /Annots as an owned list (inline or referenced array).
-fn annots_of(doc: &PdfDoc, page: &Dictionary) -> Vec<Object> {
+pub(crate) fn annots_of(doc: &PdfDoc, page: &Dictionary) -> Vec<Object> {
     match page.get(b"Annots") {
         Ok(Object::Array(a)) => a.clone(),
         Ok(Object::Reference(r)) => doc.get_object(*r).and_then(Object::as_array).cloned().unwrap_or_default(),
@@ -425,11 +425,11 @@ fn annots_of(doc: &PdfDoc, page: &Dictionary) -> Vec<Object> {
     }
 }
 
-fn page_id(doc: &PdfDoc, page_no: u32) -> Result<ObjectId, EngineError> {
+pub(crate) fn page_id(doc: &PdfDoc, page_no: u32) -> Result<ObjectId, EngineError> {
     doc.get_pages().get(&page_no).copied().ok_or_else(|| crate::err!(ErrorCode::ValidationFailed, "no page {page_no}"))
 }
 
-fn set_annots(doc: &mut PdfDoc, page: ObjectId, annots: Vec<Object>) -> Result<(), EngineError> {
+pub(crate) fn set_annots(doc: &mut PdfDoc, page: ObjectId, annots: Vec<Object>) -> Result<(), EngineError> {
     let mut p = doc.get_object(page)?.as_dict()?.clone();
     if annots.is_empty() {
         p.remove(b"Annots");

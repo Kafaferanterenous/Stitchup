@@ -682,3 +682,50 @@
 681|Legal (8,5 × 14 cali)
 682|{0} wiersz‖{0} wiersze‖{0} wierszy
 683|na {0} stronie‖na {0} stronach‖na {0} stronach
+684|Nazwa pola nie może zawierać kropki
+685|Dodaj pole
+686|Dodaj co najmniej jedną pozycję (po jednej w wierszu)
+687|Dodano pole „{0}”
+688|Przyciski o tej samej nazwie grupy należą do siebie: można wybrać tylko jeden z nich.
+689|Pole wyboru
+690|Opcja {0}
+691|Pozycje listy (po jednej w wierszu)
+692|Usuń pole
+693|Usunięto pole „{0}”
+694|Przeciągnij prostokąt na stronie dla nowego pola (lub kliknij, by wstawić zwykły rozmiar)
+695|Narysuj miejsce na podpis (Acrobat i inne programy mogą w nim podpisać)
+696|Narysuj pole wyboru
+697|Narysuj rozwijaną listę pozycji
+698|Narysuj jednowierszowe pole tekstowe (przeciągnij prostokąt lub kliknij, by wstawić zwykły rozmiar)
+699|Narysuj przycisk opcji; przyciski z tą samą nazwą grupy pozwalają na jeden wybór
+700|Narysuj pole tekstowe na kilka wierszy (uwagi, adresy)
+701|Lista rozwijana
+702|Lista rozwijana
+703|Edytuj pola
+704|Edycja pól: przeciągnij pole, by je przesunąć · kliknij dwukrotnie, by otworzyć właściwości · ⌫ usuwa
+705|Dopasuj do pola
+706|Formularze
+707|Nadaj polu nazwę
+708|Nazwa grupy
+709|Przesuwaj pola, zmieniaj ich nazwy i opcje albo je usuwaj
+710|Przesunięto pole „{0}”
+711|Wielowierszowe pole tekstowe
+712|Nowe: {0}
+713|Przycisk opcji
+714|Tylko do odczytu (nie można wypełnić)
+715|Wymagane
+716|Pole podpisu
+717|Pole wielowierszowe
+718|Pole tekstowe
+719|Rozmiar tekstu
+720|Wartość tego przycisku
+721|Zaktualizowano pole „{0}”
+722|Właściwości: {0}
+723|Przycisk
+724|Pole tekstowe: przeciągnij prostokąt (lub kliknij)
+725|Pole wielowierszowe: przeciągnij prostokąt (lub kliknij)
+726|Pole wyboru: kliknij, gdzie ma być
+727|Przycisk opcji: kliknij, gdzie ma być
+728|Lista rozwijana: przeciągnij prostokąt (lub kliknij)
+729|Pole podpisu: przeciągnij prostokąt (lub kliknij)
+730|Edycja pól: przeciągnij, by przesunąć · kliknij dwukrotnie – właściwości · ⌫ usuwa

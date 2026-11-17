@@ -1329,6 +1329,55 @@ pub fn set_field_inner(st: &Mutex<SessionState>, name: String, value: Value) -> 
     logged_objects(&mut g, "Fill form", &ids, |doc| forms::set_value(doc, &name, &v))
 }
 
+/// Forms ▸ add a field. `data`: kind, name, page, rect, options, value, required, font_size.
+#[tauri::command]
+pub fn form_field_op(st: tauri::State<'_, Mutex<SessionState>>, op: String, data: Value) -> Result<FormOpResult, EngineError> {
+    form_field_op_inner(&st, op, data)
+}
+
+#[derive(Debug, Serialize)]
+pub struct FormOpResult {
+    pub pages: Vec<PageMeta>,
+    /// The field's name afterwards (de-duplicated / renamed).
+    pub name: String,
+}
+
+pub fn form_field_op_inner(st: &Mutex<SessionState>, op: String, data: Value) -> Result<FormOpResult, EngineError> {
+    use stitchup_core::formedit;
+    let mut g = lock(st)?;
+    let doc = g.doc.as_ref().ok_or_else(no_doc)?;
+    let str_of = |k: &str| data.get(k).and_then(|v| v.as_str()).unwrap_or_default().to_string();
+    let mut out = String::new();
+    let pages = match op.as_str() {
+        "add" => {
+            let spec: formedit::NewField = serde_json::from_value(data.clone()).map_err(validation)?;
+            let ids = formedit::touched_ids(doc, spec.name.trim());
+            logged_objects(&mut g, "Add form field", &ids, |doc| formedit::add_field(doc, &spec).map(|n| out = n))?
+        }
+        "update" => {
+            let p: formedit::FieldProps = serde_json::from_value(data.clone()).map_err(validation)?;
+            let ids = formedit::touched_ids(doc, &p.name);
+            logged_objects(&mut g, "Field properties", &ids, |doc| formedit::update_field(doc, &p).map(|n| out = n))?
+        }
+        "remove" => {
+            let name = str_of("name");
+            let ids = formedit::touched_ids(doc, &name);
+            out = name.clone();
+            logged_objects(&mut g, "Delete form field", &ids, |doc| formedit::remove_field(doc, &name))?
+        }
+        "move" => {
+            let name = str_of("name");
+            let num = |k: &str| data.get(k).and_then(|v| v.as_f64()).unwrap_or(0.0);
+            let (dx, dy) = (num("dx"), num("dy"));
+            let ids = formedit::touched_ids(doc, &name);
+            out = name.clone();
+            logged_objects(&mut g, "Move form field", &ids, |doc| formedit::move_field(doc, &name, dx, dy))?
+        }
+        other => return Err(EngineError::new(ErrorCode::ValidationFailed, format!("unknown form operation {other}"))),
+    };
+    Ok(FormOpResult { pages, name: out })
+}
+
 #[derive(Debug, Deserialize)]
 struct ImagePayload {
     format: String,

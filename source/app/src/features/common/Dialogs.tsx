@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import appIcon from "../../../src-tauri/icons/128x128@2x.png";
-import { useAppState, store, getState, docName, isUntitled, rgb, annotColor } from "../../store";
+import { useAppState, store, getState, docName, isUntitled, rgb, annotColor, type FieldKind } from "../../store";
 import { extractTo, parsePages, splitInto } from "../../actions";
-import { cmdAboutSoundClear, cmdAboutSoundGet, cmdAboutSoundSet, cmdSaveCompressed, cmdDiscardRecovery, cmdListAttachments, cmdSaveAttachment, cmdSaveEncrypted, cmdSign, cmdWriteFile, type AttachmentInfo, type RecoveryEntry } from "../../ipc";
+import { cmdListFields, cmdAboutSoundClear, cmdAboutSoundGet, cmdAboutSoundSet, cmdSaveCompressed, cmdDiscardRecovery, cmdListAttachments, cmdSaveAttachment, cmdSaveEncrypted, cmdSign, cmdWriteFile, type AttachmentInfo, type RecoveryEntry } from "../../ipc";
 import { loadSettings, saveSettings, type Settings } from "../../settings";
 import { FontPicker, fontName, useSystemFonts, type FontChoice } from "./FontPicker";
 import { THEMES, applyTheme, currentTheme, type ThemeName } from "../../themes/theme";
@@ -1333,6 +1333,158 @@ export function HeaderFooterDialog() {
           {tr("Apply")}
         </button>
         <button onClick={close}>{tr("Cancel")}</button>
+      </div>
+    </Modal>
+  );
+}
+
+
+const FIELD_BASE: Record<FieldKind, string> = { text: "Text", multiline: "Comments", checkbox: "Check", radio: "Group", choice: "Dropdown", signature: "Signature" };
+const FIELD_TITLE: Record<FieldKind | "button", string> = {
+  text: "Text Field",
+  multiline: "Multi-line Text Field",
+  checkbox: "Check Box",
+  radio: "Radio Button",
+  choice: "Drop-down List",
+  signature: "Signature Field",
+  button: "Button",
+};
+const FONT_SIZES = ["0", "8", "9", "10", "11", "12", "14", "18"];
+
+/** Forms: name and options for a field just drawn, or Properties of an existing one. */
+export function FieldDialog() {
+  const app = useAppState();
+  const draft = app.fieldDraft;
+  const isNew = draft?.mode === "new";
+  const field = draft?.mode === "edit" ? draft.field : null;
+  const kind: FieldKind | "button" = isNew ? draft.kind : field ? (field.kind === "text" && field.multiline ? "multiline" : (field.kind as FieldKind | "button")) : "text";
+  const [name, setName] = useState(field?.name ?? "");
+  const [value, setValue] = useState("");
+  const [options, setOptions] = useState(field?.options.join("\n") ?? "");
+  const [required, setRequired] = useState(field?.required ?? false);
+  const [readonly, setReadonly] = useState(field?.readonly ?? false);
+  const [size, setSize] = useState(isNew ? "0" : "keep");
+  const [err, setErr] = useState<string | null>(null);
+
+  // New field: suggest a free name (Text1, Text2…; radio buttons join the last group).
+  useEffect(() => {
+    if (!isNew || !draft) return;
+    void cmdListFields().then((fs) => {
+      const names = new Set(fs.map((f) => f.name));
+      if (draft.kind === "radio") {
+        const group = app.lastRadioGroup && fs.some((f) => f.name === app.lastRadioGroup && f.kind === "radio") ? app.lastRadioGroup : null;
+        if (group) {
+          setName(group);
+          const n = fs.find((f) => f.name === group)!.widgets.length + 1;
+          setValue(tr("Choice {0}", n));
+          return;
+        }
+        setValue(tr("Choice {0}", 1));
+      }
+      const base = FIELD_BASE[draft.kind];
+      let i = 1;
+      while (names.has(`${base}${i}`)) i++;
+      setName(`${base}${i}`);
+    });
+  }, [isNew]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!draft) return null;
+  const done = () => {
+    store.setDialog(null);
+  };
+  const opts = options.split("\n").map((o) => o.trim()).filter(Boolean);
+  const hasText = kind === "text" || kind === "multiline" || kind === "choice";
+
+  async function save() {
+    setErr(null);
+    if (!name.trim()) return setErr(tr("Give the field a name"));
+    if (name.includes(".")) return setErr(tr("A field name can't contain a full stop"));
+    if (kind === "choice" && !opts.length) return setErr(tr("Add at least one choice (one per line)"));
+    if (isNew && draft?.mode === "new") {
+      const ok = await store.formField("add", {
+        kind: draft.kind,
+        name: name.trim(),
+        page: draft.page,
+        rect: draft.rect,
+        options: opts,
+        value: draft.kind === "radio" ? value.trim() || "Choice" : null,
+        required,
+        font_size: Number(size) || 0,
+      });
+      if (ok) done();
+    } else if (field) {
+      const ok = await store.formField("update", {
+        name: field.name,
+        new_name: name.trim(),
+        required,
+        readonly,
+        options: kind === "choice" ? opts : null,
+        font_size: size === "keep" ? null : Number(size),
+      });
+      if (ok) done();
+    }
+  }
+
+  return (
+    <Modal title={isNew ? tr("New {0}", tr(FIELD_TITLE[kind])) : tr("{0} Properties", tr(FIELD_TITLE[kind]))} onClose={done}>
+      <label>
+        {kind === "radio" ? tr("Group name") : tr("Name")}
+        <input aria-label="Field name" value={name} onChange={(e) => setName(e.target.value)} autoFocus onKeyDown={(e) => e.key === "Enter" && void save()} />
+      </label>
+      {kind === "radio" && isNew && (
+        <>
+          <label>
+            {tr("This button's value")}
+            <input aria-label="Button value" value={value} onChange={(e) => setValue(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void save()} />
+          </label>
+          <p className="muted">{tr("Buttons with the same group name belong together: only one of them can be chosen.")}</p>
+        </>
+      )}
+      {kind === "choice" && (
+        <label>
+          {tr("Choices (one per line)")}
+          <textarea aria-label="Choices" className="field-options" value={options} onChange={(e) => setOptions(e.target.value)} />
+        </label>
+      )}
+      {hasText && (
+        <label>
+          {tr("Text size")}
+          <select aria-label="Text size" value={size} onChange={(e) => setSize(e.target.value)}>
+            {!isNew && <option value="keep">{tr("Keep")}</option>}
+            {FONT_SIZES.map((s) => (
+              <option key={s} value={s}>
+                {s === "0" ? tr("Fit to the box") : `${s} pt`}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      <label className="inline-check">
+        <input type="checkbox" checked={required} onChange={(e) => setRequired(e.target.checked)} />
+        {tr("Required")}
+      </label>
+      {!isNew && (
+        <label className="inline-check">
+          <input type="checkbox" checked={readonly} onChange={(e) => setReadonly(e.target.checked)} />
+          {tr("Read-only (can't be filled in)")}
+        </label>
+      )}
+      {err && (
+        <p className="err-note" role="alert">
+          {err}
+        </p>
+      )}
+      <div className="modal-actions">
+        <button onClick={() => void save()}>{isNew ? tr("Add Field") : tr("Save")}</button>
+        {!isNew && field && (
+          <button
+            onClick={async () => {
+              if (await store.formField("remove", { name: field.name })) done();
+            }}>
+            {tr("Delete Field")}
+          </button>
+        )}
+        <button onClick={done}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );

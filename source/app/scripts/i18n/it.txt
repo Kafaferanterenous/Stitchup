@@ -682,3 +682,50 @@
 681|Legal (8,5 × 14 pollici)
 682|{0} riga‖{0} righe
 683|su {0} pagina‖su {0} pagine
+684|Il nome di un campo non può contenere un punto
+685|Aggiungi campo
+686|Aggiungi almeno una scelta (una per riga)
+687|Campo «{0}» aggiunto
+688|I pulsanti con lo stesso nome di gruppo vanno insieme: se ne può scegliere solo uno.
+689|Casella di controllo
+690|Scelta {0}
+691|Scelte (una per riga)
+692|Elimina campo
+693|Campo «{0}» eliminato
+694|Trascina un riquadro sulla pagina per il nuovo campo (o fai clic per la dimensione abituale)
+695|Disegna un riquadro dove firmare (Acrobat e altre app possono firmarvi)
+696|Disegna una casella di controllo
+697|Disegna un elenco a discesa di scelte
+698|Disegna un campo di testo su una riga (trascina un riquadro o fai clic per la dimensione abituale)
+699|Disegna un pulsante di opzione; i pulsanti con lo stesso nome di gruppo consentono una sola scelta
+700|Disegna un campo di testo su più righe (commenti, indirizzi)
+701|Elenco a discesa
+702|Elenco a discesa
+703|Modifica campi
+704|Modifica campi: trascina un campo per spostarlo · doppio clic per le proprietà · ⌫ elimina
+705|Adatta al riquadro
+706|Moduli
+707|Assegna un nome al campo
+708|Nome del gruppo
+709|Sposta i campi, cambiane nomi e opzioni o eliminali
+710|Campo «{0}» spostato
+711|Campo di testo su più righe
+712|Nuovo: {0}
+713|Pulsante di opzione
+714|Sola lettura (non compilabile)
+715|Obbligatorio
+716|Campo firma
+717|Area di testo
+718|Campo di testo
+719|Dimensione del testo
+720|Valore di questo pulsante
+721|Campo «{0}» aggiornato
+722|Proprietà: {0}
+723|Pulsante
+724|Campo di testo: trascina un riquadro (o fai clic)
+725|Area di testo: trascina un riquadro (o fai clic)
+726|Casella di controllo: fai clic dove va
+727|Pulsante di opzione: fai clic dove va
+728|Elenco a discesa: trascina un riquadro (o fai clic)
+729|Campo firma: trascina un riquadro (o fai clic)
+730|Modifica campi: trascina per spostare · doppio clic per le proprietà · ⌫ elimina

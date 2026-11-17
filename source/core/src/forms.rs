@@ -32,11 +32,14 @@ pub struct Field {
     pub options: Vec<String>,
     pub multiline: bool,
     pub readonly: bool,
+    pub required: bool,
+    /// Choice fields: a drop-down (combo box) rather than a list.
+    pub combo: bool,
     pub widgets: Vec<Widget>,
     #[serde(skip)]
     pub field_id: Option<ObjectId>,
     #[serde(skip)]
-    da: String,
+    pub(crate) da: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -198,6 +201,8 @@ fn walk(doc: &PdfDoc, node: &Object, parent: &Inherit, pages: &HashMap<ObjectId,
         options: inh.opt,
         multiline: kind == "text" && ff & (1 << 12) != 0,
         readonly: ff & 1 != 0,
+        required: ff & 2 != 0,
+        combo: kind == "choice" && ff & (1 << 17) != 0,
         widgets,
         field_id: id,
         da: inh.da,
@@ -236,7 +241,7 @@ fn parse_da(da: &str) -> (f64, Vec<Operation>) {
 
 /// Text appearance for one widget: the value in Helvetica (Polish letters
 /// supported), auto-sized when /DA says 0, wrapped when multi-line.
-fn text_appearance(doc: &mut PdfDoc, rect: [f64; 4], value: &str, da: &str, multiline: bool) -> Result<ObjectId, EngineError> {
+pub(crate) fn text_appearance(doc: &mut PdfDoc, rect: [f64; 4], value: &str, da: &str, multiline: bool, deco: Deco) -> Result<ObjectId, EngineError> {
     let (w, h) = (rect[2] - rect[0], rect[3] - rect[1]);
     let (da_size, color) = parse_da(da);
     // Like a real viewer: honour /DA, but auto-fit (0) and never overflow the box.
@@ -274,17 +279,20 @@ fn text_appearance(doc: &mut PdfDoc, rect: [f64; 4], value: &str, da: &str, mult
         }
         vec![one]
     };
+    let _ = w;
     let joined = lines.join("\n");
     let enc = crate::textedit::std14_encode(&joined);
     let r = |v: f64| Object::Real(v as f32);
-    let mut ops = vec![
+    let mut ops = deco.ops(w, h);
+    let w = if deco.arrow { w - h.min(16.0) } else { w };
+    ops.extend([
         Operation::new("BMC", vec![Object::Name(b"Tx".to_vec())]),
         Operation::new("q", vec![]),
         Operation::new("re", vec![r(1.0), r(1.0), r(w - 2.0), r(h - 2.0)]),
         Operation::new("W", vec![]),
         Operation::new("n", vec![]),
         Operation::new("BT", vec![]),
-    ];
+    ]);
     ops.extend(color);
     ops.push(Operation::new("Tf", vec![Object::Name(b"StHv".to_vec()), r(size)]));
     let mut y = if multiline { h - 2.0 - size } else { (h - size * 0.72) / 2.0 };
@@ -326,7 +334,8 @@ pub fn set_value(doc: &mut PdfDoc, name: &str, value: &FieldValue) -> Result<(),
         ("text" | "choice", FieldValue::Text(t)) => {
             dict_mut(doc, field_id)?.set("V", lopdf::text_string(t));
             for w in &f.widgets {
-                let ap = text_appearance(doc, w.rect, t, &f.da, f.multiline)?;
+                let deco = Deco { border: mk_border(doc, w.id), arrow: f.kind == "choice" && f.combo };
+                let ap = text_appearance(doc, w.rect, t, &f.da, f.multiline, deco)?;
                 dict_mut(doc, w.id)?.set("AP", dictionary! { "N" => ap });
             }
         }
@@ -334,7 +343,8 @@ pub fn set_value(doc: &mut PdfDoc, name: &str, value: &FieldValue) -> Result<(),
             // Widgets without an appearance get a drawn check mark (on) / empty box (off).
             let mut f = f.clone();
             for w in f.widgets.iter_mut().filter(|w| w.on_state.is_none()) {
-                check_appearance(doc, w.id, w.rect, "Yes")?;
+                let b = mk_border(doc, w.id);
+                check_appearance(doc, w.id, w.rect, "Yes", b)?;
                 w.on_state = Some("Yes".into());
             }
             let on_name = f.widgets.iter().find_map(|w| w.on_state.clone()).unwrap_or_else(|| "Yes".into());
@@ -361,13 +371,15 @@ pub fn set_value(doc: &mut PdfDoc, name: &str, value: &FieldValue) -> Result<(),
 }
 
 /// On/Off appearances for a checkbox widget that has none.
-fn check_appearance(doc: &mut PdfDoc, widget: ObjectId, rect: [f64; 4], on: &str) -> Result<(), EngineError> {
+pub(crate) fn check_appearance(doc: &mut PdfDoc, widget: ObjectId, rect: [f64; 4], on: &str, border: Option<[f64; 3]>) -> Result<(), EngineError> {
     let (w, h) = (rect[2] - rect[0], rect[3] - rect[1]);
     let r = |v: f64| Object::Real(v as f32);
     let bbox = vec![0.into(), 0.into(), r(w), r(h)];
     let s = w.min(h);
     let (ox, oy) = ((w - s) / 2.0, (h - s) / 2.0);
-    let check = vec![
+    let frame = Deco { border, arrow: false }.ops(w, h);
+    let mut check = frame.clone();
+    check.extend([
         Operation::new("q", vec![]),
         Operation::new("w", vec![r((s * 0.12).max(0.8))]),
         Operation::new("J", vec![1.into()]),
@@ -378,15 +390,66 @@ fn check_appearance(doc: &mut PdfDoc, widget: ObjectId, rect: [f64; 4], on: &str
         Operation::new("l", vec![r(ox + s * 0.82), r(oy + s * 0.76)]),
         Operation::new("S", vec![]),
         Operation::new("Q", vec![]),
-    ];
+    ]);
     let on_id = doc.add_object(Stream::new(
         dictionary! { "Type" => "XObject", "Subtype" => "Form", "BBox" => bbox.clone() },
         Content { operations: check }.encode()?,
     ));
-    let off_id = doc.add_object(Stream::new(dictionary! { "Type" => "XObject", "Subtype" => "Form", "BBox" => bbox }, Vec::new()));
+    let off_id = doc.add_object(Stream::new(dictionary! { "Type" => "XObject", "Subtype" => "Form", "BBox" => bbox }, Content { operations: frame }.encode()?));
     let mut n = Dictionary::new();
     n.set(on.as_bytes().to_vec(), on_id);
     n.set("Off", off_id);
     dict_mut(doc, widget)?.set("AP", dictionary! { "N" => n });
     Ok(())
+}
+
+/// Decoration drawn under a widget's content: a border (from /MK /BC) and,
+/// for drop-downs, a small arrow at the right.
+#[derive(Debug, Clone, Copy, Default)]
+pub(crate) struct Deco {
+    pub border: Option<[f64; 3]>,
+    pub arrow: bool,
+}
+
+impl Deco {
+    pub(crate) fn ops(&self, w: f64, h: f64) -> Vec<Operation> {
+        let r = |v: f64| Object::Real(v as f32);
+        let mut ops = vec![];
+        if let Some(c) = self.border {
+            ops.extend([
+                Operation::new("q", vec![]),
+                Operation::new("RG", c.iter().map(|v| r(*v)).collect()),
+                Operation::new("w", vec![r(0.75)]),
+                Operation::new("re", vec![r(0.375), r(0.375), r(w - 0.75), r(h - 0.75)]),
+                Operation::new("S", vec![]),
+                Operation::new("Q", vec![]),
+            ]);
+        }
+        if self.arrow {
+            let a = h.min(16.0);
+            let (cx, cy, s) = (w - a / 2.0, h / 2.0, a * 0.22);
+            ops.extend([
+                Operation::new("q", vec![]),
+                Operation::new("g", vec![r(0.35)]),
+                Operation::new("m", vec![r(cx - s), r(cy + s * 0.5)]),
+                Operation::new("l", vec![r(cx + s), r(cy + s * 0.5)]),
+                Operation::new("l", vec![r(cx), r(cy - s * 0.6)]),
+                Operation::new("f", vec![]),
+                Operation::new("Q", vec![]),
+            ]);
+        }
+        ops
+    }
+}
+
+/// Border colour from a widget's /MK /BC (RGB or grey), if any.
+pub(crate) fn mk_border(doc: &PdfDoc, widget: ObjectId) -> Option<[f64; 3]> {
+    let d = doc.get_object(widget).ok()?.as_dict().ok()?;
+    let mk = d.get(b"MK").ok().and_then(|o| deref(doc, o))?.as_dict().ok()?;
+    let v: Vec<f64> = mk.get(b"BC").ok()?.as_array().ok()?.iter().filter_map(|x| x.as_float().ok().map(|f| f as f64)).collect();
+    match v.len() {
+        1 => Some([v[0]; 3]),
+        3 => Some([v[0], v[1], v[2]]),
+        _ => None,
+    }
 }

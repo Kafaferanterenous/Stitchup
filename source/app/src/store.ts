@@ -49,6 +49,8 @@ import {
   cmdObjectOp,
   cmdInsertShape,
   cmdUnderline,
+  cmdFormFieldOp,
+  type FormField,
   cmdSetField,
   cmdInsertImage,
   cmdTabNew,
@@ -154,6 +156,11 @@ export interface AppState {
   loading: { name: string; since: number } | null;
   /** Type Text size (points). */
   typeSize: number;
+  /** Forms: the field dialog's subject, and the field picked in Edit Fields. */
+  fieldDraft: FieldDraft | null;
+  fieldSel: string | null;
+  /** Last radio group used, so the next button joins it. */
+  lastRadioGroup: string | null;
   strokeWidth: number;
   /** Select tool: picked content objects ("t12"/"i30") and annotations (obj #). */
   picked: { page: number; objects: string[]; annots: number[] } | null;
@@ -202,7 +209,19 @@ export interface PendingImage {
   widthPt?: number;
 }
 
+export type FieldKind = "text" | "multiline" | "checkbox" | "radio" | "choice" | "signature";
+
+/** The field dialog: a new field just drawn, or an existing one to edit. */
+export type FieldDraft = { mode: "new"; kind: FieldKind; page: number; rect: number[] } | { mode: "edit"; field: FormField };
+
 export type Tool =
+  | "field-text"
+  | "field-multiline"
+  | "field-checkbox"
+  | "field-radio"
+  | "field-choice"
+  | "field-signature"
+  | "field-edit"
   | "typetext"
   | "check"
   | "cross"
@@ -234,8 +253,8 @@ export interface PendingInput {
   rect: [number, number, number, number];
 }
 
-export type RibbonTabName = "Document" | "Pages" | "Annotate" | "Zoom" | "Navigate" | "Security";
-export const RIBBON_TABS: RibbonTabName[] = ["Document", "Pages", "Annotate", "Zoom", "Navigate", "Security"];
+export type RibbonTabName = "Document" | "Pages" | "Annotate" | "Forms" | "Zoom" | "Navigate" | "Security";
+export const RIBBON_TABS: RibbonTabName[] = ["Document", "Pages", "Annotate", "Forms", "Zoom", "Navigate", "Security"];
 
 export type Dialog =
   | null
@@ -259,6 +278,7 @@ export type Dialog =
   | "quickSignUnlock"
   | "quickSignManage"
   | "headerFooter"
+  | "field"
   | "recovery";
 
 let state: AppState = {
@@ -302,6 +322,9 @@ let state: AppState = {
   recent: loadRecent(),
   loading: null,
   typeSize: 11,
+  fieldDraft: null,
+  fieldSel: null,
+  lastRadioGroup: null,
   strokeWidth: 2,
   picked: null,
   pendingInput: null,
@@ -720,8 +743,39 @@ export const store = {
   /** Arm a tool (same tool again = disarm). Leaving clears the selection. */
   setTool(tool: Tool | null) {
     const next = state.tool === tool ? null : tool;
-    set({ tool: next, picked: null, editMode: false, pendingInput: null });
+    set({ tool: next, picked: null, editMode: false, pendingInput: null, fieldSel: null });
+    if (next === "field-edit") notify(tr("Edit Fields: drag a field to move it · double-click for its properties · ⌫ deletes"));
+    else if (next?.startsWith("field-")) notify(tr("Drag a box on the page for the new field (or click for the usual size)"));
     if (next === "select") notify(tr("Select: click an object or drag a box · drag to move · ⌫ deletes"));
+  },
+
+  // ---- forms
+  openFieldDialog(d: FieldDraft) {
+    set({ fieldDraft: d, dialog: "field" });
+  },
+
+  setFieldSel(name: string | null) {
+    set({ fieldSel: name });
+  },
+
+  /** Add / change / move / delete a form field (one undo step each). */
+  async formField(op: "add" | "update" | "move" | "remove", data: Record<string, unknown>) {
+    const doc = state.doc;
+    if (!doc) return null;
+    let name: string | null = null;
+    const label: Record<string, string> = { add: tr("Added field “{0}”"), update: tr("Updated field “{0}”"), move: tr("Moved field “{0}”"), remove: tr("Deleted field “{0}”") };
+    const ok = await this.command(
+      { kind: "object", before: doc.pages.map((p) => p.page_no), data: { op, ...data } },
+      async () => {
+        const r = await cmdFormFieldOp(op, data);
+        name = r.name;
+        return r.pages;
+      },
+      () => ({ status: label[op].replace("{0}", name ?? ""), page: typeof data.page === "number" ? data.page : undefined }),
+    );
+    if (ok && op === "remove") set({ fieldSel: null });
+    if (ok && op === "add" && data.kind === "radio") set({ lastRadioGroup: name });
+    return ok ? name : null;
   },
 
   setTypeSize(pt: number) {

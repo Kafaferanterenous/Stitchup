@@ -356,9 +356,9 @@ await page.goto(BASE);
 
 console.log("Stitchup E2E");
 
-await check("starts like Windows: 6 ribbon tabs, empty-state hint, status bar", async () => {
+await check("starts like Windows: 7 ribbon tabs, empty-state hint, status bar", async () => {
   const tabs = await page.locator(".ribbon-tabs [role=tab]").allInnerTexts();
-  assert(tabs.join() === "Document,Pages,Annotate,Zoom,Navigate,Security", tabs.join());
+  assert(tabs.join() === "Document,Pages,Annotate,Forms,Zoom,Navigate,Security", tabs.join());
   assert((await page.locator(".empty-viewer").innerText()).includes("No document open"), "empty hint");
   assert(/Stitchup PDF Editor/.test(await status()), await status());
   assert((await page.locator(".pages-pane").count()) === 0, "no sidebar without a document");
@@ -1437,7 +1437,7 @@ await check("Security ▸ QuickSign: a signature from a PNG, kept locked with a 
 await check("every button on every ribbon tab is live with a document open", async () => {
   const needsSelection = new Set(["objDelete", "recolor", "font", "underline"]);
   const dead = [];
-  for (const t of ["Document", "Pages", "Annotate", "Zoom", "Navigate", "Security"]) {
+  for (const t of ["Document", "Pages", "Annotate", "Forms", "Zoom", "Navigate", "Security"]) {
     await tab(t);
     for (const el of await page.locator(".ribbon-card .rb-btn").all()) {
       const id = await el.getAttribute("data-cmd");
@@ -2098,6 +2098,135 @@ await check("QuickSign: if the signature can't be kept (folder blocked), Save & 
   openPath = MAIN;
 });
 
+await check("Forms: draw text, check box, radio group, drop-down and signature fields; edit, move, delete, undo; fill; other apps read them", async () => {
+  const f = path.join(WORK, "make-form.pdf");
+  await makePdf(f, [LETTER]);
+  await openViaRibbon(f);
+  await tab("Forms");
+  const fields = async () => await ipc("list_fields");
+  const dialog = page.locator(".modal");
+  const at = async (fx, fy) => await emptySpot(1, fx, fy);
+  // Text field: drag a box.
+  await rb("formText").click();
+  let [x, y] = await at(0.3, 0.2);
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 220, y + 24, { steps: 6 });
+  await page.mouse.up();
+  await dialog.waitFor();
+  await page.waitForFunction(() => document.querySelector('.modal [aria-label="Field name"]')?.value === "Text1");
+  await dialog.getByLabel("Field name").fill("Full name");
+  await dialog.getByRole("button", { name: "Add Field" }).click();
+  await waitStatus(/Added field “Full name”/);
+  // Check box: a click gives the usual size.
+  await rb("formCheck").click();
+  [x, y] = await at(0.2, 0.3);
+  await page.mouse.click(x, y);
+  await page.waitForFunction(() => document.querySelector('.modal [aria-label="Field name"]')?.value === "Check1");
+  await dialog.getByRole("button", { name: "Add Field" }).click();
+  await waitStatus(/Added field “Check1”/);
+  // Radio group: two buttons; the second joins the first group.
+  await rb("formRadio").click();
+  [x, y] = await at(0.2, 0.4);
+  await page.mouse.click(x, y);
+  await page.waitForFunction(() => document.querySelector('.modal [aria-label="Field name"]')?.value === "Group1");
+  await dialog.getByLabel("Button value").fill("Yes");
+  await dialog.getByRole("button", { name: "Add Field" }).click();
+  await waitStatus(/Added field “Group1”/);
+  [x, y] = await at(0.35, 0.4);
+  await page.mouse.click(x, y);
+  await page.waitForFunction(() => document.querySelector('.modal [aria-label="Button value"]')?.value === "Choice 2");
+  assert((await dialog.getByLabel("Field name").inputValue()) === "Group1", "joins the last group");
+  await dialog.getByLabel("Button value").fill("No");
+  await dialog.getByRole("button", { name: "Add Field" }).click();
+  await page.waitForFunction(async () => true);
+  for (let i = 0; i < 20 && ((await fields()).find((f) => f.name === "Group1")?.widgets.length ?? 0) < 2; i++) await page.waitForTimeout(200);
+  // Drop-down with choices; refuses an empty list first.
+  await rb("formChoice").click();
+  [x, y] = await at(0.3, 0.5);
+  await page.mouse.click(x, y);
+  await dialog.waitFor();
+  await dialog.getByRole("button", { name: "Add Field" }).click();
+  await dialog.getByText("Add at least one choice").waitFor();
+  await dialog.getByLabel("Choices").fill("Poland\nItaly\nFrance");
+  await dialog.getByRole("button", { name: "Add Field" }).click();
+  await waitStatus(/Added field “Dropdown1”/);
+  // Signature field.
+  await rb("formSign").click();
+  [x, y] = await at(0.3, 0.7);
+  await page.mouse.click(x, y);
+  await dialog.waitFor();
+  await dialog.getByRole("button", { name: "Add Field" }).click();
+  await waitStatus(/Added field “Signature1”/);
+  let list = await fields();
+  assert(list.map((f) => `${f.name}:${f.kind}`).sort().join() === "Check1:checkbox,Dropdown1:choice,Full name:text,Group1:radio,Signature1:signature", list.map((f) => f.name).join());
+  assert(list.find((f) => f.name === "Group1").widgets.map((w) => w.on_state).join() === "Yes,No", "radio values");
+  assert(list.find((f) => f.name === "Dropdown1").options.join() === "Poland,Italy,France", "choices");
+
+  // Edit Fields: drag to move, double-click for properties, ⌫ deletes, undo.
+  await rb("formEdit").click();
+  const box = page.locator('[data-page="1"] .field-box[data-field="Full name"]');
+  await box.waitFor();
+  const r0 = list.find((f) => f.name === "Full name").widgets[0].rect;
+  await box.evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.waitForTimeout(200);
+  const bb = await box.boundingBox();
+  await page.mouse.move(bb.x + 20, bb.y + bb.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(bb.x + 80, bb.y + bb.height / 2, { steps: 6 });
+  await page.mouse.up();
+  await waitStatus(/Moved field “Full name”/);
+  const r1 = (await fields()).find((f) => f.name === "Full name").widgets[0].rect;
+  assert(r1[0] > r0[0] + 20 && Math.abs(r1[1] - r0[1]) < 1, `moved right: ${r0} → ${r1}`);
+  await page.locator('[data-page="1"] .field-box[data-field="Full name"]').evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await page.locator('[data-page="1"] .field-box[data-field="Full name"]').dblclick();
+  await page.waitForFunction(() => document.querySelector('.modal [aria-label="Field name"]')?.value === "Full name");
+  await dialog.getByLabel("Field name").fill("Surname");
+  await dialog.getByText("Required").click();
+  await dialog.getByRole("button", { name: "Save" }).click();
+  await waitStatus(/Updated field “Surname”/);
+  assert((await fields()).find((f) => f.name === "Surname")?.required, "renamed and required");
+  const pagesBefore = (await state()).pages.length;
+  await page.locator('[data-page="1"] .field-box[data-field="Check1"]').click();
+  await page.keyboard.press("Backspace");
+  await waitStatus(/Deleted field “Check1”/);
+  assert(!(await fields()).some((f) => f.name === "Check1"), "check box deleted");
+  assert((await state()).pages.length === pagesBefore, "⌫ never deletes pages in Edit Fields");
+  await page.keyboard.press("Meta+z");
+  for (let i = 0; i < 20 && !(await fields()).some((f) => f.name === "Check1"); i++) await page.waitForTimeout(200);
+  assert((await fields()).some((f) => f.name === "Check1"), "undo brings it back");
+  await rb("formEdit").click();
+
+  // Fill the new form like any other.
+  const name = page.getByLabel("Surname", { exact: true });
+  await name.waitFor();
+  await name.fill("Łukasiewicz");
+  await name.press("Enter");
+  await waitStatus(/Filled “Surname”/);
+  await page.getByRole("checkbox", { name: "Check1" }).click();
+  await waitStatus(/Filled “Check1”/);
+  await page.getByRole("radio", { name: /Group1: No/ }).click();
+  await waitStatus(/Filled “Group1”/);
+  await page.getByLabel("Dropdown1").selectOption("Italy");
+  await waitStatus(/Filled “Dropdown1”/);
+  const out = path.join(WORK, "made-form.pdf");
+  await pick(out);
+  await tab("Document");
+  await rb("saveAs").click();
+  await waitStatus(/made-form\.pdf/);
+  const d = await PDFDocument.load(await readFile(out));
+  const form = d.getForm();
+  assert(form.getTextField("Surname").getText() === "Łukasiewicz", "text read by pdf-lib");
+  assert(form.getCheckBox("Check1").isChecked(), "check box");
+  assert(form.getRadioGroup("Group1").getSelected() === "No", "radio");
+  assert(form.getDropdown("Dropdown1").getSelected().join() === "Italy", "drop-down");
+  assert(form.getFields().some((x) => x.getName() === "Signature1"), "signature field");
+  await page.locator(".doc-tab.active .doc-tab-close").click();
+  await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
+  await waitStatus(/main\.pdf/);
+  openPath = MAIN;
+});
+
 await check("Annotate ▸ Type Text and ✓ / ✗ fill in a form that has no fields", async () => {
   const local = path.resolve(APP, "..", "..", "fixtures", "fillable-form.pdf");
   const f = existsSync(local) ? local : path.join(WORK, "paper-form.pdf");
@@ -2224,7 +2353,7 @@ await check("Settings ▸ Language: Polish, German, Chinese, back to English", a
   };
   const tabs = () => page.locator(".ribbon-tabs [role=tab]").allInnerTexts();
   await setLang("pl");
-  assert((await tabs()).join() === "Dokument,Strony,Adnotacje,Powiększenie,Nawigacja,Zabezpieczenia", (await tabs()).join());
+  assert((await tabs()).join() === "Dokument,Strony,Adnotacje,Formularze,Powiększenie,Nawigacja,Zabezpieczenia", (await tabs()).join());
   await page.locator(".ribbon-tabs [role=tab]", { hasText: "Dokument" }).click();
   assert((await page.locator(".ribbon-card .rb-text").allInnerTexts()).includes("Zapisz jako"), "Polish ribbon labels");
   assert((await rb("save").getAttribute("title")).startsWith("Zapisz zmiany"), "Polish tooltip");
@@ -2232,11 +2361,11 @@ await check("Settings ▸ Language: Polish, German, Chinese, back to English", a
   await page.locator(".ribbon-tabs [role=tab]", { hasText: "Kommentieren" }).click();
   await page.screenshot({ path: path.join(OUT, "lang-de.png") });
   await setLang("zh");
-  assert((await tabs()).join() === "文档,页面,注释,缩放,导航,安全", (await tabs()).join());
+  assert((await tabs()).join() === "文档,页面,注释,表单,缩放,导航,安全", (await tabs()).join());
   await page.locator(".ribbon-tabs [role=tab]", { hasText: "安全" }).click();
   await page.screenshot({ path: path.join(OUT, "lang-zh.png") });
   await setLang("en");
-  assert((await tabs()).join() === "Document,Pages,Annotate,Zoom,Navigate,Security", "back to English");
+  assert((await tabs()).join() === "Document,Pages,Annotate,Forms,Zoom,Navigate,Security", "back to English");
   await page.locator(".ribbon-tabs [role=tab]", { hasText: "Document" }).click();
 });
 

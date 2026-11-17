@@ -37,8 +37,7 @@ import {
   PrintDialog,
   PropertiesDialog,
   SplitDialog,
-  WatermarkDialog,
-} from "./features/common/Dialogs";
+  WatermarkDialog, FieldDialog } from "./features/common/Dialogs";
 
 import { tr } from "./i18n";
 
@@ -236,6 +235,7 @@ export default function App() {
       </footer>
       <PropertiesDialog />
       {app.dialog === "about" && <AboutDialog />}
+      {app.dialog === "field" && <FieldDialog />}
       {app.dialog === "extract" && <ExtractDialog />}
       {app.dialog === "split" && <SplitDialog />}
       {app.dialog === "new" && <NewDialog />}

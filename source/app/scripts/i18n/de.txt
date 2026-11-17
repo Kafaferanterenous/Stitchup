@@ -682,3 +682,50 @@
 681|Legal (8,5 × 14 Zoll)
 682|{0} Zeile‖{0} Zeilen
 683|auf {0} Seite‖auf {0} Seiten
+684|Ein Feldname darf keinen Punkt enthalten
+685|Feld hinzufügen
+686|Mindestens einen Eintrag hinzufügen (einer pro Zeile)
+687|Feld „{0}“ hinzugefügt
+688|Optionsfelder mit demselben Gruppennamen gehören zusammen: Nur eines davon kann gewählt werden.
+689|Kontrollkästchen
+690|Option {0}
+691|Einträge (einer pro Zeile)
+692|Feld löschen
+693|Feld „{0}“ gelöscht
+694|Ein Rechteck für das neue Feld auf die Seite ziehen (oder klicken für die übliche Größe)
+695|Einen Bereich zum Unterschreiben zeichnen (Acrobat und andere Programme können darin signieren)
+696|Ein Kontrollkästchen zeichnen
+697|Eine Auswahlliste zeichnen
+698|Ein einzeiliges Textfeld zeichnen (Rechteck ziehen oder klicken für die übliche Größe)
+699|Ein Optionsfeld zeichnen; Optionsfelder mit demselben Gruppennamen erlauben eine Auswahl
+700|Ein mehrzeiliges Textfeld zeichnen (Kommentare, Adressen)
+701|Auswahlliste
+702|Auswahlliste
+703|Felder bearbeiten
+704|Felder bearbeiten: Feld ziehen zum Verschieben · Doppelklick für Eigenschaften · ⌫ löscht
+705|An das Feld anpassen
+706|Formulare
+707|Dem Feld einen Namen geben
+708|Gruppenname
+709|Felder verschieben, Namen und Optionen ändern oder löschen
+710|Feld „{0}“ verschoben
+711|Mehrzeiliges Textfeld
+712|Neu: {0}
+713|Optionsfeld
+714|Schreibgeschützt (kann nicht ausgefüllt werden)
+715|Pflichtfeld
+716|Unterschriftsfeld
+717|Textbereich
+718|Textfeld
+719|Textgröße
+720|Wert dieses Optionsfelds
+721|Feld „{0}“ aktualisiert
+722|Eigenschaften: {0}
+723|Schaltfläche
+724|Textfeld: Rechteck ziehen (oder klicken)
+725|Textbereich: Rechteck ziehen (oder klicken)
+726|Kontrollkästchen: dorthin klicken, wo es hin soll
+727|Optionsfeld: dorthin klicken, wo es hin soll
+728|Auswahlliste: Rechteck ziehen (oder klicken)
+729|Unterschriftsfeld: Rechteck ziehen (oder klicken)
+730|Felder bearbeiten: ziehen zum Verschieben · Doppelklick für Eigenschaften · ⌫ löscht

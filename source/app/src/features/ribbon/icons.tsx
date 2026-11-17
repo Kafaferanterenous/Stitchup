@@ -64,7 +64,14 @@ export type IconName =
   | "lock"
   | "sign"
   | "find"
-  | "strike";
+  | "strike"
+  | "f-text"
+  | "f-multi"
+  | "f-check"
+  | "f-radio"
+  | "f-choice"
+  | "f-sign"
+  | "f-edit";
 
 const ICONS: Record<IconName, ReactNode> = {
   open: (
@@ -322,6 +329,27 @@ const ICONS: Record<IconName, ReactNode> = {
   ),
   "find": (
     <><circle cx="10.5" cy="10.5" r="6" /><path d="M15 15l5.5 5.5" /></>
+  ),
+  "f-text": (
+    <><rect x="3" y="8" width="18" height="8" rx="1.5" /><path d="M7 10.5v3" /></>
+  ),
+  "f-multi": (
+    <><rect x="3" y="4" width="18" height="16" rx="1.5" /><path d="M7 9h10M7 13h10M7 17h6" /></>
+  ),
+  "f-check": (
+    <><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 12.5l3 3 5-6.5" /></>
+  ),
+  "f-radio": (
+    <><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3.5" fill="currentColor" /></>
+  ),
+  "f-choice": (
+    <><rect x="3" y="8" width="18" height="8" rx="1.5" /><path d="M15 8v8" /><path d="M16.8 11l1.2 1.4 1.2-1.4" /></>
+  ),
+  "f-sign": (
+    <><rect x="3" y="6" width="18" height="12" rx="1.5" /><path d="M6 14.5c1.5-.5 2-3 3-3s.5 2.5 1.5 2.5 1.5-1.5 2-1.5.8 1 2.5 1" /><path d="M6 16h12" strokeWidth="1" /></>
+  ),
+  "f-edit": (
+    <><rect x="3" y="8" width="11" height="8" rx="1.5" strokeDasharray="2 2" /><path d="M14 13l7 2.5-3 1-1 3z" /></>
   ),
   "strike": (
     <><path d="M5 12h14" /><path d="M16 6.5A4 4 0 0 0 12 5c-2.5 0-4 1.3-4 3 0 1.6 1.2 2.5 3 3" /><path d="M8 17.5A4.5 4.5 0 0 0 12 19c2.6 0 4.2-1.4 4.2-3.2 0-.9-.3-1.6-.9-2.1" /></>

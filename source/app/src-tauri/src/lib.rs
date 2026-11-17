@@ -61,6 +61,7 @@ pub fn run() {
             commands::open_url,
             commands::list_fields,
             commands::set_field,
+            commands::form_field_op,
             commands::insert_image,
             commands::read_image_file,
             commands::tab_new,

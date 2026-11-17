@@ -146,9 +146,12 @@ export interface FormField {
   options: string[];
   multiline: boolean;
   readonly: boolean;
+  required: boolean;
+  combo: boolean;
   widgets: FormWidget[];
 }
 export const cmdListFields = () => cmd<FormField[]>("list_fields");
+export const cmdFormFieldOp = (op: string, data: unknown) => cmd<{ pages: PageMeta[]; name: string }>("form_field_op", { op, data });
 export const cmdSetField = (name: string, value: string | boolean) => cmd<PageMeta[]>("set_field", { name, value });
 export const cmdInsertImage = (page: number, rect: number[], image: unknown) => cmd<PageMeta[]>("insert_image", { page, rect, image });
 export const cmdReadImage = (path: string) => cmd<{ b64: string }>("read_image_file", { path });

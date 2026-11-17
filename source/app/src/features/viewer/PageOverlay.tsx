@@ -9,7 +9,7 @@
 
 import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from "react";
 import type { PageViewport } from "pdfjs-dist";
-import { store, useAppState, rgb, annotColor, type Tool } from "../../store";
+import { store, useAppState, rgb, annotColor, type Tool, type FieldKind } from "../../store";
 import type { RenderSession } from "../../adapters/renderAdapter";
 import type { TextRun } from "../../types";
 import { cmdListFields, cmdListObjects, cmdOpenUrl, type FormField, type PageObject } from "../../ipc";
@@ -29,6 +29,7 @@ interface PdfAnnot {
 type Box = [number, number, number, number]; // css px x0,y0,x1,y1
 
 const DRAW_TOOLS: Tool[] = [
+  "field-text", "field-multiline", "field-checkbox", "field-radio", "field-choice", "field-signature",
   "typetext", "check", "cross",
   "highlight", "underline", "strikeout", "note", "textbox", "rect", "oval", "line", "arrow", "pen", "stamp", "link", "redact",
   "shape-rect", "shape-oval", "shape-line", "shape-arrow", "sign", "image",
@@ -159,6 +160,17 @@ export function PageOverlay({
     const w = app.strokeWidth;
     const pt = toPdf(box[0], box[1]);
     const def = (wPt: number, hPt: number): [number, number, number, number] => [pt[0], pt[1] - hPt, pt[0] + wPt, pt[1]];
+    if (t.startsWith("field-") && t !== "field-edit") {
+      const kind = t.slice(6) as FieldKind;
+      const usual: Record<FieldKind, [number, number]> = { text: [180, 20], multiline: [240, 64], checkbox: [14, 14], radio: [14, 14], choice: [160, 20], signature: [200, 50] };
+      const [uw, uh] = usual[kind];
+      const small = kind === "checkbox" || kind === "radio";
+      // A click gives the usual size (boxes centred on the click); so does a tiny drag.
+      const tiny = pr[2] - pr[0] < 6 || pr[3] - pr[1] < 6;
+      const rect = click || tiny ? (small ? [pt[0] - uw / 2, pt[1] - uh / 2, pt[0] + uw / 2, pt[1] + uh / 2] : def(uw, uh)) : pr;
+      store.openFieldDialog({ mode: "new", kind, page, rect });
+      return;
+    }
     switch (t) {
       case "highlight":
       case "underline":
@@ -434,6 +446,10 @@ export function PageOverlay({
         </div>
       )}
 
+      {/* Forms tab: existing fields as outlined boxes (movable in Edit Fields) */}
+      {tool?.startsWith("field-") && !stale && (
+        <FieldEditLayer fields={fields} pageNo={pageNo} viewBox={viewBox} toPdf={(x, y) => toPdf(x, y)} local={(e) => local(e)} editing={tool === "field-edit"} />
+      )}
       {/* Fillable form fields (reading mode) */}
       {!tool && !app.editMode && !stale && <FormLayer fields={fields} pageNo={pageNo} viewBox={viewBox} zoom={zoom} />}
 
@@ -649,5 +665,76 @@ function TypeTextInput({ at, zoom, color, onDone }: { at: { x: number; y: number
       }}
       onBlur={() => finish(v)}
     />
+  );
+}
+
+
+/** Forms ▸ Edit Fields: every field as a labelled box; drag to move,
+ *  double-click for properties, ⌫ deletes the picked one. While drawing new
+ *  fields the boxes are shown but don't take the mouse. */
+function FieldEditLayer({
+  fields,
+  pageNo,
+  viewBox,
+  toPdf,
+  local,
+  editing,
+}: {
+  fields: FormField[];
+  pageNo: number;
+  viewBox: (r: number[]) => Box;
+  toPdf: (x: number, y: number) => [number, number];
+  local: (e: RPointerEvent) => [number, number];
+  editing: boolean;
+}) {
+  const app = useAppState();
+  const [drag, setDrag] = useState<{ name: string; start: [number, number]; cur: [number, number] } | null>(null);
+  const items = fields.flatMap((f) => f.widgets.filter((w) => w.page === pageNo).map((w, i) => ({ f, w, i })));
+  return (
+    <>
+      {items.map(({ f, w, i }) => {
+        const b = viewBox(w.rect);
+        const moving = drag?.name === f.name;
+        const dx = moving ? drag!.cur[0] - drag!.start[0] : 0;
+        const dy = moving ? drag!.cur[1] - drag!.start[1] : 0;
+        const label = f.kind === "radio" && w.on_state ? `${f.name}: ${w.on_state}` : f.name;
+        return (
+          <div
+            key={`${f.name}#${i}`}
+            className={`field-box${editing ? " editing" : ""}${app.fieldSel === f.name ? " picked" : ""} kind-${f.kind}`}
+            style={{ left: b[0] + dx, top: b[1] + dy, width: b[2] - b[0], height: b[3] - b[1] }}
+            title={label}
+            data-field={f.name}
+            onPointerDown={(e) => {
+              if (!editing || e.button !== 0) return;
+              e.preventDefault();
+              e.stopPropagation();
+              (e.target as Element).setPointerCapture?.(e.pointerId);
+              store.setFieldSel(f.name);
+              const p = local(e);
+              setDrag({ name: f.name, start: p, cur: p });
+            }}
+            onPointerMove={(e) => drag && moving && setDrag({ ...drag, cur: local(e) })}
+            onPointerUp={(e) => {
+              if (!drag || !moving) return;
+              e.stopPropagation();
+              const p = local(e);
+              const d = drag;
+              setDrag(null);
+              if (Math.abs(p[0] - d.start[0]) < 3 && Math.abs(p[1] - d.start[1]) < 3) return;
+              const a = toPdf(d.start[0], d.start[1]);
+              const c = toPdf(p[0], p[1]);
+              void store.formField("move", { name: f.name, dx: c[0] - a[0], dy: c[1] - a[1], page: pageNo });
+            }}
+            onDoubleClick={(e) => {
+              if (!editing) return;
+              e.stopPropagation();
+              store.openFieldDialog({ mode: "edit", field: f });
+            }}>
+            <span className="field-box-name">{label}</span>
+          </div>
+        );
+      })}
+    </>
   );
 }

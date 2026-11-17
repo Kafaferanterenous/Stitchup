@@ -31,7 +31,7 @@ function scan(file) {
   visit(src);
 }
 walk(root);
-for (const extra of ["Black ink", "Blue ink", "Colour Scheme", "Ribbon Tab", "Export", "Window", " (coming soon)", "File", "Edit", "Pages", "Annotate", "Security", "View", "Help"]) keys.add(extra);
+for (const extra of ["Black ink", "Blue ink", "Colour Scheme", "Ribbon Tab", "Export", "Window", " (coming soon)", "File", "Edit", "Pages", "Annotate", "Forms", "Security", "View", "Help"]) keys.add(extra);
 const list = [...keys].filter((k) => hasWords(k)).sort();
 fs.writeFileSync(process.argv[3], JSON.stringify(list, null, 1));
 console.log(list.length, "strings,", list.join(" ").split(/\s+/).length, "words");
