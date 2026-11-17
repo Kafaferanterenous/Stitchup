@@ -16,6 +16,8 @@ replaced when you save.
 | Print preview with paper size and orientation | Nine colour schemes, the same as on Windows |
 | ![Two documents open in tabs; the OCR menu on a scanned page (Pastel 2 scheme)](docs/screenshots/tabs-ocr-pastel-2.png) | ![Editing a line: the format bar and the installed-font picker (Light Grey scheme)](docs/screenshots/fonts-light-grey.png) |
 | Tabs for open documents; OCR makes scanned pages searchable | Any installed font for a line, shown in its own typeface |
+| ![QuickSign: creating a handwritten signature from a scanned image, locked with a password (Blue scheme)](docs/screenshots/quicksign-blue.png) | |
+| QuickSign: your handwritten signature from a JPG, GIF or PNG | |
 
 ## Download
 
@@ -56,6 +58,10 @@ not notarized. The first time you open it, right-click it and choose
   undo (⌘T, ⌘W, ⌃Tab). Drag a page thumbnail onto another tab to move the page.
 - **Pages:** rotate, delete, add, drag to reorder, multi-select, extract,
   split, merge, import, combine, and auto-crop.
+- **QuickSign:** place your handwritten signature from a JPG, GIF or PNG
+  (trimmed, white paper made transparent). Stitchup can keep it for next
+  time, optionally locked with a password (stored encrypted), like Nitro's
+  QuickSign.
 - **Security:** AES-256 password protection, watermarks, and digital signatures
   (RSA-2048 / SHA-256 PKCS#7, verifiable with OpenSSL). Signing an already
   signed PDF, or saving changes to it, adds an incremental update, so earlier
@@ -87,7 +93,7 @@ Tests:
 |---|---|
 | `cd source/core && cargo test --release` | PDF engine: text editing, annotations, redaction, forms, signatures (checked with OpenSSL), page tree |
 | `cd source/app/src-tauri && cargo test --release` | Command layer |
-| `cd source/app && npm run build && npm run test:e2e` | 77 end-to-end checks: the real UI in Chromium driving the real Rust backend, with every ribbon tab, dialog and shortcut |
+| `cd source/app && npm run build && npm run test:e2e` | 78 end-to-end checks: the real UI in Chromium driving the real Rust backend, with every ribbon tab, dialog and shortcut |
 
 ## Layout
 

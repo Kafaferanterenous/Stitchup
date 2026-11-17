@@ -1498,6 +1498,38 @@ pub fn ocr_apply_inner(st: &Mutex<SessionState>, pages: Vec<OcrPage>) -> Result<
 
 pub static RECOVERY_DIR: Mutex<Option<PathBuf>> = Mutex::new(None);
 
+// ---------------------------------------------------------------------------
+// QuickSign: handwritten signature images kept for reuse (optionally
+// password-encrypted) in the app's private data folder.
+// ---------------------------------------------------------------------------
+
+pub static SIGNATURE_DIR: Mutex<Option<PathBuf>> = Mutex::new(None);
+
+fn signature_dir() -> PathBuf {
+    SIGNATURE_DIR.lock().ok().and_then(|g| g.clone()).unwrap_or_else(|| std::env::temp_dir().join("stitchup-signatures"))
+}
+
+#[tauri::command]
+pub fn quicksign_list() -> Vec<stitchup_core::quicksign::SavedSignature> {
+    stitchup_core::quicksign::list(&signature_dir())
+}
+
+#[tauri::command]
+pub fn quicksign_save(name: String, png_b64: String, password: Option<String>) -> Result<stitchup_core::quicksign::SavedSignature, EngineError> {
+    let png = B64.decode(png_b64.as_bytes()).map_err(|e| EngineError::new(ErrorCode::ValidationFailed, format!("bad image data: {e}")))?;
+    stitchup_core::quicksign::save(&signature_dir(), &name, &png, password.as_deref().filter(|p| !p.is_empty()))
+}
+
+#[tauri::command]
+pub fn quicksign_load(id: String, password: Option<String>) -> Result<String, EngineError> {
+    stitchup_core::quicksign::load(&signature_dir(), &id, password.as_deref()).map(|b| B64.encode(b))
+}
+
+#[tauri::command]
+pub fn quicksign_delete(id: String, password: Option<String>) -> Result<(), EngineError> {
+    stitchup_core::quicksign::delete(&signature_dir(), &id, password.as_deref())
+}
+
 fn recovery_dir() -> Result<PathBuf, EngineError> {
     let d = RECOVERY_DIR
         .lock()

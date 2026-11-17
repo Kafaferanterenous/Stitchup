@@ -198,3 +198,17 @@ export interface SystemFace {
   cjk: boolean;
 }
 export const cmdListSystemFonts = () => cmd<SystemFace[]>("list_system_fonts");
+
+// ---- QuickSign (saved handwritten signatures)
+export interface SavedSignature {
+  id: string;
+  name: string;
+  created: number;
+  protected: boolean;
+  /** PNG (base64) of unprotected signatures only. */
+  preview?: string;
+}
+export const cmdQuickSignList = () => cmd<SavedSignature[]>("quicksign_list");
+export const cmdQuickSignSave = (name: string, png_b64: string, password?: string) => cmd<SavedSignature>("quicksign_save", { name, png_b64, password });
+export const cmdQuickSignLoad = (id: string, password?: string) => cmd<string>("quicksign_load", { id, password });
+export const cmdQuickSignDelete = (id: string, password?: string) => cmd<void>("quicksign_delete", { id, password });

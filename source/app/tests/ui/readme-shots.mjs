@@ -185,6 +185,49 @@ await settle();
 await shot("fonts-light-grey.png");
 await page.keyboard.press("Escape");
 
+// 8. QuickSign: create a signature from a scanned image (Blue)
+await theme("blue");
+await page.keyboard.press("Escape");
+const sigPng = await page.evaluate(() => {
+  const c = document.createElement("canvas");
+  c.width = 1400;
+  c.height = 700;
+  const g = c.getContext("2d");
+  g.fillStyle = "#fbfaf7";
+  g.fillRect(0, 0, c.width, c.height);
+  g.strokeStyle = "#13235e";
+  g.lineWidth = 10;
+  g.lineCap = "round";
+  g.lineJoin = "round";
+  g.beginPath();
+  // An invented flowing signature.
+  const pts = [[260,420],[300,300],[330,260],[350,330],[330,440],[380,360],[430,300],[470,380],[500,330],[540,390],[590,300],[610,280],[600,420],[650,350],[700,330],[740,380],[790,320],[830,360],[880,300],[930,370],[1000,340],[1120,330]];
+  g.moveTo(...pts[0]);
+  for (let i = 1; i < pts.length - 1; i++) g.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2);
+  g.stroke();
+  g.beginPath();
+  g.moveTo(300, 470);
+  g.quadraticCurveTo(700, 520, 1150, 440);
+  g.lineWidth = 6;
+  g.stroke();
+  return c.toDataURL("image/png").split(",")[1];
+});
+const sigFile = path.join(WORK, "signature-scan.png");
+await writeFile(sigFile, Buffer.from(sigPng, "base64"));
+await tab("Security");
+await page.locator('[data-cmd="quickSign"]').click();
+await page.locator(".rb-choices").getByRole("menuitem", { name: "Create New Signature…" }).click();
+await page.evaluate((p) => window.__dialog.push(p), sigFile);
+await page.getByRole("button", { name: "Choose Image…" }).click();
+await page.locator(".qs-preview img").waitFor();
+await page.getByLabel("Signature name").fill("My signature");
+await page.getByText("Protect it with a password").click();
+await page.getByLabel("Signature password").fill("example");
+await page.getByLabel("Repeat password").fill("example");
+await settle();
+await shot("quicksign-blue.png");
+await page.keyboard.press("Escape");
+
 await browser.close();
 bridge.kill();
 console.log(`screenshots → ${OUT}`);

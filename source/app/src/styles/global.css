@@ -1573,3 +1573,93 @@ kbd {
 .obj-box.path {
   outline-color: color-mix(in srgb, #00a3a3 70%, transparent);
 }
+
+/* QuickSign */
+.qs-pick {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+.qs-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  margin: 8px 0;
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  /* checkerboard shows what is transparent */
+  background: repeating-conic-gradient(#f0f0f0 0% 25%, #ffffff 0% 50%) 50% / 16px 16px;
+}
+.qs-preview img {
+  max-width: 100%;
+  max-height: 110px;
+}
+.qs-passwords {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0 4px 22px;
+}
+.qs-error {
+  color: #c62828;
+  font-size: 12px;
+}
+.qs-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.qs-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--card-border);
+}
+.qs-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 36px;
+  font-size: 18px;
+}
+.qs-thumb img {
+  max-width: 90px;
+  max-height: 36px;
+}
+.qs-name {
+  flex: 1;
+  font-size: 13px;
+}
+.qs-actions,
+.qs-confirm {
+  display: flex;
+  gap: 6px;
+}
+.qs-confirm input {
+  width: 110px;
+}
+
+/* Checkboxes / radios in dialogs sit beside their label (the generic
+   .modal label / .modal input rules made them full-width blocks). */
+.modal label.inline-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg);
+}
+.modal input[type="checkbox"],
+.modal input[type="radio"] {
+  width: auto;
+  margin: 0;
+  flex: none;
+}
+.modal:not(.wide) {
+  max-width: min(560px, 92vw);
+}

@@ -808,7 +808,11 @@ export function Viewer() {
 
   return (
     <div className="viewer-scroll" ref={scrollRef} onScroll={onScroll}>
-      {app.tool && <div className="viewer-hint tool-hint">{TOOL_HINT[app.tool]} · Esc to stop</div>}
+      {app.tool && (
+        <div className="viewer-hint tool-hint">
+          {app.tool === "image" && app.pendingImage?.name.startsWith("signature") ? "Signature: click where it goes, or drag to set its width" : TOOL_HINT[app.tool]} · Esc to stop
+        </div>
+      )}
       {app.editMode && (
         <div className="viewer-hint">
           Edit Text: click any line to edit it in place · Enter or click away to save · Tab = next line · Esc = cancel · clear the text to delete it

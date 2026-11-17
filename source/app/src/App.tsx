@@ -7,6 +7,7 @@ import { installMenu, nativeMenuActive } from "./menu";
 import { applyTheme, type ThemeName } from "./themes/theme";
 import { cmdClearRecovery, cmdListRecovery, cmdSaveRecovery, cmdTakePendingOpen, type RecoveryEntry } from "./ipc";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { QuickSignManageDialog, QuickSignNewDialog, QuickSignUnlockDialog } from "./features/common/QuickSignDialogs";
 import { loadSettings, type Settings } from "./settings";
 import { Ribbon } from "./features/ribbon/Ribbon";
 import { TabStrip } from "./features/common/TabStrip";
@@ -22,7 +23,6 @@ import {
   SettingsDialog,
   CompressDialog,
   FontDialog,
-  RecolorDialog,
   SignDialog,
   AttachmentsDialog,
   EncryptDialog,
@@ -54,6 +54,11 @@ export default function App() {
   const app = useAppState();
   const [dropping, setDropping] = useState(false);
   const [recovered, setRecovered] = useState<RecoveryEntry[] | null>(null);
+
+  // QuickSign: the saved signatures (names, lock state, previews).
+  useEffect(() => {
+    void store.loadSignatures();
+  }, []);
 
   // Crash recovery: offer snapshots left by a Stitchup that crashed…
   useEffect(() => {
@@ -224,11 +229,13 @@ export default function App() {
       {app.dialog === "print" && app.doc && <PrintDialog />}
       {app.dialog === "help" && <HelpDialog />}
       {app.dialog === "sign" && <SignDialog />}
-      {app.dialog === "recolor" && <RecolorDialog />}
       {app.dialog === "font" && <FontDialog />}
       {app.pendingInput && <AnnotInputDialog />}
       {app.dialog === "settings" && <SettingsDialog />}
       {app.dialog === "compress" && <CompressDialog />}
+      {app.dialog === "quickSignNew" && <QuickSignNewDialog />}
+      {app.dialog === "quickSignUnlock" && <QuickSignUnlockDialog />}
+      {app.dialog === "quickSignManage" && <QuickSignManageDialog />}
       {recovered && <RecoveryDialog entries={recovered} onDone={() => setRecovered(null)} />}
       <PasswordDialog />
       <MessageBox />

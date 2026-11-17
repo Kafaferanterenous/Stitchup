@@ -49,6 +49,7 @@ const SHIPPED: { id: string; name: string; use: string; license: string }[] = [
   { id: "—", name: "ttf-parser, subsetter", use: "installed fonts: read, subset and embed", license: "MIT / Apache-2.0" },
   { id: "—", name: "jpeg-decoder, jpeg-encoder", use: "Compress: smaller images", license: "MIT / Apache-2.0" },
   { id: "—", name: "rustybuzz, unicode-bidi", use: "text shaping (Arabic, Hebrew, Indic…) and right-to-left order", license: "MIT / Apache-2.0" },
+  { id: "—", name: "aes-gcm, pbkdf2 (RustCrypto)", use: "QuickSign: password-locked saved signatures", license: "MIT / Apache-2.0" },
   { id: "—", name: "objc2 (app-kit, web-kit, foundation)", use: "native print settings", license: "MIT" },
   { id: "—", name: "Apple Vision (macOS)", use: "text recognition (OCR), on this Mac", license: "part of macOS" },
 ];
@@ -700,7 +701,9 @@ export function HelpDialog() {
         <h3>Opening and saving</h3>
         <p>Open a PDF with ⌘O, by dropping it on the window or the Dock icon, or from Finder. ⌘S saves in place (the file is replaced atomically, never half-written); ⌘⇧S saves under a new name. The Save button turns red while there are unsaved changes.</p>
         <h3>Ribbon</h3>
-        <p><b>Document</b> — new, open, save, properties, import, exports (text, CSV, images, RTF, DOCX, ODT), print. <b>Pages</b> — rotate, delete, add, extract, split, auto-crop. <b>Content</b> — Edit Text. <b>Zoom</b>, <b>Navigate</b> — view controls. <b>Security</b> — watermark and password protection.</p>
+        <p><b>Document</b> — new, open, save, properties, import pages, exports (text, CSV, images, RTF, DOCX, ODT), print (with preview; “Save as PDF” is in the macOS print panel). <b>Pages</b> — rotate, delete, add, extract, split, auto-crop. <b>Annotate</b> — highlight, underline, strike-out, notes, text boxes, shapes, stamps, links, pen; Colour and Fill. <b>Content</b> — select, edit text, delete, font, colour, insert image, OCR. <b>Zoom</b>, <b>Navigate</b> — view controls. <b>Security</b> — encrypt, digital Sign, QuickSign, redact, watermark.</p>
+        <h3>QuickSign (handwritten signature)</h3>
+        <p>Security ▸ QuickSign ▸ Create New Signature: choose a JPG, GIF or PNG of your signature. Stitchup trims it and makes the white paper transparent. Keep it for next time if you like, optionally locked with a password (stored encrypted; asked for every time it is used). Then click on the page where it goes, or drag to set its width. Saved signatures are listed under QuickSign; Manage Signatures deletes them.</p>
         <h3>Editing text</h3>
         <p>Double-click any line (or Content ▸ Edit Text, then click it). It is edited in place, in the document’s own font when it has the needed letters. A bar above the line shows its font and size: change the font, bold / italic, size or colour there, or with Content ▸ Fore and Font. Enter or clicking away saves; Tab moves to the next line; Esc cancels; clearing the text deletes the line.</p>
         <h3>Pages sidebar</h3>
@@ -906,31 +909,6 @@ export function SignDialog() {
 
 // ------------------------------------------------------- recolour / font
 
-const PRESETS = ["#000000", "#d0021b", "#1d5fd0", "#1a7f37", "#7c4dbe", "#f5a623", "#666666", "#ffffff"];
-
-export function RecolorDialog() {
-  const app = useAppState();
-  const [color, setColor] = useState(app.foreColor);
-  return (
-    <Modal title="Recolour text" onClose={close}>
-      <div className="swatch-row">
-        {PRESETS.map((c) => (
-          <button key={c} className={`swatch-btn${c === color ? " on" : ""}`} style={{ background: c }} onClick={() => setColor(c)} aria-label={c} />
-        ))}
-        <input type="color" value={color} onChange={(e) => setColor(e.target.value)} aria-label="Custom colour" />
-      </div>
-      <div className="modal-actions">
-        <button
-          onClick={async () => {
-            if (await store.objectOp({ op: "recolor", color: rgb(color) })) close();
-          }}>
-          Apply
-        </button>
-        <button onClick={close}>Cancel</button>
-      </div>
-    </Modal>
-  );
-}
 
 export function FontDialog() {
   const faces = useSystemFonts();

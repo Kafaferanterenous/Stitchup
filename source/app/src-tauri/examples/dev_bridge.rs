@@ -89,6 +89,10 @@ fn dispatch(st: &Mutex<SessionState>, cmd: &str, a: &Value) -> Result<Value, Val
         "tab_switch" => go!(tab_switch_inner(st, arg(a, "id").map_err(bad)?)),
         "tab_close" => go!(tab_close_inner(st, arg(a, "id").map_err(bad)?)),
         "move_pages_to_tab" => go!(move_pages_to_tab_inner(st, arg(a, "pages").map_err(bad)?, arg(a, "to").map_err(bad)?)),
+        "quicksign_list" => go!(Ok::<_, stitchup_core::EngineError>(quicksign_list())),
+        "quicksign_save" => go!(quicksign_save(arg(a, "name").map_err(bad)?, arg(a, "png_b64").map_err(bad)?, arg(a, "password").unwrap_or(None))),
+        "quicksign_load" => go!(quicksign_load(arg(a, "id").map_err(bad)?, arg(a, "password").unwrap_or(None))),
+        "quicksign_delete" => go!(quicksign_delete(arg(a, "id").map_err(bad)?, arg(a, "password").unwrap_or(None))),
         "recolor_annotations" => go!(recolor_annotations_inner(st, arg(a, "page").map_err(bad)?, arg(a, "objs").map_err(bad)?, arg(a, "color").map_err(bad)?)),
         "list_system_fonts" => go!(Ok::<_, stitchup_core::EngineError>(list_system_fonts())),
         "ocr_recognize" => go!(ocr_recognize(arg(a, "b64").map_err(bad)?, arg(a, "languages").ok())),
@@ -177,6 +181,9 @@ fn main() {
     std::thread::spawn(|| {
         let _ = stitchup_core::fonts::system_faces();
     });
+    if let Ok(dir) = std::env::var("STITCHUP_SIGNATURE_DIR") {
+        *SIGNATURE_DIR.lock().unwrap() = Some(PathBuf::from(dir));
+    }
     if let Ok(dir) = std::env::var("STITCHUP_RECOVERY_DIR") {
         *RECOVERY_DIR.lock().unwrap() = Some(PathBuf::from(dir));
     }

@@ -2,7 +2,7 @@
 
 Target: the best all-round PDF editor, at feature and look parity with the
 Windows build (github.com/Kafaferanterenous/stitchup-Win v0.12.28), and ahead of it where macOS allows.
-Updated 2026-11-14 (v0.10.0). Status key: ✅ done · 🔨 in progress · ⬜ to do. Every ✅ item is covered by an automated test.
+Updated 2026-11-17 (v0.11.0). Status key: ✅ done · 🔨 in progress · ⬜ to do. Every ✅ item is covered by an automated test.
 
 ## A. Look & navigation (same as Windows)
 | # | Goal | Status |
@@ -13,6 +13,9 @@ Updated 2026-11-14 (v0.10.0). Status key: ✅ done · 🔨 in progress · ⬜ to
 | A4 | Windows status bar (file name + `*` when unsaved, page x of y, selection count, zoom); red Save when dirty | ✅ |
 | A5 | Drag & drop a PDF onto the window to open; open from Finder / command line — built; drag-drop needs a check on your Mac (not testable headless) | 🔨 |
 | A6 | Multi-document tabs (⌘T, ⌘W, ⌃Tab / ⌃⇧Tab), each with its own page, zoom and undo; opening an open file switches to its tab; closing an unsaved tab asks | ✅ |
+
+## A2. Ribbon & menus tidy-up (v0.11.0)
+Duplicates removed, Nitro / macOS layout: Print Preview and Print to PDF folded into Print (preview inside, Save as PDF in the macOS panel); Merge PDFs / Merge PDF folded into Import (several files); Security ▸ Stamp (= Annotate ▸ Stamp), Content ▸ Shapes (= Annotate ▸ Shape) and Content ▸ Recolor (= Content ▸ Colour) removed; Back colour → Annotate ▸ Fill; Redact → Security (Nitro: Protect). Menus: About / Settings only in the app menu, Export as a File submenu, page commands all in Pages, new Security menu, tab switching in Window, ribbon-tab switcher in View.
 
 ## B. Document
 | # | Goal | Status |
@@ -62,6 +65,7 @@ Updated 2026-11-14 (v0.10.0). Status key: ✅ done · 🔨 in progress · ⬜ to
 | F4 | True redaction (content removed, not covered) — text glyphs and whole images under the box removed; partly-covered images are blacked out | ✅ |
 | F5 | Fill AcroForms — text, multi-line, checkbox, radio, drop-down; appearances regenerated (shows in Preview/Acrobat); undoable | ✅ |
 | F6 | Digital signature — self-signed RSA-2048 / SHA-256 PKCS#7, visible box (any script: installed fonts with per-character fallback, long lines narrowed to fit); verified with OpenSSL. Signing or saving (⌘S) an already-signed PDF — edited or not — appends an incremental update, so every earlier signature stays valid (three signatures verified with OpenSSL) | ✅ |
+| F7 | QuickSign (Nitro-style handwritten signature): from JPG / GIF / PNG, trimmed, white made transparent; optionally kept, optionally password-locked (AES-256-GCM, PBKDF2 600 000 rounds, file 0600); unlock on use; manage / delete (locked ones need the password) | ✅ |
 
 ## G. Beyond Windows (macOS)
 | # | Goal | Status |

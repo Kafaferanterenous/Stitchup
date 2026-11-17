@@ -25,6 +25,11 @@ subsetter = "0.2"
 # Text shaping (Arabic, Hebrew, Indic…) and bidirectional order (MIT / Apache-2.0).
 rustybuzz = "0.20"
 unicode-bidi = "0.3"
+# QuickSign: saved handwritten signatures, optionally password-encrypted (MIT / Apache-2.0).
+aes-gcm = "0.10"
+pbkdf2 = { version = "0.12", features = ["hmac"] }
+base64 = "0.22"
+serde_json = "1"
 # Compress: decode / re-encode JPEG images when downsampling (MIT / Apache-2.0).
 jpeg-decoder = { version = "0.3", default-features = false }
 jpeg-encoder = "0.6"

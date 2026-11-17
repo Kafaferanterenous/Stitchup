@@ -66,6 +66,10 @@ pub fn run() {
             commands::move_pages_to_tab,
             commands::list_system_fonts,
             commands::recolor_annotations,
+            commands::quicksign_list,
+            commands::quicksign_save,
+            commands::quicksign_load,
+            commands::quicksign_delete,
             commands::ocr_recognize,
             commands::ocr_apply,
             commands::save_recovery,
@@ -84,6 +88,9 @@ pub fn run() {
             if let Ok(dir) = app.path().app_data_dir() {
                 if let Ok(mut d) = commands::RECOVERY_DIR.lock() {
                     *d = Some(dir.join("Recovery"));
+                }
+                if let Ok(mut d) = commands::SIGNATURE_DIR.lock() {
+                    *d = Some(dir.join("Signatures"));
                 }
             }
             // `stitchup file.pdf` from a shell.

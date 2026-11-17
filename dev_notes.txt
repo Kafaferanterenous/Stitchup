@@ -1107,3 +1107,21 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
 - Signature box lines use the same fallback (Cyrillic, Greek, CJK names) and Tz to fit the width.
 - Flaky sign test fixed: openssl helper shared one temp folder across parallel test threads.
 - TESTS: core 60, command layer 9, e2e 77/77.
+
+2026-11-17 — v0.11.0: RIBBON / MENU DUPLICATES REMOVED, QUICKSIGN (HANDWRITTEN SIGNATURE)
+- User: remove the less logical duplicates in ribbon and menus; add a written-signature function
+  (JPG/GIF/PNG; optionally stored, optionally password-locked); follow Nitro Pro 7 where useful.
+- Removed: printPreview + printPdf (same dialog as Print), mergePdfs + merge (= Import, now
+  multi-file), Security stampMenu (= Annotate Stamp), Content shapes (= Annotate Shape, content
+  shapes from other apps stay selectable), Content recolor + RecolorDialog (= Content Colour).
+  Moved: Back → Annotate "Fill"; Redact → Security (Nitro Protect). Content Fore renamed "Colour".
+- Menus: File (Export submenu), Edit, Pages (all page ops), Annotate, Security (new), View (ribbon
+  tab submenu), Window (+ tab switching), Help; About/Settings only in the app menu. runCommand
+  opens a drop-down / palette from the menu after switching to its ribbon tab.
+- QuickSign (Nitro's name/flow, Home ▸ QuickSign ▾ there, Security here): core/src/quicksign.rs —
+  JSON per signature in the app data folder (Signatures/), PNG in the clear or AES-256-GCM with a
+  PBKDF2-HMAC-SHA256 (600k) key, random salt/nonce, 0600 files, 32-hex ids. Frontend quicksign.ts
+  makes the signature: paper → transparent (luminance ramp 175–235), trim to ink, ≤1600 px; placed
+  through the Image tool at 160 pt by click (drag sets width) with a signature hint.
+- Fixed: every dialog checkbox was a full-width block (.modal label/input beat .inline-check).
+- TESTS: core 63 (quicksign 3), command layer 9, e2e 78/78.

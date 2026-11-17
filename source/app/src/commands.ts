@@ -3,7 +3,7 @@
 //! Windows build so both look and behave the same).
 
 import { getState, store, isUntitled, docName, type AppState, type RibbonTabName, type Tool } from "./store";
-import { extractTo, pickAndMerge, pickAndOpen, saveAs } from "./actions";
+import { extractTo, pickAndOpen, saveAs } from "./actions";
 import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialog";
 import { toggleDark } from "./themes/theme";
 import type { IconName } from "./features/ribbon/icons";
@@ -112,12 +112,6 @@ function compress() {
   store.setDialog("compress");
 }
 
-async function mergeMany() {
-  const chosen = await openDialog({ multiple: true, filters: PDF });
-  const list = Array.isArray(chosen) ? chosen : typeof chosen === "string" ? [chosen] : [];
-  for (const p of list) if (!(await store.merge(p))) break;
-}
-
 async function combineNew() {
   const chosen = await openDialog({ multiple: true, filters: PDF });
   const list = Array.isArray(chosen) ? chosen : typeof chosen === "string" ? [chosen] : [];
@@ -180,9 +174,10 @@ export const COMMANDS: Command[] = [
   { id: "save", label: "Save", tip: "Save changes to the current file (⌘S)", icon: "save", accel: "CmdOrCtrl+S", tab: "Document", run: save, enabled: hasDoc },
   { id: "saveAs", label: "Save As", menu: "Save As…", tip: "Save to a new file name (⌘⇧S)", icon: "save-as", accel: "CmdOrCtrl+Shift+S", tab: "Document", run: saveAs, enabled: hasDoc },
   { id: "properties", label: "Properties", menu: "Document Properties…", tip: "Edit the document metadata (title, author, subject, keywords)", icon: "info", tab: "Document", run: () => store.setMetadataOpen(true), enabled: hasDoc },
-  { id: "import", label: "Import", menu: "Import PDF…", tip: "Insert pages from another PDF into this one", icon: "import", tab: "Document", run: async () => {
-      const p = await openDialog({ multiple: false, filters: PDF });
-      if (typeof p === "string") await store.importPdf(p);
+  { id: "import", label: "Import", menu: "Insert Pages from PDF…", tip: "Add the pages of one or more other PDFs at the end of this document", icon: "import", tab: "Document", run: async () => {
+      const chosen = await openDialog({ multiple: true, filters: PDF });
+      const list = Array.isArray(chosen) ? chosen : typeof chosen === "string" ? [chosen] : [];
+      for (const p of list) if (!(await store.importPdf(p))) break;
     }, enabled: hasDoc },
   { id: "exportText", label: "Export Text", menu: "Text…", tip: "Write the document text out to a .txt file", icon: "export-text", tab: "Document", enabled: hasDoc, run: () => exportBytes("txt", "Text", async () => exp.toText(await lines())) },
   { id: "exportCsv", label: "Export CSV", menu: "CSV…", tip: "Write page data out to a .csv file", icon: "csv", tab: "Document", enabled: hasDoc, run: () => exportBytes("csv", "CSV", async () => exp.toCsv(getState().session!, await lines())) },
@@ -191,9 +186,6 @@ export const COMMANDS: Command[] = [
   { id: "exportDocx", label: "DOCX", menu: "DOCX…", tip: "Write the document text out to a Word .docx file", icon: "docx", tab: "Document", enabled: hasDoc, run: () => exportBytes("docx", "Word document", async () => exp.toDocx(await lines())) },
   { id: "exportOdt", label: "ODT", menu: "ODT…", tip: "Write the document text out to an OpenDocument .odt file", icon: "odt", tab: "Document", enabled: hasDoc, run: () => exportBytes("odt", "OpenDocument text", async () => exp.toOdt(await lines())) },
   { id: "print", label: "Print", menu: "Print…", tip: "Print the document, all pages or a page range (⌘P)", icon: "print", accel: "CmdOrCtrl+P", tab: "Document", enabled: hasDoc, run: () => store.setDialog("print") },
-  { id: "printPreview", label: "Preview", menu: "Print Preview", tip: "See how the document looks on paper before printing (⌘⇧P)", icon: "preview", accel: "CmdOrCtrl+Shift+P", tab: "Document", enabled: hasDoc, run: () => store.setDialog("print") },
-  { id: "printPdf", label: "to PDF", menu: "Print to PDF…", tip: "Print to a PDF file (choose PDF ▸ Save as PDF in the print panel)", icon: "to-pdf", tab: "Document", enabled: hasDoc, run: () => store.setDialog("print") },
-  { id: "mergePdfs", label: "Merge", menu: "Merge PDFs…", tip: "Append one or more PDFs to this document", icon: "merge", enabled: hasDoc, run: mergeMany },
   { id: "combineNew", label: "Combine", menu: "Combine into New…", tip: "Combine several PDFs into a new document", icon: "merge", run: combineNew },
   { id: "compress", label: "Compress", menu: "Compress PDF…", tip: "Save a smaller copy: unused data removed, streams compressed, large images downsampled", icon: "compress", enabled: hasDoc, run: compress },
   { id: "settings", label: "Settings", menu: "Settings…", tip: "Crash recovery, opening zoom, sidebar (⌘,)", icon: "info", accel: "CmdOrCtrl+,", run: () => store.setDialog("settings") },
@@ -216,7 +208,6 @@ export const COMMANDS: Command[] = [
   { id: "split", label: "Split", menu: "Split Document…", tip: "Split the document into several files", icon: "split", tab: "Pages", enabled: (s) => hasDoc(s) && (s.doc?.pages.length ?? 0) > 1, run: () => store.setDialog("split") },
   { id: "autoCrop", label: "Auto-Crop", menu: "Auto-Crop Selected Page(s)", tip: "Trim the white margin around the selected page(s)", icon: "crop", tab: "Pages", enabled: hasDoc, run: autoCrop },
   { id: "selectAll", label: "Select All", menu: "Select All Pages", tip: "Select every page (⌘A)", icon: "thumbnails", accel: "CmdOrCtrl+A", enabled: hasDoc, run: () => store.selectAllPages(), textFallback: "selectAll" },
-  { id: "merge", label: "Merge PDF", tip: "Append the pages of another PDF", icon: "merge", enabled: hasDoc, run: pickAndMerge },
 
   // ---------------------------------------------------------------- Annotate
   { id: "annHighlight", label: "Highlight", tip: "Drag across text to highlight it", icon: "highlight", tab: "Annotate", enabled: hasDoc, active: isTool("highlight"), run: toolCmd("highlight") },
@@ -228,9 +219,9 @@ export const COMMANDS: Command[] = [
     active: (s) => ["rect", "oval", "line", "arrow"].includes(s.tool ?? ""), choices: shapeChoices(""), run: () => {} },
   { id: "annStamp", label: "Stamp", tip: "Choose a stamp, then click or drag on the page", icon: "stamp", tab: "Annotate", enabled: hasDoc, active: isTool("stamp"), choices: stampChoices, run: () => {} },
   { id: "annLink", label: "Link", menu: "Link…", tip: "Drag the clickable area, then give a web address or page number", icon: "link", tab: "Annotate", enabled: hasDoc, active: isTool("link"), run: toolCmd("link") },
-  { id: "annRedact", label: "Redact", tip: "Drag over content to permanently remove it and black it out", icon: "redact", tab: "Annotate", enabled: hasDoc, active: isTool("redact"), run: toolCmd("redact") },
   { id: "annPen", label: "Pen", tip: "Draw freehand lines on the page (Fore colour)", icon: "pen", tab: "Annotate", enabled: hasDoc, active: isTool("pen"), run: toolCmd("pen") },
-  { id: "annFore", label: "Colour", tip: "Colour for new annotations: highlight, underline, strike-out, pen, shapes and text boxes", icon: "palette", tab: "Annotate", swatch: "ann", run: () => {} },
+  { id: "annFore", label: "Colour", menu: "Annotation Colour…", tip: "Colour for new annotations: highlight, underline, strike-out, pen, shapes and text boxes", icon: "palette", tab: "Annotate", swatch: "ann", run: () => {} },
+  { id: "back", label: "Fill", menu: "Fill Colour…", tip: "Fill colour for new rectangles and ovals (or no fill)", icon: "palette", tab: "Annotate", swatch: "back", run: () => {} },
 
   // ----------------------------------------------------------------- Content
   { id: "select", label: "Select", menu: "Select / Move Content Object", tip: "Click text, images or annotations to select (⌘-click adds, drag a box for many); drag to move; ⌫ deletes", icon: "select", tab: "Content", enabled: hasDoc, active: isTool("select"), run: toolCmd("select") },
@@ -241,12 +232,9 @@ export const COMMANDS: Command[] = [
     } },
   { id: "objDelete", label: "Delete", menu: "Delete Selected Object", tip: "Remove the selected objects (⌫)", icon: "trash", tab: "Content",
     enabled: (s) => hasDoc(s) && !!s.picked && s.picked.objects.length + s.picked.annots.length > 0, run: () => store.deletePicked() },
-  { id: "recolor", label: "Recolor", menu: "Recolor Selected Object…", tip: "Change the colour of the selected text or the line being edited", icon: "palette", tab: "Content",
-    enabled: (s) => hasDoc(s) && (!!s.picked?.objects.length || !!s.editingLine), run: () => store.setDialog("recolor") },
   { id: "font", label: "Font", menu: "Font and Size…", tip: "Change the font family and size of the selected text or the line being edited", icon: "font", tab: "Content",
     enabled: (s) => hasDoc(s) && (!!s.picked?.objects.length || !!s.editingLine), run: () => store.setDialog("font") },
-  { id: "fore", label: "Fore", tip: "Text colour: recolours the selected text or the line being edited; also the outline of new shapes", icon: "palette", tab: "Content", swatch: "fore", run: () => {} },
-  { id: "back", label: "Back", tip: "Fill colour for new shapes (or none)", icon: "palette", tab: "Content", swatch: "back", run: () => {} },
+  { id: "fore", label: "Colour", menu: "Text Colour…", tip: "Recolour the selected text, shapes or annotations, or the line being edited", icon: "palette", tab: "Content", swatch: "fore", run: () => {} },
   { id: "image", label: "Image", menu: "Insert Image…", tip: "Insert a picture (PNG, JPEG, GIF, WebP, HEIC…): choose it, then click or drag on the page", icon: "image", tab: "Content", enabled: hasDoc, active: isTool("image"), run: insertImage },
   { id: "ocr", label: "OCR", menu: "Recognize Text (OCR)", tip: "Make scanned pages searchable: recognise their text on this Mac (Apple Vision) and add it as an invisible layer", icon: "find", tab: "Content", enabled: hasDoc,
     choices: () => [
@@ -254,8 +242,6 @@ export const COMMANDS: Command[] = [
       { label: "This Page", run: () => void store.recognizeText("current") },
       { label: "All Pages", run: () => void store.recognizeText("all") },
     ], run: () => {} },
-  { id: "shapes", label: "Shapes", tip: "Insert a vector shape into the page content; click for a default size or drag", icon: "shape", tab: "Content", enabled: hasDoc,
-    active: (s) => (s.tool ?? "").startsWith("shape-"), choices: shapeChoices("shape-"), run: () => {} },
 
   // -------------------------------------------------------------------- Zoom
   { id: "zoomOut", label: "Zoom -", menu: "Zoom Out", tip: "Zoom out one step (⌘−)", icon: "zoom-out", accel: "CmdOrCtrl+-", tab: "Zoom", enabled: hasDoc, run: () => zoomStep(-1) },
@@ -273,10 +259,16 @@ export const COMMANDS: Command[] = [
   { id: "sidebar", label: "Sidebar", tip: "Show or hide the page thumbnails (F8)", icon: "sidebar", accel: "F8", tab: "Navigate", active: (s) => s.paneOpen, run: () => store.setPaneOpen(!getState().paneOpen) },
 
   // ---------------------------------------------------------------- Security
-  { id: "watermark", label: "Watermark", menu: "Watermark…", tip: "Stamp a text watermark across every page", icon: "watermark", tab: "Security", enabled: hasDoc, run: () => store.setDialog("watermark") },
-  { id: "stampMenu", label: "Stamp…", tip: "Place a common status stamp (Draft, Approved, Paid…)", icon: "stamp", tab: "Security", enabled: hasDoc, active: isTool("stamp"), choices: stampChoices, run: () => {} },
   { id: "encrypt", label: "Encrypt", menu: "Save As Encrypted…", tip: "Save a copy protected by a password (AES-256)", icon: "lock", tab: "Security", enabled: hasDoc, run: () => store.setDialog("encrypt") },
   { id: "sign", label: "Sign", menu: "Sign Document…", tip: "Add a digital signature and save a signed copy", icon: "sign", tab: "Security", enabled: hasDoc, active: isTool("sign"), run: () => store.setDialog("sign") },
+  { id: "quickSign", label: "QuickSign", menu: "QuickSign", tip: "Place your handwritten signature (from a JPG, GIF or PNG); keep it for next time, optionally locked with a password", icon: "pen", tab: "Security", enabled: hasDoc,
+    choices: () => [
+      ...getState().signatures.map((g) => ({ label: `${g.protected ? "🔒 " : ""}${g.name}`, run: () => void store.useSignature(g) })),
+      { label: "Create New Signature…", run: () => store.setDialog("quickSignNew") },
+      ...(getState().signatures.length ? [{ label: "Manage Signatures…", run: () => store.setDialog("quickSignManage") }] : []),
+    ], run: () => {} },
+  { id: "annRedact", label: "Redact", tip: "Drag over content to permanently remove it and black it out", icon: "redact", tab: "Security", enabled: hasDoc, active: isTool("redact"), run: toolCmd("redact") },
+  { id: "watermark", label: "Watermark", menu: "Watermark…", tip: "Stamp a text watermark across every page", icon: "watermark", tab: "Security", enabled: hasDoc, run: () => store.setDialog("watermark") },
 
   // -------------------------------------------------------------- Edit / misc
   { id: "undo", label: "Undo", tip: "Undo the last change (⌘Z)", icon: "undo", accel: "CmdOrCtrl+Z", enabled: (s) => hasDoc(s) && (s.doc?.history.length ?? 0) > 0, run: () => store.undo(), textFallback: "undo" },
@@ -315,14 +307,14 @@ export async function runCommand(id: string): Promise<void> {
     if (!s.doc) store.notify("Open a document first");
     return;
   }
-  if (c.choices) {
-    // From the menu bar / shortcuts: open the ribbon tab so its drop-down shows.
+  if (c.choices || c.swatch) {
+    // From the menu bar / shortcuts: show the ribbon tab, then open the
+    // button's drop-down / palette once that tab's buttons are on screen.
+    const switching = !!c.tab && s.ribbonTab !== c.tab;
     if (c.tab) store.setRibbonTab(c.tab);
-    window.dispatchEvent(new CustomEvent("stitchup-choices", { detail: c.id }));
-    return;
-  }
-  if (c.swatch) {
-    window.dispatchEvent(new CustomEvent("stitchup-swatch", { detail: c.swatch }));
+    const open = () => window.dispatchEvent(c.choices ? new CustomEvent("stitchup-choices", { detail: c.id }) : new CustomEvent("stitchup-swatch", { detail: c.swatch }));
+    if (switching) setTimeout(open, 50);
+    else open();
     return;
   }
   await c.run();
@@ -349,12 +341,14 @@ export function matchesKey(e: KeyboardEvent, spec: string): boolean {
 
 /** Menu bar layout (same menus as the Windows build). */
 export const MENUS: { title: string; items: (string | "-" | { submenu: string })[] }[] = [
-  { title: "File", items: ["new", "open", "newTab", "closeTab", "prevTab", "nextTab", "-", "save", "saveAs", "encrypt", "import", "mergePdfs", "combineNew", "compress", "watermark", "sign", "properties", "-", "print", "printPreview", "printPdf", "-", "settings"] },
-  { title: "Export", items: ["exportText", "exportCsv", "exportImages", "exportRtf", "exportDocx", "exportOdt"] },
-  { title: "Edit", items: ["undo", "redo", "-", { submenu: "clipboard" }, "-", "find", "findNext", "findPrev", "-", "rotateCw", "rotateCcw", "rotateAll", "delete", "addPage", "-", "selectAll", "-", "select", "editText", "objDelete", "recolor", "font", "image", "shapes", "ocr"] },
-  { title: "Pages", items: ["extract", "split", "autoCrop"] },
-  { title: "Annotate", items: ["annHighlight", "annUnderline", "annStrike", "annNote", "annText", "annShape", "annStamp", "annLink", "annRedact", "annPen"] },
-  { title: "View", items: ["zoomIn", "zoomOut", "zoom100", "fitWidth", "fitPage", "-", "prev", "next", "-", "spread", "single", "continuous", "sidebar", "-", { submenu: "schemes" }] },
-  { title: "Tabs", items: [{ submenu: "ribbonTabs" }] },
-  { title: "Help", items: ["guide", "-", "about"] },
+  // macOS conventions + Nitro's grouping: About / Settings / Quit live in the
+  // app menu, Export is a File submenu, tab switching is in Window, every
+  // page command is in Pages and every protection tool in Security.
+  { title: "File", items: ["new", "open", "-", "newTab", "closeTab", "-", "save", "saveAs", { submenu: "export" }, "-", "combineNew", "compress", "properties", "-", "print"] },
+  { title: "Edit", items: ["undo", "redo", "-", { submenu: "clipboard" }, "-", "find", "findNext", "findPrev", "-", "select", "editText", "objDelete", "fore", "font", "image", "ocr"] },
+  { title: "Pages", items: ["import", "addPage", "delete", "-", "rotateCw", "rotateCcw", "rotateAll", "-", "extract", "split", "autoCrop", "-", "selectAll"] },
+  { title: "Annotate", items: ["annHighlight", "annUnderline", "annStrike", "annNote", "annText", "annShape", "annStamp", "annLink", "annPen", "-", "annFore", "back"] },
+  { title: "Security", items: ["encrypt", "sign", "quickSign", "annRedact", "watermark"] },
+  { title: "View", items: ["zoomIn", "zoomOut", "zoom100", "fitWidth", "fitPage", "-", "prev", "next", "-", "spread", "single", "continuous", "sidebar", "-", { submenu: "ribbonTabs" }, { submenu: "schemes" }] },
+  { title: "Help", items: ["guide"] },
 ];

@@ -314,7 +314,8 @@ await makePdf(OTHER, [LETTER, LETTER]);
 const bridgeBin = path.join(APP, "src-tauri", "target", "release", "examples", "dev_bridge");
 assert(existsSync(bridgeBin), "build the bridge first: cargo build --release --example dev_bridge");
 const RECOVERY = path.join(WORK, "recovery");
-const bridgeEnv = { ...process.env, STITCHUP_RECOVERY_DIR: RECOVERY };
+const SIGNATURES = path.join(WORK, "signatures");
+const bridgeEnv = { ...process.env, STITCHUP_RECOVERY_DIR: RECOVERY, STITCHUP_SIGNATURE_DIR: SIGNATURES };
 const bridge = spawn(bridgeBin, [String(PORT), path.join(APP, "dist")], { stdio: ["ignore", "pipe", "inherit"], env: bridgeEnv });
 await new Promise((res) => bridge.stdout.once("data", res));
 
@@ -358,7 +359,7 @@ await check("starts like Windows: 7 ribbon tabs, empty-state hint, status bar", 
 
 await check("Document tab has the Windows button set", async () => {
   const labels = await page.locator(".ribbon-card .rb-text").allInnerTexts();
-  const want = "New,Open,Save,Save As,Properties,Import,Export Text,Export CSV,Images,RTF,DOCX,ODT,Print,Preview,to PDF";
+  const want = "New,Open,Save,Save As,Properties,Import,Export Text,Export CSV,Images,RTF,DOCX,ODT,Print";
   assert(labels.join() === want, labels.join());
 });
 
@@ -795,8 +796,9 @@ await check("Annotate ▸ Link to a page works when clicked", async () => {
   await waitStatus(/Page 4 of/);
 });
 
-await check("Annotate ▸ Redact removes the text under the box for real", async () => {
+await check("Security ▸ Redact removes the text under the box for real", async () => {
   await page.locator('[data-thumb="4"] .thumb').click();
+  await tab("Security");
   await rb("annRedact").click();
   const b = await runBox(4, "Line two on page 4");
   await dragMouse(b.x - 2, b.y - 2, b.x + b.width + 2, b.y + b.height + 2);
@@ -843,13 +845,13 @@ await check("Content ▸ Select: click a line, drag to move it, ⌫ deletes it",
   assert(!(await liveText())[3].includes("Heading for page 4"), "deleted");
 });
 
-await check("Content ▸ Recolor and Font change the selected text", async () => {
+await check("Content ▸ Colour and Font change the selected text", async () => {
   await page.waitForSelector('[data-page="4"] .obj-box.text');
   const b = await runBox(4, "The quick brown fox");
   await page.mouse.click(b.x + 10, b.y + b.height / 2);
-  await rb("recolor").click();
-  await page.getByLabel("#1d5fd0").click();
-  await btn("Apply").click();
+  await page.waitForSelector('[data-page="4"] .obj-box.picked');
+  await rb("fore").click();
+  await page.locator('.color-palette [aria-label="#1d5fd0"]').click();
   await waitStatus(/Recoloured/);
   await page.waitForTimeout(600);
   await page.waitForSelector('[data-page="4"] .page-overlay[data-ready="true"]');
@@ -866,32 +868,42 @@ await check("Content ▸ Recolor and Font change the selected text", async () =>
   assert((await liveText())[3].includes("quick brown fox"), "text kept");
 });
 
-await check("Content ▸ Fore/Back colours and Shapes ▾ insert into the page", async () => {
+await check("Content ▸ Select picks a vector shape in the page; Colour recolours it, Delete removes it", async () => {
   await tab("Content");
   await rb("fore").click();
   await page.locator('.color-palette [aria-label="#1a7f37"]').click();
   assert((await page.evaluate(() => window.__stitchup.state().foreColor)) === "#1a7f37", "fore colour set");
-  await rb("shapes").click();
-  await page.locator(".rb-choices").getByRole("menuitem", { name: "Oval" }).click();
-  const [x, y] = await emptySpot(4, 0.6, 0.6);
-  await dragMouse(x, y, x + 120, y + 70);
-  await waitStatus(/Inserted oval/);
-  await page.keyboard.press("Escape");
+  // A vector oval drawn into the page content (like shapes from other apps).
+  await page.evaluate(() => window.__stitchup.store.insertShape(4, { kind: "oval", rect: [380, 120, 500, 190], stroke: [0.1, 0.5, 0.2], fill: null, width: 2 }));
+  await waitStatus(/oval/i);
+  await page.waitForTimeout(400);
+  const ovalBox = async () => {
+    await page.waitForSelector('[data-page="4"] .obj-box.path');
+    // The largest shape on the page is the oval: bring it on screen, then aim at its centre.
+    await page.locator('[data-page="4"] .obj-box.path').evaluateAll((els) => {
+      const big = els.sort((a, b) => b.offsetWidth * b.offsetHeight - a.offsetWidth * a.offsetHeight)[0];
+      big.scrollIntoView({ block: "center" });
+    });
+    await page.waitForTimeout(200);
+    const boxes = await page.locator('[data-page="4"] .obj-box.path').evaluateAll((els) => els.map((e) => e.getBoundingClientRect().toJSON()));
+    const bb = boxes.sort((a, b) => b.width * b.height - a.width * a.height)[0];
+    return [bb.x + bb.width / 2, bb.y + bb.height / 2];
+  };
   // The shape is a selectable object: pick it, recolour it with Fore, delete it.
   const paths = async () => (await ipc("list_objects", { page: 4 })).filter((o) => o.kind === "path");
   const n0 = (await paths()).length;
   assert(n0 >= 1, "oval listed as a path");
-  await rb("select").click();
+  if ((await page.evaluate(() => window.__stitchup.state().tool)) !== "select") await rb("select").click();
   await page.waitForSelector('[data-page="4"] .page-overlay[data-ready="true"]');
-  await page.waitForSelector('[data-page="4"] .obj-box.path');
-  await page.mouse.click(x + 60, y + 35);
+  let [x, y] = await ovalBox();
+  await page.mouse.click(x, y);
   await page.waitForSelector('[data-page="4"] .obj-box.path.picked');
   await rb("fore").click();
   await page.locator('.color-palette [aria-label="#7c4dbe"]').click();
   await waitStatus(/Recoloured/);
   await page.waitForSelector('[data-page="4"] .page-overlay[data-ready="true"]');
-  await page.waitForSelector('[data-page="4"] .obj-box.path');
-  await page.mouse.click(x + 60, y + 35);
+  [x, y] = await ovalBox();
+  await page.mouse.click(x, y);
   await page.waitForSelector('[data-page="4"] .obj-box.path.picked');
   await rb("objDelete").click();
   await waitStatus(/Deleted 1 object/);
@@ -1040,6 +1052,7 @@ await check("colour palettes: Fore / Back / Annotate ▸ Colour open a palette a
   await waitNotice(/Text colour #1d5fd0/);
   assert((await page.evaluate(() => window.__stitchup.state().foreColor)) === "#1d5fd0", "fore set");
   assert(/rgb\(29, 95, 208\)/.test(await rb("fore").locator(".rb-swatch").evaluate((el) => el.style.background)), "swatch shows it");
+  await tab("Annotate"); // Fill colour lives with the annotation shapes
   await rb("back").click();
   await page.locator(".color-palette").getByRole("menuitem", { name: "No fill" }).click();
   assert((await page.evaluate(() => window.__stitchup.state().backColor)) === null, "back none");
@@ -1047,6 +1060,7 @@ await check("colour palettes: Fore / Back / Annotate ▸ Colour open a palette a
   await page.locator(".color-palette").getByLabel("Colour code").fill("#123456");
   await page.locator(".color-palette").getByRole("button", { name: "Use" }).click();
   assert((await page.evaluate(() => window.__stitchup.state().backColor)) === "#123456", "custom back");
+  await tab("Content");
   // Select a line, Fore recolours it straight away.
   await rb("select").click();
   await page.waitForSelector('[data-page="1"] .obj-box.text');
@@ -1200,6 +1214,117 @@ await check("an edited signed PDF: ⌘S and signing again keep every earlier sig
   const d = await PDFDocument.load(all, { updateMetadata: false });
   const notes = d.getPage(0).node.Annots().asArray().map((r) => d.context.lookup(r)).filter((a) => a.get(PDFName.of("Subtype")).toString() === "/Text");
   assert(notes.length === 2, `both notes in the signed file: ${notes.length}`);
+  await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
+  await waitStatus(/main\.pdf/);
+  openPath = MAIN;
+});
+
+await check("Security ▸ QuickSign: a signature from a PNG, kept locked with a password, placed, reused, deleted", async () => {
+  // A "scan" of a handwritten signature: dark ink on white paper, lots of margin.
+  const scan = async (type) =>
+    page.evaluate((t) => {
+      const c = document.createElement("canvas");
+      c.width = 1200;
+      c.height = 600;
+      const g = c.getContext("2d");
+      g.fillStyle = "#fdfdfb";
+      g.fillRect(0, 0, c.width, c.height);
+      g.strokeStyle = "#102060";
+      g.lineWidth = 9;
+      g.lineCap = "round";
+      g.beginPath();
+      g.moveTo(300, 380);
+      for (let i = 0; i <= 60; i++) g.lineTo(300 + i * 10, 330 - Math.sin(i / 3) * 70 + (i % 7) * 4);
+      g.stroke();
+      return c.toDataURL(t).split(",")[1];
+    }, type);
+  const png = path.join(WORK, "my-signature.png");
+  const jpg = path.join(WORK, "scan.jpg");
+  await writeFile(png, Buffer.from(await scan("image/png"), "base64"));
+  await writeFile(jpg, Buffer.from(await scan("image/jpeg"), "base64"));
+  const f = path.join(WORK, "contract.pdf");
+  await makePdf(f, [LETTER]);
+  await openViaRibbon(f);
+  const images = async () => (await ipc("list_objects", { page: 1 })).filter((o) => o.kind === "image").length;
+  const waitImages = async (n) => {
+    for (let i = 0; i < 60 && (await images()) !== n; i++) await page.waitForTimeout(200);
+    return images();
+  };
+
+  // Create: choose the PNG, keep it, lock it.
+  await tab("Security");
+  await rb("quickSign").click();
+  await page.locator(".rb-choices").getByRole("menuitem", { name: "Create New Signature…" }).click();
+  await pick(png);
+  await btn("Choose Image…").click();
+  await page.locator('.qs-preview img').waitFor();
+  const dims = await page.locator(".qs-preview img").evaluate((im) => [im.naturalWidth, im.naturalHeight]);
+  assert(dims[0] < 700 && dims[1] < 250, `trimmed to the ink: ${dims}`);
+  assert((await page.getByLabel("Signature name").inputValue()) === "my-signature", "named after the file");
+  await page.getByLabel("Signature name").fill("Jan Kowalski");
+  await page.getByText("Protect it with a password").click();
+  await page.getByLabel("Signature password").fill("pióro2026");
+  await page.getByLabel("Repeat password").fill("pióro2026x");
+  assert(await btn("Save & Place Signature").isDisabled(), "mismatched passwords block saving");
+  await page.getByLabel("Repeat password").fill("pióro2026");
+  await btn("Save & Place Signature").click();
+  await waitNotice(/saved, locked with a password — click on the page/);
+  assert(/Signature: click where it goes/.test(await page.locator(".tool-hint").innerText()), "signature hint");
+  const [x, y] = await emptySpot(1, 0.55, 0.75);
+  await page.mouse.click(x, y);
+  await waitStatus(/Inserted image signature “Jan Kowalski”/);
+  assert((await images()) === 1, "placed");
+  // Placed with transparency (soft mask), about 160 pt wide.
+  const img = (await ipc("list_objects", { page: 1 })).find((o) => o.kind === "image");
+  assert(Math.abs(img.rect[2] - img.rect[0] - 160) < 1, `width ${img.rect[2] - img.rect[0]}`);
+  const bytes = Buffer.from((await ipc("render_bytes")).bytes_b64, "base64").toString("latin1");
+  assert(/\/SMask/.test(bytes), "transparent background");
+
+  // Stored encrypted: no preview, nothing readable on disk.
+  const saved = await ipc("quicksign_list");
+  assert(saved.length === 1 && saved[0].protected && !saved[0].preview, JSON.stringify(saved));
+  const raw = await readFile(path.join(SIGNATURES, `${saved[0].id}.json`), "utf8");
+  assert(!raw.includes("iVBORw0KGgo"), "no PNG stored in the clear");
+
+  // Reuse: the locked one asks for its password.
+  await page.evaluate(() => window.__stitchup.store.loadSignatures());
+  await rb("quickSign").click();
+  await page.locator(".rb-choices").getByRole("menuitem", { name: "🔒 Jan Kowalski" }).click();
+  await page.getByLabel("Signature password").fill("wrong");
+  await btn("Unlock & Place").click();
+  await page.getByText("Wrong password — try again").waitFor();
+  await page.getByLabel("Signature password").fill("pióro2026");
+  await btn("Unlock & Place").click();
+  await page.locator(".tool-hint", { hasText: "Signature:" }).waitFor();
+  const [x2, y2] = await emptySpot(1, 0.25, 0.85);
+  await page.mouse.click(x2, y2);
+  assert((await waitImages(2)) === 2, "placed again");
+
+  // Manage: deleting a locked signature needs its password.
+  await rb("quickSign").click();
+  await page.locator(".rb-choices").getByRole("menuitem", { name: "Manage Signatures…" }).click();
+  await btn("Delete…").click();
+  await page.getByLabel("Password for Jan Kowalski").fill("pióro2026");
+  await page.locator(".qs-confirm").getByRole("button", { name: "Delete" }).click();
+  await page.getByText("No saved signatures yet.").waitFor();
+  await btn("Close").click();
+  assert((await ipc("quicksign_list")).length === 0, "deleted");
+
+  // One-off from a JPG: placed, not kept.
+  await rb("quickSign").click();
+  await page.locator(".rb-choices").getByRole("menuitem", { name: "Create New Signature…" }).click();
+  await pick(jpg);
+  await btn("Choose Image…").click();
+  await page.locator('.qs-preview img').waitFor();
+  await page.getByText("Keep this signature in Stitchup for next time").click();
+  await btn("Place Signature").click();
+  await page.locator(".tool-hint", { hasText: "Signature:" }).waitFor();
+  const [x3, y3] = await emptySpot(1, 0.6, 0.55);
+  await page.mouse.click(x3, y3);
+  assert((await waitImages(3)) === 3 && (await ipc("quicksign_list")).length === 0, "placed once, not stored");
+
+  await pick("Close");
+  await page.locator(".doc-tab.active .doc-tab-close").click();
   await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
   await waitStatus(/main\.pdf/);
   openPath = MAIN;

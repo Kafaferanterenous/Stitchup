@@ -39,6 +39,9 @@ import {
   cmdDeleteAnnotation,
   cmdMoveAnnotation,
   cmdRecolorAnnotations,
+  cmdQuickSignList,
+  cmdQuickSignLoad,
+  type SavedSignature,
   cmdRedact,
   cmdObjectOp,
   cmdInsertShape,
@@ -57,6 +60,7 @@ import {
 } from "./ipc";
 import { pageImage, toBase64 } from "./export";
 import { loadSettings } from "./settings";
+import { signatureFromPng, SIGNATURE_WIDTH_PT, type PreparedSignature } from "./quicksign";
 import { ask } from "@tauri-apps/plugin-dialog";
 import { search as searchText } from "./adapters/renderAdapter";
 
@@ -131,6 +135,9 @@ export interface AppState {
   annColor: string | null;
   /** The line open in the inline text editor (Fore / Font apply to it). */
   editingLine: EditingLine | null;
+  /** QuickSign: saved signatures, and the locked one waiting for its password. */
+  signatures: SavedSignature[];
+  unlockSignature: SavedSignature | null;
   strokeWidth: number;
   /** Select tool: picked content objects ("t12"/"i30") and annotations (obj #). */
   picked: { page: number; objects: string[]; annots: number[] } | null;
@@ -175,6 +182,8 @@ export interface PendingImage {
   width: number;
   height: number;
   name: string;
+  /** Width (points) when placed with a single click (default: from the pixels). */
+  widthPt?: number;
 }
 
 export type Tool =
@@ -227,6 +236,9 @@ export type Dialog =
   | "font"
   | "settings"
   | "compress"
+  | "quickSignNew"
+  | "quickSignUnlock"
+  | "quickSignManage"
   | "recovery";
 
 let state: AppState = {
@@ -263,6 +275,8 @@ let state: AppState = {
   backColor: null,
   annColor: null,
   editingLine: null,
+  signatures: [],
+  unlockSignature: null,
   strokeWidth: 2,
   picked: null,
   pendingInput: null,
@@ -707,6 +721,39 @@ export const store = {
 
   setPendingInput(p: PendingInput | null) {
     set({ pendingInput: p });
+  },
+
+  // ------------------------------------------------------------ QuickSign
+
+  async loadSignatures() {
+    try {
+      set({ signatures: await cmdQuickSignList() });
+    } catch {
+      set({ signatures: [] });
+    }
+  },
+
+  /** Place a signature: click (or drag for a size) on the page. */
+  placeSignature(sig: PreparedSignature, name: string, note?: string) {
+    this.armImage({ format: "rgba", b64: sig.rgba, width: sig.width, height: sig.height, name: `signature “${name}”`, widthPt: SIGNATURE_WIDTH_PT });
+    if (note) notify(`${note} — click on the page to place it (drag to set its width)`);
+  },
+
+  /** Use a saved signature; a locked one asks for its password first. */
+  async useSignature(s: SavedSignature, password?: string): Promise<boolean> {
+    if (s.protected && password === undefined) {
+      set({ unlockSignature: s, dialog: "quickSignUnlock" });
+      return false;
+    }
+    try {
+      const png = await cmdQuickSignLoad(s.id, password);
+      this.placeSignature(await signatureFromPng(png), s.name);
+      return true;
+    } catch (e) {
+      const msg = (e as { message?: string }).message ?? String(e);
+      notify(msg === "wrong password" ? "Wrong password for this signature" : `Could not use the signature: ${msg}`);
+      return false;
+    }
   },
 
   /** Arm the Image tool with a decoded image. */

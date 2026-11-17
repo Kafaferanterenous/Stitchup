@@ -1,5 +1,5 @@
 //! Native macOS menu bar, built from the command registry with the same menus
-//! as the Windows build (File · Export · Edit · Pages · Annotate · View · Tabs
+//! as the Windows build, regrouped like macOS / Nitro (File · Edit · Pages · Annotate · Security · View · Window · Help
 //! · Help) plus the standard macOS app menu. Accelerators live on the menu
 //! items, so the JS key handler skips them while the native menu is active.
 
@@ -49,7 +49,13 @@ export async function installMenu(): Promise<void> {
       schemes: async () => [
         await Submenu.new({ text: "Colour Scheme", items: [...schemeItems, await sep(), await make("darkMode")] }),
       ],
-      ribbonTabs: async () => tabItems,
+      ribbonTabs: async () => [await Submenu.new({ text: "Ribbon Tab", items: tabItems })],
+      export: async () => [
+        await Submenu.new({
+          text: "Export",
+          items: await Promise.all(["exportText", "exportCsv", "exportImages", "exportRtf", "exportDocx", "exportOdt"].map((id) => make(id))),
+        }),
+      ],
     };
 
     const bar: Submenu[] = [
@@ -81,7 +87,13 @@ export async function installMenu(): Promise<void> {
         // Standard macOS full-screen entry.
         its.push(await sep(), await PredefinedMenuItem.new({ item: "Fullscreen" }));
       }
-      if (m.title === "Help") bar.push(await Submenu.new({ text: "Window", items: [await PredefinedMenuItem.new({ item: "Minimize" }), await PredefinedMenuItem.new({ item: "Maximize" })] }));
+      if (m.title === "Help")
+        bar.push(
+          await Submenu.new({
+            text: "Window",
+            items: [await PredefinedMenuItem.new({ item: "Minimize" }), await PredefinedMenuItem.new({ item: "Maximize" }), await sep(), await make("prevTab"), await make("nextTab")],
+          }),
+        );
       bar.push(await Submenu.new({ text: m.title, items: its }));
     }
     const menu = await Menu.new({ items: bar });

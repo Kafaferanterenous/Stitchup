@@ -394,3 +394,5 @@ Notes:
   (both MIT / Apache-2.0) for Compress ▸ image downsampling.
 - **Update 2026-11-14 (v0.9.0):** added `rustybuzz` 0.20 (MIT; HarfBuzz port) and
   `unicode-bidi` 0.3 (MIT / Apache-2.0) for complex-script shaping and bidi order.
+- **Update 2026-11-17 (v0.11.0):** added `aes-gcm` 0.10 and `pbkdf2` 0.12 (RustCrypto,
+  MIT / Apache-2.0), `base64` 0.22 and `serde_json` 1 in the core, for QuickSign storage.

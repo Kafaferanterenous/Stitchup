@@ -180,7 +180,7 @@ export function PageOverlay({
         if (!img) return;
         // Keep the picture's proportions: the drag sets the width.
         const aspect = img.height / img.width;
-        const wPt = click ? Math.min(img.width * 0.75, 300) : Math.max(8, pr[2] - pr[0]);
+        const wPt = click ? img.widthPt ?? Math.min(img.width * 0.75, 300) : Math.max(8, pr[2] - pr[0]);
         const hPt = wPt * aspect;
         void store.placeImage(page, [pt[0], pt[1] - hPt, pt[0] + wPt, pt[1]]);
         return;
