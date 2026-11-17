@@ -4,6 +4,8 @@
 
 import { useAppState, store } from "../../store";
 
+import { tr } from "../../i18n";
+
 export function TabStrip() {
   const app = useAppState();
   if (!app.doc && app.tabs.length <= 1) return null;
@@ -22,14 +24,14 @@ export function TabStrip() {
           }}
           onClick={() => void store.switchTab(t.id)}>
           <span className="doc-tab-name">
-            {t.name}
+            {tr(t.name)}
             {t.dirty ? " *" : ""}
           </span>
           <button
             type="button"
             className="doc-tab-close"
             aria-label={`Close ${t.name}`}
-            title="Close tab (⌘W)"
+            title={tr("Close tab (⌘W)")}
             onClick={(e) => {
               e.stopPropagation();
               void store.closeTab(t.id);
@@ -38,7 +40,7 @@ export function TabStrip() {
           </button>
         </div>
       ))}
-      <button type="button" className="doc-tab-new" aria-label="New tab" title="New tab (⌘T)" onClick={() => void store.newTab()}>
+      <button type="button" className="doc-tab-new" aria-label="New tab" title={tr("New tab (⌘T)")} onClick={() => void store.newTab()}>
         +
       </button>
     </nav>

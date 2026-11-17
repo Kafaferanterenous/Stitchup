@@ -65,6 +65,8 @@ import { signatureFromPng, SIGNATURE_WIDTH_PT, type PreparedSignature } from "./
 import { ask } from "@tauri-apps/plugin-dialog";
 import { search as searchText } from "./adapters/renderAdapter";
 
+import { language, onLanguageChange, tr } from "./i18n";
+
 /** Virtual path prefix the backend gives never-saved documents. */
 export const UNTITLED = "stitchup-untitled:";
 export const isUntitled = (doc: Document | null) => !!doc && doc.path.startsWith(UNTITLED);
@@ -141,6 +143,8 @@ export interface AppState {
   unlockSignature: SavedSignature | null;
   /** OS and per-OS features (OCR uses Apple Vision on macOS). */
   platform: { os: string; ocr: boolean };
+  /** Interface language (changing it re-renders every translated string). */
+  lang: string;
   strokeWidth: number;
   /** Select tool: picked content objects ("t12"/"i30") and annotations (obj #). */
   picked: { page: number; objects: string[]; annots: number[] } | null;
@@ -255,7 +259,7 @@ let state: AppState = {
   lastError: null,
   notice: null,
   lastCommit: null,
-  statusMessage: "No document open",
+  statusMessage: tr("No document open"),
   metadataOpen: false,
   editMode: false,
   selectionText: "",
@@ -281,6 +285,7 @@ let state: AppState = {
   signatures: [],
   unlockSignature: null,
   platform: { os: "macos", ocr: true },
+  lang: language(),
   strokeWidth: 2,
   picked: null,
   pendingInput: null,
@@ -314,7 +319,7 @@ const EMPTY_SLICE: TabSlice = {
   selection: [],
   query: "",
   lastCommit: null,
-  statusMessage: "No document open",
+  statusMessage: tr("No document open"),
 };
 
 /** "#rrggbb" → [r, g, b] in 0..1. */
@@ -363,6 +368,8 @@ function notify(message: string) {
   if (noticeTimer) clearTimeout(noticeTimer);
   noticeTimer = setTimeout(() => set({ notice: null }), 2500);
 }
+
+onLanguageChange(() => set({ lang: language() }));
 
 export function getState(): AppState {
   return state;
@@ -445,15 +452,15 @@ export const store = {
         searchIndex: -1,
         unlockOpen: doc.passwordRequired,
         statusMessage: doc.passwordRequired
-          ? "This document is password-protected"
-          : `Opened ${doc.pages.length} page${doc.pages.length === 1 ? "" : "s"}`,
+          ? tr("This document is password-protected")
+          : tr("Opened {0} page{1}", doc.pages.length, doc.pages.length === 1 ? "" : "s"),
       });
       const w = doc.warnings.filter((x) => !/password-protected/.test(x));
       if (!doc.passwordRequired && w.length) {
-        notify(`⚠ ${w.length} warning${w.length > 1 ? "s" : ""}: ${w[0]}`);
+        notify(tr("⚠ {0} warning{1}: {2}", w.length, w.length > 1 ? "s" : "", w[0]));
       }
     } catch (e) {
-      set({ lastError: e as Error, statusMessage: "Open failed" });
+      set({ lastError: e as Error, statusMessage: tr("Open failed") });
     } finally {
       set({ busy: false });
     }
@@ -469,12 +476,12 @@ export const store = {
         currentPage: 1,
         unlockOpen: false,
         selectionText: "",
-        statusMessage: `Unlocked ${doc.pages.length} pages`,
+        statusMessage: tr("Unlocked {0} pages", doc.pages.length),
       });
-      notify("Unlocked — copies you save will not be password-protected");
+      notify(tr("Unlocked — copies you save will not be password-protected"));
       return true;
     } catch (e) {
-      set({ lastError: e as Error, statusMessage: "Unlock failed" });
+      set({ lastError: e as Error, statusMessage: tr("Unlock failed") });
       return false;
     } finally {
       set({ busy: false });
@@ -484,13 +491,13 @@ export const store = {
   /** Start a new blank document (Letter, A4, ...). */
   async newDocument(widthPt: number, heightPt: number) {
     await this.freshTab();
-    return this.adopt(() => cmdNew(widthPt, heightPt), "New document");
+    return this.adopt(() => cmdNew(widthPt, heightPt), tr("New document"));
   },
 
   /** Combine several PDFs into a new untitled document. */
   async combine(paths: string[]) {
     await this.freshTab();
-    return this.adopt(() => cmdCombine(paths), `Combined ${paths.length} files`);
+    return this.adopt(() => cmdCombine(paths), tr("Combined {0} files", paths.length));
   },
 
   /** Replace the open document with one the backend just built. */
@@ -540,10 +547,10 @@ export const store = {
         lastCommit: { target: res.published_path, sha: res.new_sha256, size: res.size_bytes },
         statusMessage: `Saved ${docName(doc)}`,
       });
-      notify(`Saved ${docName(doc)}`);
+      notify(tr("Saved {0}", docName(doc)));
       return true;
     } catch (e) {
-      set({ lastError: e as Error, statusMessage: "Save failed" });
+      set({ lastError: e as Error, statusMessage: tr("Save failed") });
       return false;
     } finally {
       set({ busy: false });
@@ -572,7 +579,7 @@ export const store = {
     return this.command(
       { kind: "watermark", before: doc.pages.map((p) => p.page_no), data: spec },
       () => cmdWatermark(spec),
-      () => ({ status: `Watermark added to ${spec.pages?.length || doc.pages.length} page(s)` }),
+      () => ({ status: tr("Watermark added to {0} page(s)", spec.pages?.length || doc.pages.length) }),
     );
   },
 
@@ -583,7 +590,7 @@ export const store = {
     return this.command(
       { kind: "crop", before: doc.pages.map((p) => p.page_no), data: boxes },
       () => cmdSetCrop(boxes),
-      () => ({ status: `Cropped ${boxes.length} page(s)` }),
+      () => ({ status: tr("Cropped {0} page(s)", boxes.length) }),
     );
   },
 
@@ -629,7 +636,7 @@ export const store = {
     const start = Math.max(0, hits.findIndex((h) => h.page_no >= state.currentPage));
     set({ query: q, searchHits: hits, searchIndex: hits.length ? start : -1 });
     if (hits.length) this.goToPage(hits[start].page_no);
-    else notify(`No matches for “${q.trim()}”`);
+    else notify(tr("No matches for “{0}”", q.trim()));
     return hits.length;
   },
 
@@ -649,7 +656,7 @@ export const store = {
   setTool(tool: Tool | null) {
     const next = state.tool === tool ? null : tool;
     set({ tool: next, picked: null, editMode: false, pendingInput: null });
-    if (next === "select") notify("Select: click an object or drag a box · drag to move · ⌫ deletes");
+    if (next === "select") notify(tr("Select: click an object or drag a box · drag to move · ⌫ deletes"));
   },
 
   setStampLabel(label: string) {
@@ -680,12 +687,12 @@ export const store = {
         await this.recolorPicked(hex);
         return;
       }
-      notify(hex ? `Annotation colour ${hex} — used by the next highlight, underline, strike-out, pen, shape or text box (select annotations to recolour them)` : "Annotation colours reset to defaults");
+      notify(hex ? tr("Annotation colour {0} — used by the next highlight, underline, strike-out, pen, shape or text box (select annotations to recolour them)", hex) : tr("Annotation colours reset to defaults"));
       return;
     }
     if (which === "back") {
       set({ backColor: hex });
-      notify(hex ? `Fill colour ${hex} — used by the next shape you draw` : "Fill: none — new shapes are outlines");
+      notify(hex ? tr("Fill colour {0} — used by the next shape you draw", hex) : tr("Fill: none — new shapes are outlines"));
       return;
     }
     if (!hex) return;
@@ -695,7 +702,7 @@ export const store = {
     } else if (state.picked?.objects.length || state.editingLine) {
       await this.objectOp({ op: "recolor", color: rgb(hex) });
     } else {
-      notify(`Text colour ${hex} — select text (or double-click a line) to recolour it; also used for new shape outlines`);
+      notify(tr("Text colour {0} — select text (or double-click a line) to recolour it; also used for new shape outlines", hex));
     }
   },
 
@@ -713,7 +720,7 @@ export const store = {
         if (p.annots.length) pages = await cmdRecolorAnnotations(p.page, p.annots, rgb(hex));
         return pages!;
       },
-      () => ({ status: `Recoloured ${n} object${n > 1 ? "s" : ""}`, page: p.page }),
+      () => ({ status: tr("Recoloured {0} object{1}", n, n > 1 ? "s" : ""), page: p.page }),
     );
     set({ picked: null });
     return ok;
@@ -748,7 +755,7 @@ export const store = {
   /** Place a signature: click (or drag for a size) on the page. */
   placeSignature(sig: PreparedSignature, name: string, note?: string) {
     this.armImage({ format: "rgba", b64: sig.rgba, width: sig.width, height: sig.height, name: `signature “${name}”`, widthPt: SIGNATURE_WIDTH_PT });
-    if (note) notify(`${note} — click on the page to place it (drag to set its width)`);
+    if (note) notify(tr("{0} — click on the page to place it (drag to set its width)", note));
   },
 
   /** Use a saved signature; a locked one asks for its password first. */
@@ -763,7 +770,7 @@ export const store = {
       return true;
     } catch (e) {
       const msg = (e as { message?: string }).message ?? String(e);
-      notify(msg === "wrong password" ? "Wrong password for this signature" : `Could not use the signature: ${msg}`);
+      notify(msg === "wrong password" ? tr("Wrong password for this signature") : tr("Could not use the signature: {0}", msg));
       return false;
     }
   },
@@ -771,7 +778,7 @@ export const store = {
   /** Arm the Image tool with a decoded image. */
   armImage(img: PendingImage) {
     set({ pendingImage: img, tool: "image", picked: null, editMode: false });
-    notify(`Click or drag on the page to place ${img.name}`);
+    notify(tr("Click or drag on the page to place {0}", img.name));
   },
 
   async placeImage(page: number, rect: number[]) {
@@ -781,7 +788,7 @@ export const store = {
     const ok = await this.command(
       { kind: "object", before: doc.pages.map((p) => p.page_no), data: { image: img.name } },
       () => cmdInsertImage(page, rect, { format: img.format, b64: img.b64, width: img.width, height: img.height }),
-      () => ({ status: `Inserted image ${img.name} on page ${page}`, page }),
+      () => ({ status: tr("Inserted image {0} on page {1}", img.name, page), page }),
     );
     set({ tool: null, pendingImage: null });
     return ok;
@@ -805,7 +812,7 @@ export const store = {
         if (!tc.items.some((i) => "str" in i && i.str.trim())) bare.push(n);
       }
       if (!bare.length) {
-        this.notify("Every page already has text — choose This Page or All Pages to recognise anyway");
+        this.notify(tr("Every page already has text — choose This Page or All Pages to recognise anyway"));
         return false;
       }
       pages = bare;
@@ -814,7 +821,7 @@ export const store = {
     set({ busy: true });
     try {
       for (const [i, n] of pages.entries()) {
-        this.notify(`Recognising text: page ${i + 1} of ${pages.length}…`);
+        this.notify(tr("Recognising text: page {0} of {1}…", i + 1, pages.length));
         const rotation = doc.pages.find((p) => p.page_no === n)?.rotation ?? 0;
         const png = await pageImage(session, n, rotation, 300, "image/png");
         const lines = await cmdOcrRecognize(toBase64(png));
@@ -822,19 +829,19 @@ export const store = {
       }
     } catch (e) {
       set({ busy: false });
-      this.notify(`Text recognition failed: ${(e as { message?: string }).message ?? e}`);
+      this.notify(tr("Text recognition failed: {0}", (e as { message?: string }).message ?? e));
       return false;
     }
     set({ busy: false });
     const total = found.reduce((a, p) => a + p.lines.length, 0);
     if (!total) {
-      this.notify(`No text found on ${pages.length === 1 ? "this page" : `${pages.length} pages`}`);
+      this.notify(tr("No text found on {0}", pages.length === 1 ? "this page" : `${pages.length} pages`));
       return false;
     }
     return this.command(
       { kind: "object", before: doc.pages.map((p) => p.page_no), data: { ocr: found.length } },
       () => cmdOcrApply(found),
-      () => ({ status: `Recognised ${total} line${total === 1 ? "" : "s"} on ${found.length} page${found.length === 1 ? "" : "s"} — now searchable`, page: found[0].page }),
+      () => ({ status: tr("Recognised {0} line{1} on {2} page{3} — now searchable", total, total === 1 ? "" : "s", found.length, found.length === 1 ? "" : "s"), page: found[0].page }),
     );
   },
 
@@ -845,7 +852,7 @@ export const store = {
     return this.command(
       { kind: "object", before: doc.pages.map((p) => p.page_no), data: { name, value } },
       () => cmdSetField(name, value),
-      () => ({ status: `Filled “${name}”` }),
+      () => ({ status: tr("Filled “{0}”", name) }),
     );
   },
 
@@ -856,7 +863,7 @@ export const store = {
     return this.command(
       { kind: "annotate", before: doc.pages.map((p) => p.page_no), data: spec },
       () => cmdAddAnnotation(page, spec),
-      () => ({ status: `Added ${spec.kind.replace("_", " ")} on page ${page}`, page }),
+      () => ({ status: tr("Added {0} on page {1}", spec.kind.replace("_", " "), page), page }),
     );
   },
 
@@ -894,7 +901,7 @@ export const store = {
         // Annotation numbers are stable across deletes (they are object ids).
         for (const a of p.annots) await cmdDeleteAnnotation(p.page, a);
       },
-      () => ({ status: `Deleted ${p.objects.length + p.annots.length} object(s)`, page: p.page }),
+      () => ({ status: tr("Deleted {0} object(s)", p.objects.length + p.annots.length), page: p.page }),
     );
     set({ picked: null });
     return ok;
@@ -911,7 +918,7 @@ export const store = {
         if (p.objects.length) await cmdObjectOp(p.page, { op: "move", ids: p.objects, dx, dy });
         for (const a of p.annots) await cmdMoveAnnotation(p.page, a, dx, dy);
       },
-      () => ({ status: `Moved ${p.objects.length + p.annots.length} object(s)`, page: p.page }),
+      () => ({ status: tr("Moved {0} object(s)", p.objects.length + p.annots.length), page: p.page }),
     );
     set({ picked: null });
     return ok;
@@ -922,13 +929,13 @@ export const store = {
     const doc = state.doc;
     if ((!p || !p.objects.length) && state.editingLine) return state.editingLine.apply(data);
     if (!p || !doc || !p.objects.length) {
-      notify("Select text first (Content ▸ Select, then click a line)");
+      notify(tr("Select text first (Content ▸ Select, then click a line)"));
       return false;
     }
     const ok = await this.command(
       { kind: "object", before: doc.pages.map((x) => x.page_no), data },
       () => cmdObjectOp(p.page, { ...data, ids: p.objects }),
-      () => ({ status: data.op === "recolor" ? "Recoloured" : "Font changed", page: p.page }),
+      () => ({ status: data.op === "recolor" ? "Recoloured" : tr("Font changed"), page: p.page }),
     );
     set({ picked: null });
     return ok;
@@ -950,10 +957,10 @@ export const store = {
     if (!doc) return false;
     const ids = (await this.lineObjects(page, box)).map((o) => o.id);
     if (!ids.length) {
-      notify("This line can't be reformatted (its text isn't readable from the PDF)");
+      notify(tr("This line can't be reformatted (its text isn't readable from the PDF)"));
       return false;
     }
-    const what = data.op === "recolor" ? "Recoloured the line" : data.family ? `Font: ${data.family}${data.size ? ` ${data.size} pt` : ""}` : `Size: ${data.size} pt`;
+    const what = data.op === "recolor" ? tr("Recoloured the line") : data.family ? `Font: ${data.family}${data.size ? ` ${data.size} pt` : ""}` : `Size: ${data.size} pt`;
     return this.command(
       { kind: "object", before: doc.pages.map((p) => p.page_no), data },
       () => cmdObjectOp(page, { ...data, ids }),
@@ -967,7 +974,7 @@ export const store = {
     return this.command(
       { kind: "object", before: doc.pages.map((p) => p.page_no), data: spec },
       () => cmdInsertShape(page, spec),
-      () => ({ status: `Inserted ${spec.kind} on page ${page}`, page }),
+      () => ({ status: tr("Inserted {0} on page {1}", spec.kind, page), page }),
     );
   },
 
@@ -1057,7 +1064,7 @@ export const store = {
     const ok = await this.command(
       { kind: "delete", before: doc.pages.map((p) => p.page_no), data: { pages, to } },
       () => cmdMovePagesToTab(pages, to),
-      () => ({ status: `Moved ${pages.length} page${pages.length > 1 ? "s" : ""} to “${target.name}”` }),
+      () => ({ status: tr("Moved {0} page{1} to “{2}”", pages.length, pages.length > 1 ? "s" : "", target.name) }),
     );
     if (ok) {
       const slice = parked.get(to);
@@ -1086,7 +1093,7 @@ export const store = {
     set({ busy: true, lastError: null });
     try {
       const doc = state.doc;
-      if (!doc) throw new Error("no document open");
+      if (!doc) throw new Error(tr("no document open"));
       const result = await mutation(doc);
       let next = await refreshPages(doc);
       next = await withFreshBytes(next);
@@ -1102,7 +1109,7 @@ export const store = {
       });
       return true;
     } catch (e) {
-      set({ lastError: e as Error, statusMessage: "Command failed" });
+      set({ lastError: e as Error, statusMessage: tr("Command failed") });
       return false;
     } finally {
       set({ busy: false });
@@ -1156,7 +1163,7 @@ export const store = {
     return this.command(
       { kind: "insert_blank", before, data: { after: afterPage, width_pt: w, height_pt: h } },
       () => pageTreeAdapter.insertBlank(doc, afterPage, w, h),
-      () => ({ status: `Inserted a blank page after page ${afterPage}`, page: afterPage + 1 }),
+      () => ({ status: tr("Inserted a blank page after page {0}", afterPage), page: afterPage + 1 }),
     );
   },
 
@@ -1173,10 +1180,10 @@ export const store = {
         const r = res as EditResult | null;
         const msg =
           r?.method === "in_place"
-            ? `Text edited (${r.note})`
+            ? tr("Text edited ({0})", r.note)
             : r
-              ? `Text edited — ${r.note}`
-              : "Text edited";
+              ? tr("Text edited — {0}", r.note)
+              : tr("Text edited");
         notify(msg);
         return { status: msg };
       },
@@ -1200,12 +1207,12 @@ export const store = {
     set({ busy: true, lastError: null });
     try {
       const res = await cmdExportPages(pages, target, true);
-      const msg = `Saved ${pages.length} page${pages.length === 1 ? "" : "s"} to ${res.published_path}`;
+      const msg = tr("Saved {0} page{1} to {2}", pages.length, pages.length === 1 ? "" : "s", res.published_path);
       set({ statusMessage: msg });
       notify(msg);
       return res;
     } catch (e) {
-      set({ lastError: e as Error, statusMessage: "Extract failed" });
+      set({ lastError: e as Error, statusMessage: tr("Extract failed") });
       return null;
     } finally {
       set({ busy: false });
@@ -1217,12 +1224,12 @@ export const store = {
     set({ busy: true, lastError: null });
     try {
       const res = await cmdSplit(every, dir, stem, false);
-      const msg = `Split into ${res.length} files in ${dir}`;
+      const msg = tr("Split into {0} files in {1}", res.length, dir);
       set({ statusMessage: msg });
       notify(msg);
       return res;
     } catch (e) {
-      set({ lastError: e as Error, statusMessage: "Split failed" });
+      set({ lastError: e as Error, statusMessage: tr("Split failed") });
       return null;
     } finally {
       set({ busy: false });
@@ -1248,7 +1255,7 @@ export const store = {
       });
       return true;
     } catch (e) {
-      set({ lastError: e as Error, statusMessage: "Undo failed" });
+      set({ lastError: e as Error, statusMessage: tr("Undo failed") });
       return false;
     } finally {
       set({ busy: false });
@@ -1274,7 +1281,7 @@ export const store = {
       });
       return true;
     } catch (e) {
-      set({ lastError: e as Error, statusMessage: "Redo failed" });
+      set({ lastError: e as Error, statusMessage: tr("Redo failed") });
       return false;
     } finally {
       set({ busy: false });
@@ -1285,16 +1292,16 @@ export const store = {
     set({ busy: true, lastError: null });
     try {
       const doc = state.doc;
-      if (!doc) throw new Error("no document open");
+      if (!doc) throw new Error(tr("no document open"));
       const res = await commitAdapter.export(doc, target, overwrite);
       set({
         lastCommit: { target: res.published_path, sha: res.new_sha256, size: res.size_bytes },
-        statusMessage: `Saved to ${res.published_path}`,
+        statusMessage: tr("Saved to {0}", res.published_path),
       });
-      notify(`Saved to ${res.published_path}`);
+      notify(tr("Saved to {0}", res.published_path));
       return res;
     } catch (e) {
-      set({ lastError: e as Error, statusMessage: "Save failed" });
+      set({ lastError: e as Error, statusMessage: tr("Save failed") });
       throw e;
     } finally {
       set({ busy: false });
@@ -1320,11 +1327,11 @@ export const store = {
           ],
           redo: [],
         },
-        statusMessage: "Metadata updated",
+        statusMessage: tr("Metadata updated"),
       });
       return true;
     } catch (e) {
-      set({ lastError: e as Error, statusMessage: "Metadata update failed" });
+      set({ lastError: e as Error, statusMessage: tr("Metadata update failed") });
       return false;
     } finally {
       set({ busy: false });
@@ -1400,7 +1407,7 @@ export const store = {
       ...doc,
       bookmarks: [...doc.bookmarks, n].sort((a, b) => a - b),
     };
-    set({ doc: next, statusMessage: `Bookmarked page ${n}` });
+    set({ doc: next, statusMessage: tr("Bookmarked page {0}", n) });
   },
 
   /** Add/remove a bookmark for a specific page (sidebar star toggle). */
@@ -1414,7 +1421,7 @@ export const store = {
         ? doc.bookmarks.filter((b) => b !== n)
         : [...doc.bookmarks, n].sort((a, b) => a - b),
     };
-    set({ doc: next, statusMessage: has ? `Bookmark removed (page ${n})` : `Bookmarked page ${n}` });
+    set({ doc: next, statusMessage: has ? tr("Bookmark removed (page {0})", n) : tr("Bookmarked page {0}", n) });
   },
 
   async removeBookmark(n: number) {
@@ -1424,14 +1431,14 @@ export const store = {
       ...doc,
       bookmarks: doc.bookmarks.filter((b) => b !== n),
     };
-    set({ doc: next, statusMessage: "Bookmark removed" });
+    set({ doc: next, statusMessage: tr("Bookmark removed") });
   },
 
   async clearBookmarks() {
     const doc = state.doc;
     if (!doc) return;
     const next: Document = { ...doc, bookmarks: [] };
-    set({ doc: next, statusMessage: "All bookmarks removed" });
+    set({ doc: next, statusMessage: tr("All bookmarks removed") });
   },
 
   /** Jump to page `n` and scroll it into view. */
@@ -1493,10 +1500,10 @@ export const store = {
     }
     set({
       statusMessage: ok
-        ? `Copied ${text.length} character${text.length === 1 ? "" : "s"}`
-        : "Copy failed",
+        ? tr("Copied {0} character{1}", text.length, text.length === 1 ? "" : "s")
+        : tr("Copy failed"),
     });
-    notify(ok ? `Copied ${text.length} character${text.length === 1 ? "" : "s"}` : "Copy failed");
+    notify(ok ? tr("Copied {0} character{1}", text.length, text.length === 1 ? "" : "s") : tr("Copy failed"));
     return ok;
   },
 
@@ -1506,7 +1513,7 @@ export const store = {
 
   /** Quit the app (⌘Q): asks first when any tab has unsaved changes. */
   async exitApp(): Promise<void> {
-    if (!(await this.confirmDiscard("Quit Stitchup"))) return;
+    if (!(await this.confirmDiscard(tr("Quit Stitchup")))) return;
     await cmdClearRecovery().catch(() => {});
     await cmdQuit();
   },
@@ -1518,7 +1525,7 @@ export const store = {
     const names = dirty.map((t) => `“${t.name}”`).join(", ");
     const msg = `${names} ${dirty.length > 1 ? "have" : "has"} unsaved changes. Discard them and quit?`;
     try {
-      return await ask(msg, { title, kind: "warning", okLabel: "Discard and Quit", cancelLabel: "Cancel" });
+      return await ask(msg, { title, kind: "warning", okLabel: tr("Discard and Quit"), cancelLabel: "Cancel" });
     } catch {
       return window.confirm(msg);
     }
@@ -1532,7 +1539,7 @@ export const store = {
       const payload = await cmdRestoreRecovery(file);
       displayNames.set(payload.path, label);
       return payload;
-    }, `Recovered ${name} — use Save As to keep it`);
+    }, tr("Recovered {0} — use Save As to keep it", name));
     return ok;
   },
 };

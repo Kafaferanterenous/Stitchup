@@ -10,6 +10,8 @@ import type { IconName } from "./features/ribbon/icons";
 import * as exp from "./export";
 import { cmdReadImage, cmdWriteFile } from "./ipc";
 
+import { language, tr } from "./i18n";
+
 export interface Command {
   id: string;
   /** Ribbon caption. */
@@ -51,22 +53,25 @@ const shapeChoices = (prefix: "" | "shape-") => () => {
   ];
   return items.map(([label, t]) => ({ label, active: s.tool === t, run: () => store.setTool(t) }));
 };
+/** A stamp's printed text: in the interface language, except Chinese (stamps use standard PDF fonts). */
+const stampText = (label: string) => (language() === "zh" ? label : tr(label));
+
 const stampChoices = () => {
   const s = getState();
   return [
     ...STAMPS.map((label) => ({
       label,
-      active: s.tool === "stamp" && s.stampLabel === label,
+      active: s.tool === "stamp" && s.stampLabel === stampText(label),
       run: () => {
-        store.setStampLabel(label);
+        store.setStampLabel(stampText(label));
         if (getState().tool !== "stamp") store.setTool("stamp");
-        store.notify(`Stamp “${label}”: click or drag on the page`);
+        store.notify(tr("Stamp “{0}”: click or drag on the page", stampText(label)));
       },
     })),
     {
       label: "Custom…",
       run: () => {
-        const t = window.prompt("Stamp text", getState().stampLabel);
+        const t = window.prompt(tr("Stamp text"), getState().stampLabel);
         if (t && t.trim()) {
           store.setStampLabel(t.trim());
           if (getState().tool !== "stamp") store.setTool("stamp");
@@ -100,9 +105,9 @@ async function exportBytes(ext: string, label: string, make: () => Promise<Uint8
   try {
     const bytes = await make();
     const res = await cmdWriteFile(target, exp.toBase64(bytes));
-    store.notify(`Exported ${label} → ${res.published_path}`);
+    store.notify(tr("Exported {0} → {1}", label, res.published_path));
   } catch (e) {
-    store.notify(`Export failed: ${(e as Error).message ?? e}`);
+    store.notify(tr("Export failed: {0}", (e as Error).message ?? e));
   }
 }
 
@@ -133,7 +138,7 @@ async function autoCrop() {
     if (b) boxes.push([p, ...b]);
   }
   if (boxes.length) await store.crop(boxes);
-  else store.notify("Nothing to crop: the page is blank");
+  else store.notify(tr("Nothing to crop: the page is blank"));
 }
 
 /** Pick an image, decode it (JPEG kept as-is), then arm the Image tool. */
@@ -158,7 +163,7 @@ async function insertImage() {
     const px = ctx.getImageData(0, 0, c.width, c.height).data;
     store.armImage({ format: "rgba", b64: exp.toBase64(new Uint8Array(px.buffer)), width: c.width, height: c.height, name });
   } catch (e) {
-    store.notify(`Could not read that image: ${(e as Error).message ?? e}`);
+    store.notify(tr("Could not read that image: {0}", (e as Error).message ?? e));
   }
 }
 
@@ -300,11 +305,11 @@ export async function runCommand(id: string): Promise<void> {
   }
   const s = getState();
   if (c.soon) {
-    store.notify(`${c.label} is coming soon (goal ${c.soon} in GOALS.md)`);
+    store.notify(tr("{0} is coming soon (goal {1} in GOALS.md)", c.label, c.soon));
     return;
   }
   if (c.enabled && !c.enabled(s)) {
-    if (!s.doc) store.notify("Open a document first");
+    if (!s.doc) store.notify(tr("Open a document first"));
     return;
   }
   if (c.choices || c.swatch) {

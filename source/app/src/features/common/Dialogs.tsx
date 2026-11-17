@@ -10,6 +10,8 @@ import { pageImage, toBase64 } from "../../export";
 import { PAPERS, fitOnSheet, printDocument } from "../../print";
 import { renderPage } from "../../adapters/renderAdapter";
 
+import { LANGUAGES, language, setLanguage, tr, type Lang } from "../../i18n";
+
 /** Shared modal shell: backdrop click and Escape close it. */
 function Modal({ title, onClose, children, wide }: { title: string; onClose: () => void; children: ReactNode; wide?: boolean }) {
   useEffect(() => {
@@ -57,19 +59,19 @@ const NOT_YET: string[] = ["pdf-lib (D-04)", "Konva + react-konva (D-06)", "perf
 
 export function AboutDialog() {
   return (
-    <Modal title="About Stitchup" onClose={() => store.setDialog(null)} wide>
+    <Modal title={tr("About Stitchup")} onClose={() => store.setDialog(null)} wide>
       <p>
-        <b>Stitchup</b> — offline PDF viewer &amp; editor. Your files never leave this computer, and a file
-        is only replaced when you save — written to a temporary file first, then swapped in, so it is never half-written.
+        <b>{tr("Stitchup")}</b> {tr("— offline PDF viewer & editor. Your files never leave this computer, and a file is only replaced when you save — written to a temporary file first, then swapped in, so it is never half-written.")}
       </p>
-      <h3>Open-source components</h3>
+      <p className="risk-note">⚠ {tr("Stitchup is an experimental PDF editor, made for its author’s own needs and shared as open source. Use it at your own risk: keep backups of important documents and check the results before you rely on them. There is no warranty of any kind.")}</p>
+      <h3>{tr("Open-source components")}</h3>
       <table className="license-table">
         <thead>
           <tr>
-            <th>Ledger</th>
-            <th>Component</th>
-            <th>Used for</th>
-            <th>License</th>
+            <th>{tr("Ledger")}</th>
+            <th>{tr("Component")}</th>
+            <th>{tr("Used for")}</th>
+            <th>{tr("License")}</th>
           </tr>
         </thead>
         <tbody>
@@ -83,10 +85,10 @@ export function AboutDialog() {
           ))}
         </tbody>
       </table>
-      <p className="muted">Approved for later stages, not yet used: {NOT_YET.join(", ")}.</p>
+      <p className="muted">{tr("Approved for later stages, not yet used:")} {NOT_YET.join(", ")}.</p>
       <div className="modal-actions">
         <button onClick={() => store.setDialog(null)} autoFocus>
-          Close
+          {tr("Close")}
         </button>
       </div>
     </Modal>
@@ -103,20 +105,20 @@ export function ExtractDialog() {
     if (await extractTo(pages)) store.setDialog(null);
   }
   return (
-    <Modal title="Extract pages" onClose={() => store.setDialog(null)}>
-      <p className="muted">Save chosen pages as a new PDF. This document is not changed.</p>
+    <Modal title={tr("Extract pages")} onClose={() => store.setDialog(null)}>
+      <p className="muted">{tr("Save chosen pages as a new PDF. This document is not changed.")}</p>
       <label>
-        Pages (e.g. 1-3, 5)
+        {tr("Pages (e.g. 1-3, 5)")}
         <input value={range} onChange={(e) => setRange(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void go()} autoFocus />
       </label>
       <p className={pages ? "muted" : "err-note"}>
-        {pages ? `${pages.length} page${pages.length === 1 ? "" : "s"} selected` : `Use page numbers between 1 and ${max}`}
+        {pages ? tr("{0} page{1} selected", pages.length, pages.length === 1 ? "" : "s") : tr("Use page numbers between 1 and {0}", max)}
       </p>
       <div className="modal-actions">
         <button onClick={() => void go()} disabled={!pages || app.busy}>
-          Save As…
+          {tr("Save As…")}
         </button>
-        <button onClick={() => store.setDialog(null)}>Cancel</button>
+        <button onClick={() => store.setDialog(null)}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -134,18 +136,18 @@ export function SplitDialog() {
     if (await splitInto(n)) store.setDialog(null);
   }
   return (
-    <Modal title="Split document" onClose={() => store.setDialog(null)}>
-      <p className="muted">Write the document as several PDFs into a folder you choose. This document is not changed.</p>
+    <Modal title={tr("Split document")} onClose={() => store.setDialog(null)}>
+      <p className="muted">{tr("Write the document as several PDFs into a folder you choose. This document is not changed.")}</p>
       <label>
-        Pages per file
+        {tr("Pages per file")}
         <input type="number" min={1} max={Math.max(1, max - 1)} value={every} onChange={(e) => setEvery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && void go()} autoFocus />
       </label>
-      <p className={valid ? "muted" : "err-note"}>{valid ? `${parts} files` : `Choose 1 to ${max - 1}`}</p>
+      <p className={valid ? "muted" : "err-note"}>{valid ? tr("{0} files", parts) : tr("Choose 1 to {0}", max - 1)}</p>
       <div className="modal-actions">
         <button onClick={() => void go()} disabled={!valid || app.busy}>
-          Choose Folder…
+          {tr("Choose Folder…")}
         </button>
-        <button onClick={() => store.setDialog(null)}>Cancel</button>
+        <button onClick={() => store.setDialog(null)}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -180,7 +182,7 @@ function PropertiesForm() {
   }
   const warnings = doc.warnings.filter((w) => !/password-protected/.test(w));
   return (
-    <Modal title="Document properties" onClose={() => store.setMetadataOpen(false)} wide>
+    <Modal title={tr("Document properties")} onClose={() => store.setMetadataOpen(false)} wide>
       {FIELDS.map((k) => (
         <label key={k}>
           {k[0].toUpperCase() + k.slice(1)}
@@ -188,30 +190,30 @@ function PropertiesForm() {
         </label>
       ))}
       <dl className="props">
-        <dt>File</dt>
+        <dt>{tr("File")}</dt>
         <dd title={doc.path}>{doc.path}</dd>
-        <dt>Pages</dt>
+        <dt>{tr("Pages")}</dt>
         <dd>{doc.pages.length}</dd>
-        <dt>Size</dt>
-        <dd>{(doc.sourceSize / 1024).toFixed(1)} KB</dd>
+        <dt>{tr("Size")}</dt>
+        <dd>{(doc.sourceSize / 1024).toFixed(1)} {tr("KB")}</dd>
         {doc.metadata.creator && (
           <>
-            <dt>Created with</dt>
+            <dt>{tr("Created with")}</dt>
             <dd>{doc.metadata.creator}</dd>
           </>
         )}
         {doc.metadata.producer && (
           <>
-            <dt>Producer</dt>
+            <dt>{tr("Producer")}</dt>
             <dd>{doc.metadata.producer}</dd>
           </>
         )}
-        <dt>Security</dt>
-        <dd>{doc.encrypted ? "Password-protected (unlocked for this session)" : "None"}</dd>
+        <dt>{tr("Security")}</dt>
+        <dd>{doc.encrypted ? tr("Password-protected (unlocked for this session)") : tr("None")}</dd>
       </dl>
       {warnings.length > 0 && (
         <div className="warn-box" role="note">
-          <b>⚠ Warnings</b>
+          <b>{tr("⚠ Warnings")}</b>
           <ul>
             {warnings.map((w) => (
               <li key={w}>{w}</li>
@@ -219,13 +221,13 @@ function PropertiesForm() {
           </ul>
         </div>
       )}
-      <p className="muted">Changes apply to the next Save As (the original file is never modified).</p>
+      <p className="muted">{tr("Changes apply to the next Save As (the original file is never modified).")}</p>
       <div className="modal-actions">
-        {saved && <span className="ok-note">Saved ✓</span>}
+        {saved && <span className="ok-note">{tr("Saved ✓")}</span>}
         <button onClick={() => void save()} disabled={!changed || app.busy}>
-          Apply
+          {tr("Apply")}
         </button>
-        <button onClick={() => store.setMetadataOpen(false)}>Close</button>
+        <button onClick={() => store.setMetadataOpen(false)}>{tr("Close")}</button>
       </div>
     </Modal>
   );
@@ -245,9 +247,9 @@ const SIZES: { name: string; w: number; h: number }[] = [
 function SizePicker({ value, onChange, withCurrent }: { value: string; onChange: (v: string) => void; withCurrent?: boolean }) {
   return (
     <label>
-      Page size
+      {tr("Page size")}
       <select value={value} onChange={(e) => onChange(e.target.value)} aria-label="Page size">
-        {withCurrent && <option value="current">Same as current page</option>}
+        {withCurrent && <option value="current">{tr("Same as current page")}</option>}
         {SIZES.map((sz) => (
           <option key={sz.name} value={sz.name}>
             {sz.name}
@@ -269,16 +271,16 @@ export function NewDialog() {
     if (await store.newDocument(w, h)) close();
   }
   return (
-    <Modal title="New document" onClose={close}>
+    <Modal title={tr("New document")} onClose={close}>
       <SizePicker value={size} onChange={setSize} />
       <label className="inline-check">
-        <input type="checkbox" checked={landscape} onChange={(e) => setLandscape(e.target.checked)} /> Landscape
+        <input type="checkbox" checked={landscape} onChange={(e) => setLandscape(e.target.checked)} /> {tr("Landscape")}
       </label>
       <div className="modal-actions">
         <button onClick={() => void go()} autoFocus>
-          Create
+          {tr("Create")}
         </button>
-        <button onClick={close}>Cancel</button>
+        <button onClick={close}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -295,20 +297,20 @@ export function AddPageDialog() {
     if (await store.insertBlank(after, sz?.w, sz?.h)) close();
   }
   return (
-    <Modal title="Add blank page" onClose={close}>
+    <Modal title={tr("Add blank page")} onClose={close}>
       <SizePicker value={size} onChange={setSize} withCurrent />
       <label>
-        Position
+        {tr("Position")}
         <select value={where} onChange={(e) => setWhere(e.target.value as "after" | "end")} aria-label="Position">
-          <option value="after">After page {app.currentPage}</option>
-          <option value="end">At the end</option>
+          <option value="after">{tr("After page")} {app.currentPage}</option>
+          <option value="end">{tr("At the end")}</option>
         </select>
       </label>
       <div className="modal-actions">
         <button onClick={() => void go()} autoFocus>
-          Add Page
+          {tr("Add Page")}
         </button>
-        <button onClick={close}>Cancel</button>
+        <button onClick={close}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -341,34 +343,34 @@ export function WatermarkDialog() {
     if (ok) close();
   }
   return (
-    <Modal title="Watermark" onClose={close}>
+    <Modal title={tr("Watermark")} onClose={close}>
       <label>
-        Text
+        {tr("Text")}
         <input value={text} onChange={(e) => setText(e.target.value)} autoFocus aria-label="Watermark text" />
       </label>
       <div className="row2">
         <label>
-          Size
+          {tr("Size")}
           <select value={size} onChange={(e) => setSize(e.target.value)} aria-label="Size">
             {[16, 24, 36, 48, 64, 96].map((n) => (
               <option key={n} value={n}>
-                {n} pt
+                {n} {tr("pt")}
               </option>
             ))}
           </select>
         </label>
         <label>
-          Placement
+          {tr("Placement")}
           <select value={placement} onChange={(e) => setPlacement(e.target.value)} aria-label="Placement">
-            <option value="center">Center (diagonal)</option>
-            <option value="top">Top center</option>
-            <option value="tiled">Tiled</option>
+            <option value="center">{tr("Center (diagonal)")}</option>
+            <option value="top">{tr("Top center")}</option>
+            <option value="tiled">{tr("Tiled")}</option>
           </select>
         </label>
       </div>
       <div className="row2">
         <label>
-          Colour
+          {tr("Colour")}
           <select value={color} onChange={(e) => setColor(e.target.value)} aria-label="Colour">
             {Object.keys(COLORS).map((c) => (
               <option key={c}>{c}</option>
@@ -376,7 +378,7 @@ export function WatermarkDialog() {
           </select>
         </label>
         <label>
-          Opacity
+          {tr("Opacity")}
           <select value={opacity} onChange={(e) => setOpacity(e.target.value)} aria-label="Opacity">
             {[20, 35, 50, 75, 100].map((n) => (
               <option key={n} value={n}>
@@ -387,17 +389,17 @@ export function WatermarkDialog() {
         </label>
       </div>
       <label>
-        Pages
+        {tr("Pages")}
         <select value={scope} onChange={(e) => setScope(e.target.value)} aria-label="Pages">
-          <option value="all">All pages</option>
-          <option value="selected">{app.selection.length > 1 ? `${app.selection.length} selected pages` : `Page ${app.currentPage}`}</option>
+          <option value="all">{tr("All pages")}</option>
+          <option value="selected">{app.selection.length > 1 ? tr("{0} selected pages", app.selection.length) : tr("Page {0}", app.currentPage)}</option>
         </select>
       </label>
       <div className="modal-actions">
         <button onClick={() => void go()} disabled={!text.trim() || app.busy}>
-          Apply
+          {tr("Apply")}
         </button>
-        <button onClick={close}>Cancel</button>
+        <button onClick={close}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -418,34 +420,34 @@ export function EncryptDialog() {
     if (typeof target !== "string") return;
     try {
       const r = await cmdSaveEncrypted(target, pw, owner);
-      store.notify(`Saved a password-protected copy → ${r.published_path}`);
+      store.notify(tr("Saved a password-protected copy → {0}", r.published_path));
       close();
     } catch (e) {
       setErr((e as Error).message ?? String(e));
     }
   }
   return (
-    <Modal title="Save As Encrypted" onClose={close}>
-      <p className="muted">Saves a copy that needs a password to open (AES-256). This document is not changed.</p>
+    <Modal title={tr("Save As Encrypted")} onClose={close}>
+      <p className="muted">{tr("Saves a copy that needs a password to open (AES-256). This document is not changed.")}</p>
       <label>
-        Password
+        {tr("Password")}
         <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} autoFocus aria-label="Password" />
       </label>
       <label>
-        Confirm password
+        {tr("Confirm password")}
         <input type="password" value={pw2} onChange={(e) => setPw2(e.target.value)} aria-label="Confirm password" onKeyDown={(e) => e.key === "Enter" && void go()} />
       </label>
       <label>
-        Owner password (optional — for changing permissions)
+        {tr("Owner password (optional — for changing permissions)")}
         <input type="password" value={owner} onChange={(e) => setOwner(e.target.value)} aria-label="Owner password" />
       </label>
-      {pw2 && pw !== pw2 && <p className="err-note">Passwords don’t match</p>}
+      {pw2 && pw !== pw2 && <p className="err-note">{tr("Passwords don’t match")}</p>}
       {err && <p className="err-note">{err}</p>}
       <div className="modal-actions">
         <button onClick={() => void go()} disabled={!ok}>
-          Save As…
+          {tr("Save As…")}
         </button>
-        <button onClick={close}>Cancel</button>
+        <button onClick={close}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -461,25 +463,25 @@ export function AttachmentsDialog() {
     if (typeof target !== "string") return;
     try {
       await cmdSaveAttachment(a.index, target);
-      store.notify(`Saved ${a.name}`);
+      store.notify(tr("Saved {0}", a.name));
     } catch (e) {
-      store.notify(`Could not save: ${(e as Error).message ?? e}`);
+      store.notify(tr("Could not save: {0}", (e as Error).message ?? e));
     }
   }
   return (
-    <Modal title="Attachments" onClose={close} wide>
+    <Modal title={tr("Attachments")} onClose={close} wide>
       {list === null ? (
-        <p className="muted">Reading…</p>
+        <p className="muted">{tr("Reading…")}</p>
       ) : list.length === 0 ? (
-        <p className="muted">This document has no embedded files.</p>
+        <p className="muted">{tr("This document has no embedded files.")}</p>
       ) : (
         <table className="license-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Size</th>
-              <th>Type</th>
-              <th>Description</th>
+              <th>{tr("Name")}</th>
+              <th>{tr("Size")}</th>
+              <th>{tr("Type")}</th>
+              <th>{tr("Description")}</th>
               <th />
             </tr>
           </thead>
@@ -487,11 +489,11 @@ export function AttachmentsDialog() {
             {list.map((a) => (
               <tr key={a.index}>
                 <td>{a.name}</td>
-                <td>{a.size ? `${(a.size / 1024).toFixed(1)} KB` : "—"}</td>
+                <td>{a.size ? tr("{0} KB", (a.size / 1024).toFixed(1)) : "—"}</td>
                 <td>{a.mime || "—"}</td>
                 <td>{a.description || "—"}</td>
                 <td>
-                  <button onClick={() => void saveOne(a)}>Save…</button>
+                  <button onClick={() => void saveOne(a)}>{tr("Save…")}</button>
                 </td>
               </tr>
             ))}
@@ -499,7 +501,7 @@ export function AttachmentsDialog() {
         </table>
       )}
       <div className="modal-actions">
-        <button onClick={close}>Close</button>
+        <button onClick={close}>{tr("Close")}</button>
       </div>
     </Modal>
   );
@@ -522,7 +524,7 @@ export function ExportImagesDialog() {
     if (typeof target !== "string") return;
     const stem = target.replace(/\.(png|jpe?g)$/i, "");
     for (const [i, n] of pages.entries()) {
-      setProgress(`Page ${i + 1} of ${pages.length}…`);
+      setProgress(tr("Page {0} of {1}…", i + 1, pages.length));
       const rot = s.doc.pages.find((p) => p.page_no === n)?.rotation ?? 0;
       const bytes = await pageImage(s.session, n, rot, Number(dpi), fmt === "png" ? "image/png" : "image/jpeg");
       const name = pages.length === 1 ? `${stem}.${fmt}` : `${stem}-${n}.${fmt}`;
@@ -530,47 +532,47 @@ export function ExportImagesDialog() {
         await cmdWriteFile(name, toBase64(bytes));
       } catch (e) {
         setProgress(null);
-        store.notify(`Export failed: ${(e as Error).message ?? e}`);
+        store.notify(tr("Export failed: {0}", (e as Error).message ?? e));
         return;
       }
     }
-    store.notify(`Exported ${pages.length} image${pages.length === 1 ? "" : "s"}`);
+    store.notify(tr("Exported {0} image{1}", pages.length, pages.length === 1 ? "" : "s"));
     close();
   }
   return (
-    <Modal title="Export pages as images" onClose={close}>
+    <Modal title={tr("Export pages as images")} onClose={close}>
       <div className="row2">
         <label>
-          Format
+          {tr("Format")}
           <select value={fmt} onChange={(e) => setFmt(e.target.value as "png" | "jpg")} aria-label="Format">
-            <option value="png">PNG</option>
-            <option value="jpg">JPEG</option>
+            <option value="png">{tr("PNG")}</option>
+            <option value="jpg">{tr("JPEG")}</option>
           </select>
         </label>
         <label>
-          Resolution
+          {tr("Resolution")}
           <select value={dpi} onChange={(e) => setDpi(e.target.value)} aria-label="Resolution">
             {[72, 150, 300].map((d) => (
               <option key={d} value={d}>
-                {d} dpi
+                {d} {tr("dpi")}
               </option>
             ))}
           </select>
         </label>
       </div>
       <label>
-        Pages
+        {tr("Pages")}
         <select value={range} onChange={(e) => setRange(e.target.value)} aria-label="Pages">
-          <option value="all">All {count} pages</option>
-          <option value="sel">{app.selection.length > 1 ? `${app.selection.length} selected pages` : `Page ${app.currentPage}`}</option>
+          <option value="all">{tr("All")} {count} {tr("pages")}</option>
+          <option value="sel">{app.selection.length > 1 ? tr("{0} selected pages", app.selection.length) : tr("Page {0}", app.currentPage)}</option>
         </select>
       </label>
       {progress && <p className="muted">{progress}</p>}
       <div className="modal-actions">
         <button onClick={() => void go()} disabled={!!progress}>
-          Export…
+          {tr("Export…")}
         </button>
-        <button onClick={close}>Cancel</button>
+        <button onClick={close}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -627,7 +629,7 @@ export function PrintDialog() {
     setBusy(true);
     try {
       await printDocument(s, new Map(doc.pages.map((p) => [p.page_no, p.rotation])), { pages, paper: pp, landscape });
-      store.notify(`Sent ${pages.length} page${pages.length === 1 ? "" : "s"} to the print panel`);
+      store.notify(tr("Sent {0} page{1} to the print panel", pages.length, pages.length === 1 ? "" : "s"));
       close();
     } finally {
       setBusy(false);
@@ -635,7 +637,7 @@ export function PrintDialog() {
   }
 
   return (
-    <Modal title="Print" onClose={close} wide>
+    <Modal title={tr("Print")} onClose={close} wide>
       <div className="print-layout">
         <div className="print-preview">
           <canvas ref={canvasRef} aria-label="Print preview" />
@@ -644,7 +646,7 @@ export function PrintDialog() {
               ‹
             </button>
             <span>
-              Sheet {Math.min(at + 1, pages.length)} of {pages.length}
+              {tr("Sheet")} {Math.min(at + 1, pages.length)} {tr("of")} {pages.length}
             </span>
             <button onClick={() => setAt((i) => Math.min(pages.length - 1, i + 1))} disabled={at >= pages.length - 1} aria-label="Next sheet">
               ›
@@ -653,7 +655,7 @@ export function PrintDialog() {
         </div>
         <div className="print-options">
           <label>
-            Paper
+            {tr("Paper")}
             <select value={paper} onChange={(e) => setPaper(e.target.value)} aria-label="Paper">
               {PAPERS.map((p) => (
                 <option key={p.name}>{p.name}</option>
@@ -661,34 +663,34 @@ export function PrintDialog() {
             </select>
           </label>
           <label>
-            Orientation
+            {tr("Orientation")}
             <select value={landscape ? "l" : "p"} onChange={(e) => setLandscape(e.target.value === "l")} aria-label="Orientation">
-              <option value="p">Portrait</option>
-              <option value="l">Landscape</option>
+              <option value="p">{tr("Portrait")}</option>
+              <option value="l">{tr("Landscape")}</option>
             </select>
           </label>
           <label>
-            Pages
+            {tr("Pages")}
             <select value={range} onChange={(e) => (setRange(e.target.value), setAt(0))} aria-label="Print range">
-              <option value="all">All ({count})</option>
-              <option value="current">Current page ({app.currentPage})</option>
-              <option value="custom">Pages…</option>
+              <option value="all">{tr("All (")}{count})</option>
+              <option value="current">{tr("Current page (")}{app.currentPage})</option>
+              <option value="custom">{tr("Pages…")}</option>
             </select>
           </label>
           {range === "custom" && (
             <label>
-              Page range (e.g. 1-3, 5)
+              {tr("Page range (e.g. 1-3, 5)")}
               <input value={custom} onChange={(e) => (setCustom(e.target.value), setAt(0))} aria-label="Custom pages" autoFocus />
             </label>
           )}
-          <p className="muted">The macOS print panel opens next — copies, printer, and “Save as PDF” are there.</p>
+          <p className="muted">{tr("The macOS print panel opens next — copies, printer, and “Save as PDF” are there.")}</p>
         </div>
       </div>
       <div className="modal-actions">
         <button onClick={() => void go()} disabled={!pages.length || busy}>
-          {busy ? "Preparing…" : "Print…"}
+          {busy ? tr("Preparing…") : tr("Print…")}
         </button>
-        <button onClick={close}>Cancel</button>
+        <button onClick={close}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -696,19 +698,19 @@ export function PrintDialog() {
 
 export function HelpDialog() {
   return (
-    <Modal title="Stitchup — User Guide" onClose={close} wide>
+    <Modal title={tr("Stitchup — User Guide")} onClose={close} wide>
       <div className="help-body">
-        <h3>Opening and saving</h3>
-        <p>Open a PDF with ⌘O, by dropping it on the window or the Dock icon, or from Finder. ⌘S saves in place (the file is replaced atomically, never half-written); ⌘⇧S saves under a new name. The Save button turns red while there are unsaved changes.</p>
-        <h3>Ribbon</h3>
-        <p><b>Document</b> — new, open, save, properties, import pages, exports (text, CSV, images, RTF, DOCX, ODT), print (with preview; “Save as PDF” is in the macOS print panel). <b>Pages</b> — rotate, delete, add, extract, split, auto-crop. <b>Annotate</b> — highlight, underline, strike-out, notes, text boxes, shapes, stamps, links, pen; Colour and Fill. <b>Content</b> — select, edit text, delete, font, colour, insert image, OCR. <b>Zoom</b>, <b>Navigate</b> — view controls. <b>Security</b> — encrypt, digital Sign, QuickSign, redact, watermark.</p>
-        <h3>QuickSign (handwritten signature)</h3>
-        <p>Security ▸ QuickSign ▸ Create New Signature: choose a JPG, GIF or PNG of your signature. Stitchup trims it and makes the white paper transparent. Keep it for next time if you like, optionally locked with a password (stored encrypted; asked for every time it is used). Then click on the page where it goes, or drag to set its width. Saved signatures are listed under QuickSign; Manage Signatures deletes them.</p>
-        <h3>Editing text</h3>
-        <p>Double-click any line (or Content ▸ Edit Text, then click it). It is edited in place, in the document’s own font when it has the needed letters. A bar above the line shows its font and size: change the font, bold / italic, size or colour there, or with Content ▸ Fore and Font. Enter or clicking away saves; Tab moves to the next line; Esc cancels; clearing the text deletes the line.</p>
-        <h3>Pages sidebar</h3>
-        <p>Drag thumbnails to reorder. ⌘-click and Shift-click select several pages; Rotate, Delete, Extract and Watermark then act on the selection. F8 shows or hides the sidebar.</p>
-        <h3>Keyboard</h3>
+        <h3>{tr("Opening and saving")}</h3>
+        <p>{tr("Open a PDF with ⌘O, by dropping it on the window or the Dock icon, or from Finder. ⌘S saves in place (the file is replaced atomically, never half-written); ⌘⇧S saves under a new name. The Save button turns red while there are unsaved changes.")}</p>
+        <h3>{tr("Ribbon")}</h3>
+        <p><b>{tr("Document")}</b> {tr("— new, open, save, properties, import pages, exports (text, CSV, images, RTF, DOCX, ODT), print (with preview; “Save as PDF” is in the macOS print panel).")} <b>{tr("Pages")}</b> {tr("— rotate, delete, add, extract, split, auto-crop.")} <b>{tr("Annotate")}</b> {tr("— highlight, underline, strike-out, notes, text boxes, shapes, stamps, links, pen; Colour and Fill.")} <b>{tr("Content")}</b> {tr("— select, edit text, delete, font, colour, insert image, OCR.")} <b>{tr("Zoom")}</b>, <b>{tr("Navigate")}</b> {tr("— view controls.")} <b>{tr("Security")}</b> {tr("— encrypt, digital Sign, QuickSign, redact, watermark.")}</p>
+        <h3>{tr("QuickSign (handwritten signature)")}</h3>
+        <p>{tr("Security ▸ QuickSign ▸ Create New Signature: choose a JPG, GIF or PNG of your signature. Stitchup trims it and makes the white paper transparent. Keep it for next time if you like, optionally locked with a password (stored encrypted; asked for every time it is used). Then click on the page where it goes, or drag to set its width. Saved signatures are listed under QuickSign; Manage Signatures deletes them.")}</p>
+        <h3>{tr("Editing text")}</h3>
+        <p>{tr("Double-click any line (or Content ▸ Edit Text, then click it). It is edited in place, in the document’s own font when it has the needed letters. A bar above the line shows its font and size: change the font, bold / italic, size or colour there, or with Content ▸ Fore and Font. Enter or clicking away saves; Tab moves to the next line; Esc cancels; clearing the text deletes the line.")}</p>
+        <h3>{tr("Pages sidebar")}</h3>
+        <p>{tr("Drag thumbnails to reorder. ⌘-click and Shift-click select several pages; Rotate, Delete, Extract and Watermark then act on the selection. F8 shows or hides the sidebar.")}</p>
+        <h3>{tr("Keyboard")}</h3>
         <table className="license-table">
           <tbody>
             {[
@@ -737,7 +739,7 @@ export function HelpDialog() {
       </div>
       <div className="modal-actions">
         <button onClick={close} autoFocus>
-          Close
+          {tr("Close")}
         </button>
       </div>
     </Modal>
@@ -769,7 +771,7 @@ export function AnnotInputDialog() {
     if (p.kind === "link") {
       if (!t) return;
       const page = /^#?\d+$/.test(t) ? Number(t.replace("#", "")) : null;
-      if (page !== null && (page < 1 || page > (app.doc?.pages.length ?? 0))) return store.notify(`No page ${page}`);
+      if (page !== null && (page < 1 || page > (app.doc?.pages.length ?? 0))) return store.notify(tr("No page {0}", page));
       await store.annotate(p.page, page !== null ? { kind: "link", rect: p.rect, page } : { kind: "link", rect: p.rect, uri: t });
     } else if (p.kind === "note") {
       await store.annotate(p.page, { kind: "note", at: [p.rect[0], p.rect[1]], text: t, color: [1, 0.85, 0.2] });
@@ -784,22 +786,22 @@ export function AnnotInputDialog() {
     <Modal title={title} onClose={done}>
       {p.kind === "link" ? (
         <label>
-          Web address, or a page number to jump to
-          <input value={text} onChange={(e) => setText(e.target.value)} placeholder="example.com or 3" autoFocus aria-label="Link target" onKeyDown={(e) => e.key === "Enter" && void ok()} />
+          {tr("Web address, or a page number to jump to")}
+          <input value={text} onChange={(e) => setText(e.target.value)} placeholder={tr("example.com or 3")} autoFocus aria-label="Link target" onKeyDown={(e) => e.key === "Enter" && void ok()} />
         </label>
       ) : (
         <label>
-          {p.kind === "note" ? "Comment" : "Text"}
+          {p.kind === "note" ? tr("Comment") : tr("Text")}
           <textarea className="edit-input" rows={4} value={text} onChange={(e) => setText(e.target.value)} autoFocus aria-label={p.kind === "note" ? "Comment" : "Text"} />
         </label>
       )}
       {p.kind === "textbox" && (
         <label>
-          Size
+          {tr("Size")}
           <select value={size} onChange={(e) => setSize(e.target.value)} aria-label="Text size">
             {[8, 10, 12, 14, 18, 24, 36].map((n) => (
               <option key={n} value={n}>
-                {n} pt
+                {n} {tr("pt")}
               </option>
             ))}
           </select>
@@ -807,9 +809,9 @@ export function AnnotInputDialog() {
       )}
       <div className="modal-actions">
         <button onClick={() => void ok()} disabled={app.busy || (p.kind !== "note" && !text.trim())}>
-          Add
+          {tr("Add")}
         </button>
-        <button onClick={done}>Cancel</button>
+        <button onClick={done}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -839,9 +841,9 @@ async function signNow(spec: SignDetails) {
   if (typeof target !== "string") return;
   try {
     const r = await cmdSign(target, spec);
-    store.notify(`Signed by ${spec.name} → ${r.published_path}`);
+    store.notify(tr("Signed by {0} → {1}", spec.name, r.published_path));
   } catch (e) {
-    store.notify(`Signing failed: ${(e as Error).message ?? e}`);
+    store.notify(tr("Signing failed: {0}", (e as Error).message ?? e));
   }
 }
 
@@ -871,37 +873,36 @@ export function SignDialog() {
     if (visible) {
       pendingSign = details;
       store.setTool("sign");
-      store.notify("Drag the signature box on the page (click for a default size, Esc to cancel)");
+      store.notify(tr("Drag the signature box on the page (click for a default size, Esc to cancel)"));
     } else {
       await signNow({ ...details, page: app.currentPage });
     }
   }
   return (
-    <Modal title="Sign document" onClose={close}>
+    <Modal title={tr("Sign document")} onClose={close}>
       <p className="muted">
-        Adds a digital signature (RSA-2048, SHA-256) and saves a signed copy; this document stays as it is. Stitchup creates a
-        self-signed certificate, so readers will show the signature as valid but from an unverified identity.
+        {tr("Adds a digital signature (RSA-2048, SHA-256) and saves a signed copy; this document stays as it is. Stitchup creates a self-signed certificate, so readers will show the signature as valid but from an unverified identity.")}
       </p>
       <label>
-        Your name
+        {tr("Your name")}
         <input value={name} onChange={(e) => setName(e.target.value)} autoFocus aria-label="Signer name" />
       </label>
       <label>
-        Reason
+        {tr("Reason")}
         <input value={reason} onChange={(e) => setReason(e.target.value)} aria-label="Reason" />
       </label>
       <label>
-        Location (optional)
+        {tr("Location (optional)")}
         <input value={location} onChange={(e) => setLocation(e.target.value)} aria-label="Location" />
       </label>
       <label className="inline-check">
-        <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)} aria-label="Visible signature" /> Show a signature box on the page
+        <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)} aria-label="Visible signature" /> {tr("Show a signature box on the page")}
       </label>
       <div className="modal-actions">
         <button onClick={() => void go()} disabled={!name.trim()}>
-          {visible ? "Place Signature…" : "Sign & Save As…"}
+          {visible ? tr("Place Signature…") : tr("Sign & Save As…")}
         </button>
-        <button onClick={close}>Cancel</button>
+        <button onClick={close}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -917,31 +918,31 @@ export function FontDialog() {
   const [italic, setItalic] = useState(false);
   const [size, setSize] = useState("");
   return (
-    <Modal title="Font and size" onClose={close}>
+    <Modal title={tr("Font and size")} onClose={close}>
       <label>
-        Font
+        {tr("Font")}
         <FontPicker value={family} onPick={setFamily} />
       </label>
       <label className="inline-check">
-        <input type="checkbox" checked={bold} onChange={(e) => setBold(e.target.checked)} /> Bold
+        <input type="checkbox" checked={bold} onChange={(e) => setBold(e.target.checked)} /> {tr("Bold")}
       </label>
       <label className="inline-check">
-        <input type="checkbox" checked={italic} onChange={(e) => setItalic(e.target.checked)} /> Italic
+        <input type="checkbox" checked={italic} onChange={(e) => setItalic(e.target.checked)} /> {tr("Italic")}
       </label>
       <label>
-        Size (pt, empty = keep)
+        {tr("Size (pt, empty = keep)")}
         <input value={size} onChange={(e) => setSize(e.target.value)} inputMode="decimal" aria-label="Font size" />
       </label>
-      <p className="muted">Installed fonts are embedded (only the letters used), so the PDF looks the same on every computer.</p>
+      <p className="muted">{tr("Installed fonts are embedded (only the letters used), so the PDF looks the same on every computer.")}</p>
       <div className="modal-actions">
         <button
           onClick={async () => {
             const n = Number(size);
             if (await store.objectOp({ op: "font", family: fontName(faces, family, bold, italic), size: size.trim() && n > 0 ? n : undefined })) close();
           }}>
-          Apply
+          {tr("Apply")}
         </button>
-        <button onClick={close}>Cancel</button>
+        <button onClick={close}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -953,51 +954,62 @@ export function FontDialog() {
 export function SettingsDialog() {
   const [st, setSt] = useState<Settings>(loadSettings);
   const [scheme, setScheme] = useState<ThemeName>(currentTheme());
+  const [lang, setLang] = useState<Lang>(language());
   function save() {
     saveSettings(st);
     void applyTheme(scheme);
-    store.notify("Settings saved");
+    if (lang !== language()) setLanguage(lang);
+    store.notify(tr("Settings saved"));
     close();
   }
   return (
-    <Modal title="Settings" onClose={close}>
+    <Modal title={tr("Settings")} onClose={close}>
       <label>
-        Crash-recovery snapshots
+        {tr("Language")}
+        <select aria-label="Language" value={lang} onChange={(e) => setLang(e.target.value as Lang)}>
+          {LANGUAGES.map((l) => (
+            <option key={l.code} value={l.code}>
+              {l.name}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label>
+        {tr("Crash-recovery snapshots")}
         <select aria-label="Crash-recovery snapshots" value={st.recoverySeconds} onChange={(e) => setSt({ ...st, recoverySeconds: Number(e.target.value) })}>
-          <option value={0}>Off</option>
-          <option value={30}>Every 30 seconds</option>
-          <option value={60}>Every minute</option>
-          <option value={300}>Every 5 minutes</option>
+          <option value={0}>{tr("Off")}</option>
+          <option value={30}>{tr("Every 30 seconds")}</option>
+          <option value={60}>{tr("Every minute")}</option>
+          <option value={300}>{tr("Every 5 minutes")}</option>
         </select>
       </label>
       <p className="muted">
-        Unsaved documents are copied into Stitchup’s private folder (never over your files) and offered back if Stitchup quits
-        unexpectedly. Your own files are only written when you save.
+        {tr("Unsaved documents are copied into Stitchup’s private folder (never over your files) and offered back if Stitchup quits unexpectedly. Your own files are only written when you save.")}
       </p>
       <label>
-        When a document opens
+        {tr("When a document opens")}
         <select aria-label="Opening zoom" value={st.openZoom} onChange={(e) => setSt({ ...st, openZoom: e.target.value as Settings["openZoom"] })}>
-          <option value="fit-width">Fit width</option>
-          <option value="fit-page">Fit page</option>
+          <option value="fit-width">{tr("Fit width")}</option>
+          <option value="fit-page">{tr("Fit page")}</option>
           <option value="actual">100%</option>
         </select>
       </label>
       <label className="inline-check">
-        <input type="checkbox" checked={st.sidebarOnOpen} onChange={(e) => setSt({ ...st, sidebarOnOpen: e.target.checked })} /> Show the page sidebar
+        <input type="checkbox" checked={st.sidebarOnOpen} onChange={(e) => setSt({ ...st, sidebarOnOpen: e.target.checked })} /> {tr("Show the page sidebar")}
       </label>
       <label>
-        Colour scheme
+        {tr("Colour scheme")}
         <select aria-label="Colour scheme" value={scheme} onChange={(e) => setScheme(e.target.value as ThemeName)}>
           {THEMES.map((t) => (
             <option key={t.name} value={t.name}>
-              {t.label}
+              {tr(t.label)}
             </option>
           ))}
         </select>
       </label>
       <div className="modal-actions">
-        <button onClick={save}>Save</button>
-        <button onClick={close}>Cancel</button>
+        <button onClick={save}>{tr("Save")}</button>
+        <button onClick={close}>{tr("Cancel")}</button>
       </div>
     </Modal>
   );
@@ -1017,8 +1029,8 @@ export function RecoveryDialog({ entries, onDone }: { entries: RecoveryEntry[]; 
     onDone();
   }
   return (
-    <Modal title="Recover unsaved documents?" onClose={onDone}>
-      <p>Stitchup didn’t close properly last time. These documents had unsaved changes:</p>
+    <Modal title={tr("Recover unsaved documents?")} onClose={onDone}>
+      <p>{tr("Stitchup didn’t close properly last time. These documents had unsaved changes:")}</p>
       <ul className="recovery-list">
         {entries.map((e) => (
           <li key={e.file}>
@@ -1027,13 +1039,13 @@ export function RecoveryDialog({ entries, onDone }: { entries: RecoveryEntry[]; 
           </li>
         ))}
       </ul>
-      <p className="muted">Recovered documents open as new, unsaved documents; use Save As to keep them.</p>
+      <p className="muted">{tr("Recovered documents open as new, unsaved documents; use Save As to keep them.")}</p>
       <div className="modal-actions">
         <button onClick={() => void restoreAll()} disabled={busy} autoFocus>
-          Recover
+          {tr("Recover")}
         </button>
         <button onClick={() => void discard()} disabled={busy}>
-          Discard
+          {tr("Discard")}
         </button>
       </div>
     </Modal>
@@ -1068,30 +1080,66 @@ export function CompressDialog() {
       const kb = (n: number) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
       const pct = r.before > 0 ? Math.round((1 - r.after / r.before) * 100) : 0;
       const imgs = r.images?.images ? ` · ${r.images.images} image${r.images.images > 1 ? "s" : ""} downsampled` : "";
-      store.notify(`Compressed: ${kb(r.before)} → ${kb(r.after)} (${pct}% smaller)${imgs}`);
+      store.notify(tr("Compressed: {0} → {1} ({2}% smaller){3}", kb(r.before), kb(r.after), pct, imgs));
       close();
     } catch (e) {
-      store.notify(`Compress failed: ${(e as { message?: string }).message ?? e}`);
+      store.notify(tr("Compress failed: {0}", (e as { message?: string }).message ?? e));
     } finally {
       setBusy(false);
     }
   }
   return (
-    <Modal title="Compress PDF" onClose={close}>
-      <p className="muted">Saves a smaller copy; the open document is not changed. Unused data is removed and everything is recompressed.</p>
+    <Modal title={tr("Compress PDF")} onClose={close}>
+      <p className="muted">{tr("Saves a smaller copy; the open document is not changed. Unused data is removed and everything is recompressed.")}</p>
       <div role="radiogroup" aria-label="Compression level" className="compress-levels">
         {COMPRESS_LEVELS.map((l) => (
           <label key={l.id} className="inline-check">
-            <input type="radio" name="compress-level" checked={level === l.id} onChange={() => setLevel(l.id)} /> {l.label}
+            <input type="radio" name="compress-level" checked={level === l.id} onChange={() => setLevel(l.id)} /> {tr(l.label)}
           </label>
         ))}
       </div>
-      <p className="muted">Only images shown at a higher resolution than this are made smaller; text and drawings stay sharp.</p>
+      <p className="muted">{tr("Only images shown at a higher resolution than this are made smaller; text and drawings stay sharp.")}</p>
       <div className="modal-actions">
         <button onClick={() => void go()} disabled={busy}>
-          {busy ? "Compressing…" : "Save Copy…"}
+          {busy ? tr("Compressing…") : tr("Save Copy…")}
         </button>
-        <button onClick={close}>Cancel</button>
+        <button onClick={close}>{tr("Cancel")}</button>
+      </div>
+    </Modal>
+  );
+}
+
+
+// ---------------------------------------------------------- first launch
+
+const RISK_KEY = "stitchup.riskAccepted";
+
+export function riskAccepted(): boolean {
+  try {
+    return localStorage.getItem(RISK_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+/** Shown once: Stitchup is experimental — use at your own risk. */
+export function RiskNotice({ onDone }: { onDone: () => void }) {
+  return (
+    <Modal title={tr("Experimental software")} onClose={() => {}}>
+      <p>{tr("Stitchup is an experimental PDF editor, made for its author’s own needs and shared as open source. Use it at your own risk: keep backups of important documents and check the results before you rely on them. There is no warranty of any kind.")}</p>
+      <div className="modal-actions">
+        <button
+          autoFocus
+          onClick={() => {
+            try {
+              localStorage.setItem(RISK_KEY, "1");
+            } catch {
+              /* shown again next time */
+            }
+            onDone();
+          }}>
+          {tr("I understand")}
+        </button>
       </div>
     </Modal>
   );

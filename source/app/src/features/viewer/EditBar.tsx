@@ -8,6 +8,8 @@ import type { TextRun } from "../../types";
 import { ColorPalette } from "../common/ColorPalette";
 import { FontPicker, STANDARD, familyOf, fontName, useSystemFonts, type FontChoice } from "../common/FontPicker";
 
+import { tr } from "../../i18n";
+
 export { std14Name } from "../common/FontPicker";
 
 /** PDF box around a run's baseline (for finding its content objects). */
@@ -80,8 +82,8 @@ export function EditBar({ run, page, zoom }: { run: TextRun; page: number; zoom:
       style={{ left: Math.max(0, run.rect.x * zoom - 2), top: top < 0 ? (run.rect.y + run.rect.height) * zoom + 6 : top }}
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}>
-      <span className="edit-bar-font" title="The line's font in the PDF">
-        {info ? `${info.font || "Unknown font"} · ${info.size} pt` : "…"}
+      <span className="edit-bar-font" title={tr("The line's font in the PDF")}>
+        {info ? tr("{0} · {1} pt", info.font || "Unknown font", info.size) : "…"}
       </span>
       <FontPicker
         value={family}
@@ -96,7 +98,7 @@ export function EditBar({ run, page, zoom }: { run: TextRun; page: number; zoom:
         className={`edit-bar-toggle${bold ? " on" : ""}`}
         aria-pressed={bold}
         aria-label="Bold"
-        title="Bold"
+        title={tr("Bold")}
         onMouseDown={keepFocus}
         onClick={() => {
           setBold(!bold);
@@ -109,7 +111,7 @@ export function EditBar({ run, page, zoom }: { run: TextRun; page: number; zoom:
         className={`edit-bar-toggle${italic ? " on" : ""}`}
         aria-pressed={italic}
         aria-label="Italic"
-        title="Italic"
+        title={tr("Italic")}
         onMouseDown={keepFocus}
         onClick={() => {
           setItalic(!italic);
@@ -128,15 +130,15 @@ export function EditBar({ run, page, zoom }: { run: TextRun; page: number; zoom:
           if (e.key === "Enter" && sizeOk) apply({ op: "font", family: fontName(faces, family, bold, italic), size: sizeNum });
         }}
       />
-      <span className="edit-bar-unit">pt</span>
+      <span className="edit-bar-unit">{tr("pt")}</span>
       <span className="edit-bar-color">
-        <button type="button" aria-label="Text colour" title="Text colour" aria-haspopup="menu" aria-expanded={palette} onMouseDown={keepFocus} onClick={() => setPalette(!palette)}>
+        <button type="button" aria-label="Text colour" title={tr("Text colour")} aria-haspopup="menu" aria-expanded={palette} onMouseDown={keepFocus} onClick={() => setPalette(!palette)}>
           <span className="rb-swatch" style={{ background: info?.color ?? "#000" }} />▾
         </button>
         {palette && (
           <div className="rb-choices rb-palette">
             <ColorPalette
-              label="Text colour"
+              label={tr("Text colour")}
               value={info?.color ?? null}
               onPick={(c) => {
                 setPalette(false);

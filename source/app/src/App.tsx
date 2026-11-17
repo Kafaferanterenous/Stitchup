@@ -4,6 +4,7 @@ import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { useAppState, store, docName, getState } from "./store";
 import { COMMANDS, matchesKey, runCommand } from "./commands";
 import { installMenu, nativeMenuActive } from "./menu";
+import { onLanguageChange } from "./i18n";
 import { applyTheme, type ThemeName } from "./themes/theme";
 import { cmdClearRecovery, cmdListRecovery, cmdSaveRecovery, cmdTakePendingOpen, type RecoveryEntry } from "./ipc";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -21,6 +22,8 @@ import {
   AnnotInputDialog,
   RecoveryDialog,
   SettingsDialog,
+  RiskNotice,
+  riskAccepted,
   CompressDialog,
   FontDialog,
   SignDialog,
@@ -35,6 +38,8 @@ import {
   SplitDialog,
   WatermarkDialog,
 } from "./features/common/Dialogs";
+
+import { tr } from "./i18n";
 
 /** True while the user is typing in a field (shortcuts must not steal keys). */
 function typing(e: KeyboardEvent): boolean {
@@ -54,6 +59,7 @@ export default function App() {
   const app = useAppState();
   const [dropping, setDropping] = useState(false);
   const [recovered, setRecovered] = useState<RecoveryEntry[] | null>(null);
+  const [risk, setRisk] = useState(!riskAccepted());
 
   // QuickSign: the saved signatures (names, lock state, previews).
   useEffect(() => {
@@ -93,7 +99,7 @@ export default function App() {
     try {
       getCurrentWindow()
         .onCloseRequested(async (e) => {
-          if (!(await store.confirmDiscard("Close Stitchup"))) {
+          if (!(await store.confirmDiscard(tr("Close Stitchup")))) {
             e.preventDefault();
             return;
           }
@@ -109,6 +115,7 @@ export default function App() {
   // Native menu + files handed to us by Finder / the Dock / the command line.
   useEffect(() => {
     void installMenu();
+    const off = onLanguageChange(() => void installMenu());
     const openFirst = (paths: string[]) => {
       const pdf = paths.find((p) => p.toLowerCase().endsWith(".pdf"));
       if (pdf) void store.open(pdf);
@@ -132,7 +139,10 @@ export default function App() {
     } catch {
       /* not inside Tauri */
     }
-    return () => unlisten.forEach((u) => void u.then((f) => f()));
+    return () => {
+      off();
+      unlisten.forEach((u) => void u.then((f) => f()));
+    };
   }, []);
 
   // Keyboard: every command's accelerator (when no native menu handles it)
@@ -176,7 +186,7 @@ export default function App() {
   // Window title like the Windows build: "name * — Stitchup".
   const dirty = store.isDirty();
   useEffect(() => {
-    document.title = app.doc ? `${docName(app.doc)}${dirty ? " *" : ""} — Stitchup` : "Stitchup PDF Editor";
+    document.title = app.doc ? `${docName(app.doc)}${dirty ? " *" : ""} — Stitchup` : tr("Stitchup PDF Editor");
   }, [app.doc, dirty]);
 
   const warnings = app.doc?.warnings.filter((w) => !/password-protected/.test(w)) ?? [];
@@ -195,26 +205,26 @@ export default function App() {
             <PageTree />
           </aside>
         )}
-        {dropping && <div className="drop-overlay">Drop a PDF to open it</div>}
+        {dropping && <div className="drop-overlay">{tr("Drop a PDF to open it")}</div>}
       </main>
       <footer className="status-bar" role="status">
-        <span className="status-name">{app.doc ? `${docName(app.doc)}${dirty ? " *" : ""}` : "Stitchup PDF Editor"}</span>
+        <span className="status-name">{app.doc ? `${docName(app.doc)}${dirty ? " *" : ""}` : tr("Stitchup PDF Editor")}</span>
         <span className="status-msg">{app.statusMessage}</span>
         <span className="status-right">
           {warnings.length > 0 && (
             <button className="status-warn" title={warnings.join("\n")} onClick={() => store.setMetadataOpen(true)}>
-              ⚠ {warnings.length} warning{warnings.length > 1 ? "s" : ""}
+              ⚠ {warnings.length} {tr("warning")}{warnings.length > 1 ? "s" : ""}
             </button>
           )}
           {app.doc && app.doc.passwordRequired && (
             <button className="status-warn" onClick={() => store.setUnlockOpen(true)}>
-              🔒 password required — unlock
+              {tr("🔒 password required — unlock")}
             </button>
           )}
-          {app.doc && app.doc.encrypted && !app.doc.passwordRequired && <span>unlocked</span>}
-          {sel > 1 && <span>{sel} pages selected</span>}
-          <span>{app.doc && !app.doc.passwordRequired ? `Page ${app.currentPage} of ${app.doc.pages.length}` : "No document"}</span>
-          <span>Zoom {Math.round(app.zoom * 100)}%</span>
+          {app.doc && app.doc.encrypted && !app.doc.passwordRequired && <span>{tr("unlocked")}</span>}
+          {sel > 1 && <span>{sel} {tr("pages selected")}</span>}
+          <span>{app.doc && !app.doc.passwordRequired ? tr("Page {0} of {1}", app.currentPage, app.doc.pages.length) : tr("No document")}</span>
+          <span>{tr("Zoom")} {Math.round(app.zoom * 100)}%</span>
         </span>
       </footer>
       <PropertiesDialog />
@@ -237,7 +247,8 @@ export default function App() {
       {app.dialog === "quickSignNew" && <QuickSignNewDialog />}
       {app.dialog === "quickSignUnlock" && <QuickSignUnlockDialog />}
       {app.dialog === "quickSignManage" && <QuickSignManageDialog />}
-      {recovered && <RecoveryDialog entries={recovered} onDone={() => setRecovered(null)} />}
+      {recovered && !risk && <RecoveryDialog entries={recovered} onDone={() => setRecovered(null)} />}
+      {risk && <RiskNotice onDone={() => setRisk(false)} />}
       <PasswordDialog />
       <MessageBox />
       {app.notice && (

@@ -1707,3 +1707,10 @@ kbd {
 .qs-pad-tools button {
   margin-left: auto;
 }
+
+.risk-note {
+  padding: 8px 10px;
+  border-left: 3px solid #f5a623;
+  background: color-mix(in srgb, #f5a623 10%, transparent);
+  font-size: 13px;
+}

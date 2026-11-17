@@ -1,5 +1,11 @@
 # Stitchup for macOS
 
+> **⚠ Experimental — use at your own risk.** Stitchup is a PDF editor made for
+> its author's own needs and shared as open source in case it is useful to
+> someone else. It has automated tests, but it is not a finished product: keep
+> backups of important documents and check the results before relying on them.
+> There is no warranty of any kind (see the licence).
+
 An offline PDF viewer and editor for macOS (Apple Silicon and Intel). Same
 ribbon, menus and colour schemes as the Windows build
 ([stitchup-Win](https://github.com/Kafaferanterenous/stitchup-Win)).
@@ -81,11 +87,18 @@ Progress against the Windows build: [GOALS.md](GOALS.md).
 
 ## Windows and Linux
 
-The same code base targets Windows and Linux (Tauri). The engine and app
-compile for Windows; installers are built by the manual GitHub Actions
-workflow **Windows & Linux builds** (Windows: NSIS / MSI, Linux: deb /
-AppImage). These builds are not yet tested on real machines, and OCR is
-macOS-only for now.
+The same app is built for Windows (installer `.exe` or `.msi`) and Linux
+(`.deb` or `.AppImage`) by the GitHub Actions workflow **Windows & Linux
+builds**; the files are attached to each release. They are new and less
+tested than the Mac version. Not on Windows / Linux yet: OCR (macOS uses Apple
+Vision). The apps are not code-signed: Windows SmartScreen may warn before
+the first start ("More info" ▸ "Run anyway"); on Linux make the AppImage
+executable (`chmod +x`).
+
+## Languages
+
+English, Polski, Italiano, Deutsch, Français and 中文（简体）: File ▸ Settings
+(⌘,) ▸ Language. The first start follows the system language.
 
 ## Build
 
@@ -102,7 +115,7 @@ Tests:
 |---|---|
 | `cd source/core && cargo test --release` | PDF engine: text editing, annotations, redaction, forms, signatures (checked with OpenSSL), page tree |
 | `cd source/app/src-tauri && cargo test --release` | Command layer |
-| `cd source/app && npm run build && npm run test:e2e` | 78 end-to-end checks: the real UI in Chromium driving the real Rust backend, with every ribbon tab, dialog and shortcut |
+| `cd source/app && npm run build && npm run test:e2e` | 79 end-to-end checks: the real UI in Chromium driving the real Rust backend, with every ribbon tab, dialog and shortcut |
 
 ## Layout
 

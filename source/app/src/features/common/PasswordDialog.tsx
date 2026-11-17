@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useAppState, store } from "../../store";
 
+import { tr } from "../../i18n";
+
 /** Password prompt for a protected document (A-c6). */
 export function PasswordDialog() {
   const app = useAppState();
@@ -26,12 +28,12 @@ export function PasswordDialog() {
   return (
     <div className="modal-backdrop">
       <form className="modal" role="dialog" aria-modal="true" aria-label="unlock document" onSubmit={submit}>
-        <h2>Password required</h2>
+        <h2>{tr("Password required")}</h2>
         <p className="muted">
-          This PDF is encrypted. Enter its password to load the page tree.
+          {tr("This PDF is encrypted. Enter its password to load the page tree.")}
         </p>
         <label>
-          Password
+          {tr("Password")}
           <input
             ref={inputRef}
             type="password"
@@ -42,10 +44,10 @@ export function PasswordDialog() {
         </label>
         <div className="modal-actions">
           <button type="submit" disabled={app.busy || password.length === 0}>
-            Unlock
+            {tr("Unlock")}
           </button>
           <button type="button" onClick={() => store.setUnlockOpen(false)}>
-            Cancel
+            {tr("Cancel")}
           </button>
         </div>
       </form>

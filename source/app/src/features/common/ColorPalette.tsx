@@ -4,6 +4,8 @@
 
 import { useState } from "react";
 
+import { tr } from "../../i18n";
+
 export const PALETTE = [
   "#000000", "#434343", "#666666", "#999999", "#cccccc", "#ffffff",
   "#d0021b", "#e8590c", "#f5a623", "#ffeb3b", "#7ed321", "#1a7f37",
@@ -65,7 +67,7 @@ export function ColorPalette({
           }}
         />
         <button type="button" disabled={!valid} onMouseDown={keepFocus} onClick={() => onPick(hex.toLowerCase())}>
-          Use
+          {tr("Use")}
         </button>
       </div>
     </div>

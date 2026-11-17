@@ -14,6 +14,9 @@ import type { RenderSession } from "../../adapters/renderAdapter";
 import type { TextRun } from "../../types";
 import { cmdListFields, cmdListObjects, cmdOpenUrl, type FormField, type PageObject } from "../../ipc";
 
+import { STAMPS } from "../../commands";
+import { tr } from "../../i18n";
+
 interface PdfAnnot {
   obj: number | null;
   subtype: string;
@@ -158,7 +161,7 @@ export function PageOverlay({
       case "underline":
       case "strikeout": {
         const boxes = markupBoxes(box).map(pdfRect);
-        if (!boxes.length) return store.notify("Drag across some text");
+        if (!boxes.length) return store.notify(tr("Drag across some text"));
         const kind = t === "strikeout" ? "strike_out" : t;
         void store.annotate(page, { kind, boxes, color: rgb(annotColor(app, t === "highlight" ? "highlight" : "other")) });
         return;
@@ -200,7 +203,7 @@ export function PageOverlay({
         return;
       }
       case "redact":
-        if (click) return store.notify("Drag over the area to redact");
+        if (click) return store.notify(tr("Drag over the area to redact"));
         void store.redact(page, pr);
         return;
       case "shape-rect":
@@ -337,7 +340,7 @@ export function PageOverlay({
   async function followLink(a: PdfAnnot) {
     if (a.url) {
       await cmdOpenUrl(a.url).catch(() => window.open(a.url, "_blank"));
-      store.notify(`Opening ${a.url}`);
+      store.notify(tr("Opening {0}", a.url));
       return;
     }
     try {
@@ -390,7 +393,7 @@ export function PageOverlay({
         <div className="note-popup" style={{ left: viewBox(note.rect)[2] + 6, top: viewBox(note.rect)[1] }} role="dialog" aria-label="Note">
           <div>{note.contents || "(empty note)"}</div>
           <button type="button" onClick={() => setNote(null)}>
-            Close
+            {tr("Close")}
           </button>
         </div>
       )}
@@ -454,9 +457,12 @@ export function PageOverlay({
 
 /** Stamp colours: green for positive, red for negative, blue otherwise. */
 export function stampColor(label: string): number[] {
-  const l = label.toLowerCase();
-  if (/approved|paid|final|received|completed|accepted/.test(l)) return [0.1, 0.55, 0.2];
+  // A translated stamp keeps the colour of its English original.
+  const en = STAMPS.find((s) => s === label || tr(s) === label) ?? label;
+  const l = en.toLowerCase();
+  // Red first: "not approved" must not match "approved".
   if (/rejected|void|draft|confidential|not approved|urgent/.test(l)) return [0.8, 0.1, 0.1];
+  if (/approved|paid|final|received|completed|accepted/.test(l)) return [0.1, 0.55, 0.2];
   return [0.1, 0.3, 0.75];
 }
 

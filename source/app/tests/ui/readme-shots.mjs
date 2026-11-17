@@ -66,6 +66,7 @@ const ipc = async (cmd, args = {}) => {
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1360, height: 860 }, deviceScaleFactor: 2 });
 await page.addInitScript(() => {
+  localStorage.setItem("stitchup.riskAccepted", "1");
   window.__dialog = [];
   window.__TAURI_INTERNALS__ = {
     async invoke(cmd, args) {

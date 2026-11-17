@@ -19,6 +19,8 @@ import { Icon } from "../ribbon/icons";
 import { useAppState, store } from "../../store";
 import { renderPage, type RenderSession } from "../../adapters/renderAdapter";
 
+import { tr } from "../../i18n";
+
 /**
  * Live page preview: renders the page through the SAME pdf.js session as the
  * viewer (shared via the store) so nothing is parsed twice. The canvas is only
@@ -224,7 +226,7 @@ function PagesContent() {
     store.goToPage(pageNo);
   }
 
-  if (!app.doc) return <div className="pages-empty">No pages</div>;
+  if (!app.doc) return <div className="pages-empty">{tr("No pages")}</div>;
 
   const locked = app.doc.passwordRequired || app.busy;
   const targets = sel.length ? sel : [app.currentPage];
@@ -257,7 +259,7 @@ function PagesContent() {
           <Icon name="extract" size={16} />
         </button>
         {sel.length > 1 && (
-          <button onClick={() => setSel([])} title="Clear selection" className="pages-sel">
+          <button onClick={() => setSel([])} title={tr("Clear selection")} className="pages-sel">
             {sel.length} ✓
           </button>
         )}
@@ -273,7 +275,7 @@ function PagesContent() {
           </div>
         </SortableContext>
       </DndContext>
-      <div className="pages-hint">Drag to reorder · ⌘/Shift-click to select · ☆ to bookmark</div>
+      <div className="pages-hint">{tr("Drag to reorder · ⌘/Shift-click to select · ☆ to bookmark")}</div>
     </>
   );
 }
@@ -285,20 +287,20 @@ function BookmarksContent() {
   return (
     <>
       <div className="pages-tools">
-        <button onClick={() => void store.addBookmark()} title="Add the current page">
-          ＋ Page {app.currentPage}
+        <button onClick={() => void store.addBookmark()} title={tr("Add the current page")}>
+          {tr("＋ Page")} {app.currentPage}
         </button>
         <button
           onClick={() => void store.clearBookmarks()}
           disabled={bookmarks.length === 0}
-          title="Remove all bookmarks">
-          Clear
+          title={tr("Remove all bookmarks")}>
+          {tr("Clear")}
         </button>
       </div>
       <div className="thumb-list">
         {bookmarks.length === 0 && (
           <div className="pages-empty">
-            No bookmarks yet — click ⭐ on a thumbnail to bookmark a page.
+            {tr("No bookmarks yet — click ⭐ on a thumbnail to bookmark a page.")}
           </div>
         )}
         {bookmarks.map((n) => {
@@ -316,19 +318,19 @@ function BookmarksContent() {
                 </span>
               )}
               <button className="bm-jump" onClick={() => store.goToPage(n)} title={`Go to page ${n}`}>
-                Page {n}
+                {tr("Page")} {n}
               </button>
               <button
                 className="bm-del"
                 onClick={() => void store.removeBookmark(n)}
-                title="Remove bookmark">
+                title={tr("Remove bookmark")}>
                 ✕
               </button>
             </div>
           );
         })}
       </div>
-      <div className="pages-hint">Bookmarks live in this session only (never written to the PDF)</div>
+      <div className="pages-hint">{tr("Bookmarks live in this session only (never written to the PDF)")}</div>
     </>
   );
 }
@@ -346,16 +348,16 @@ export function PageTree() {
           aria-selected={tab === "pages"}
           className={`pane-tab${tab === "pages" ? " active" : ""}`}
           onClick={() => store.setPaneTab("pages")}>
-          Pages
+          {tr("Pages")}
         </button>
         <button
           role="tab"
           aria-selected={tab === "bookmarks"}
           className={`pane-tab${tab === "bookmarks" ? " active" : ""}`}
           onClick={() => store.setPaneTab("bookmarks")}>
-          Bookmarks{count > 0 ? ` (${count})` : ""}
+          {tr("Bookmarks")}{count > 0 ? ` (${count})` : ""}
         </button>
-        <button className="pane-close" onClick={() => store.setPaneOpen(false)} title="Close the sidebar (F8 shows it again)" aria-label="Close sidebar">
+        <button className="pane-close" onClick={() => store.setPaneOpen(false)} title={tr("Close the sidebar (F8 shows it again)")} aria-label="Close sidebar">
           ×
         </button>
       </div>

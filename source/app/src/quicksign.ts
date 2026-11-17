@@ -5,6 +5,8 @@
 
 import { toBase64 } from "./export";
 
+import { tr } from "./i18n";
+
 export interface PreparedSignature {
   /** PNG (base64) — what is stored. */
   png: string;
@@ -21,7 +23,7 @@ function fromB64(b64: string): Uint8Array {
 }
 
 async function canvasPng(c: HTMLCanvasElement): Promise<string> {
-  const blob: Blob = await new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error("encode failed"))), "image/png"));
+  const blob: Blob = await new Promise((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error(tr("encode failed")))), "image/png"));
   return toBase64(new Uint8Array(await blob.arrayBuffer()));
 }
 
@@ -63,7 +65,7 @@ export async function prepareSignature(fileB64: string, removeWhite: boolean): P
       }
     }
   }
-  if (x1 < 0) throw new Error("the image looks empty — nothing darker than the paper was found");
+  if (x1 < 0) throw new Error(tr("the image looks empty — nothing darker than the paper was found"));
   const pad = Math.round(Math.max(w, h) * 0.01) + 2;
   x0 = Math.max(0, x0 - pad);
   y0 = Math.max(0, y0 - pad);

@@ -1,0 +1,582 @@
+0| (demnächst)
+1|Über
+2|Über Stitchup
+3|Hinzufügen
+4|Leere Seite danach einfügen
+5|Seite hinzufügen
+6|Seite hinzufügen…
+7|Eine leere Seite nach der aktuellen Seite einfügen
+8|Eine digitale Signatur hinzufügen und eine signierte Kopie speichern
+9|Leere Seite hinzufügen
+10|Aktuelle Seite hinzufügen
+11|Die Seiten eines oder mehrerer anderer PDFs am Ende dieses Dokuments anfügen
+12|{0} auf Seite {1} hinzugefügt
+13|Fügt eine digitale Signatur hinzu (RSA-2048, SHA-256) und speichert eine signierte Kopie; dieses Dokument bleibt unverändert. Stitchup erstellt ein selbstsigniertes Zertifikat, daher zeigen Reader die Signatur als gültig, aber von einer nicht bestätigten Identität an.
+14|Nach Seite
+15|Alle
+16|Alle (
+17|Alle Seiten
+18|Alle Seiten
+19|Alle Seiten in einer durchgehenden Spalte
+20|Kommentieren
+21|Kommentarfarbe…
+22|Kommentarfarbe {0} — für die nächste Hervorhebung, Unterstreichung, Durchstreichung, Stiftzeichnung, Form oder das nächste Textfeld (Kommentare auswählen, um sie umzufärben)
+23|Kommentarfarben auf Standard zurückgesetzt
+24|Anwenden
+25|Genehmigt
+26|Für später genehmigt, noch nicht verwendet:
+27|Pfeil: vom Anfang zur Spitze ziehen
+28|Am Ende
+29|Anhänge
+30|Auto-Zuschnitt
+31|Ausgewählte Seite(n) automatisch zuschneiden
+32|Schwarz
+33|Schwarze Tinte
+34|Blau
+35|Blaue Tinte
+36|Fett
+37|Lesezeichen
+38|Lesezeichen gelten nur in dieser Sitzung (werden nie ins PDF geschrieben)
+39|CSV…
+40|Abbrechen
+41|Mitte (diagonal)
+42|Schriftart und -größe des ausgewählten Texts oder der bearbeiteten Zeile ändern
+43|Änderungen gelten beim nächsten „Speichern unter“ (die Originaldatei wird nie verändert).
+44|1 bis {0} wählen
+45|Anderes Bild wählen…
+46|Ordner wählen…
+47|Bild wählen…
+48|Wählen Sie ein Foto oder einen Scan Ihrer handschriftlichen Unterschrift (JPG, GIF oder PNG). Am besten mit dunklem Stift auf weißem Papier unterschreiben.
+49|Stempel wählen, dann auf der Seite klicken oder ziehen
+50|Löschen
+51|Auswahl aufheben
+52|Eine Textzeile anklicken, um sie direkt in ihrer eigenen Schrift zu bearbeiten (oder einfach doppelklicken)
+53|Auf der Seite klicken oder ziehen, um {0} zu platzieren
+54|Text, Bilder oder Kommentare anklicken, um sie auszuwählen (⌘-Klick fügt hinzu, Rahmen ziehen für mehrere); ziehen zum Verschieben; ⌫ löscht
+55|Klicken, um eine Haftnotiz anzuheften
+56|Schließen
+57|Tab schließen
+58|Tab schließen
+59|Tab schließen (⌘W)
+60|Seitenleiste schließen (F8 zeigt sie wieder)
+61|Diesen Tab schließen (⌘W)
+62|Farbe
+63|Farbschema
+64|Farbe für neue Kommentare: Hervorhebung, Unterstreichung, Durchstreichung, Stift, Formen und Textfelder
+65|Farbschema
+66|Kombinieren
+67|In neues Dokument kombinieren…
+68|Mehrere PDFs zu einem neuen Dokument kombinieren
+69|Kommentar
+70|Komponente
+71|Komprimieren
+72|PDF komprimieren
+73|PDF komprimieren…
+74|Komprimieren fehlgeschlagen: {0}
+75|Komprimiert: {0} → {1} ({2} % kleiner){3}
+76|Wird komprimiert…
+77|Vertraulich
+78|Passwort bestätigen
+79|Inhalt
+80|Fortlaufend
+81|Fortlaufend scrollen
+82|{0} Zeichen kopiert
+83|Kopieren
+84|Zeile kopieren
+85|Kopieren fehlgeschlagen
+86|Ausgewählten Text kopieren (⌘C)
+87|Dieses Bild konnte nicht gelesen werden: {0}
+88|Speichern nicht möglich: {0}
+89|Unterschrift konnte nicht verwendet werden: {0}
+90|Absturzwiederherstellung, Zoom beim Öffnen, Seitenleiste (⌘,)
+91|Wiederherstellungs-Schnappschüsse
+92|Erstellt
+93|Neue Unterschrift erstellen
+94|Neue Unterschrift erstellen…
+95|Ein neues leeres Dokument erstellen (⌘N)
+96|Erstellt mit
+97|{0} Seite(n) zugeschnitten
+98|Aktuelle Seite (
+99|Eigener…
+100|DOCX
+101|DOCX…
+102|Dunkelblau
+103|Dunkelmodus
+104|Dunkles Marineblau
+105|Löschen
+106|Seite löschen
+107|Seite(n) löschen
+108|Ausgewähltes Objekt löschen
+109|Aktuelle Seite(n) löschen (⌫)
+110|{0} Objekt(e) gelöscht
+111|Löschen…
+112|Beschreibung
+113|Verwerfen
+114|Schließen
+115|Dokument
+116|Dokumenteigenschaften…
+117|Dokumenteigenschaften
+118|Doppelklicken Sie auf eine Zeile (oder Inhalt ▸ Text bearbeiten und dann anklicken). Sie wird direkt bearbeitet, in der Schrift des Dokuments, wenn diese die nötigen Buchstaben hat. Eine Leiste über der Zeile zeigt Schriftart und -größe: Ändern Sie dort Schrift, fett / kursiv, Größe oder Farbe, oder mit Inhalt ▸ Farbe und Schrift. Eingabetaste oder Wegklicken speichert; Tab geht zur nächsten Zeile; Esc bricht ab; Leeren des Texts löscht die Zeile.
+119|Entwurf
+120|Rahmen ziehen, dann Text eingeben
+121|Über Text ziehen
+122|Über Text ziehen, um ihn hervorzuheben
+123|Über Text ziehen, um ihn durchzustreichen (Kommentarfarbe)
+124|Über Text ziehen, um ihn zu unterstreichen (Kommentarfarbe)
+125|Über Inhalte ziehen, um sie dauerhaft zu entfernen und zu schwärzen
+126|Über den zu schwärzenden Bereich ziehen
+127|Den anklickbaren Bereich ziehen, dann eine Webadresse oder Seitenzahl angeben
+128|Das Unterschriftenfeld auf der Seite ziehen (Klick für Standardgröße, Esc bricht ab)
+129|Miniaturen ziehen, um die Reihenfolge zu ändern. ⌘-Klick und Umschalt-Klick wählen mehrere Seiten; Drehen, Löschen, Extrahieren und Wasserzeichen wirken dann auf die Auswahl. F8 blendet die Seitenleiste ein oder aus.
+130|Ziehen zum Sortieren · ⌘/Umschalt-Klick zum Auswählen · ☆ als Lesezeichen
+131|Zeichnen
+132|Rechteck, Oval, Linie oder Pfeil zeichnen (Umriss in Kommentarfarbe, Füllung)
+133|Freihandlinien auf der Seite zeichnen (Kommentarfarbe)
+134|PDF hier ablegen, um es zu öffnen
+135|Bearbeiten
+136|Text bearbeiten
+137|Text bearbeiten: eine Zeile anklicken, um sie direkt zu bearbeiten · Eingabe oder Wegklicken speichert · Tab = nächste Zeile · Esc = abbrechen · Text leeren, um ihn zu löschen
+138|Metadaten des Dokuments bearbeiten (Titel, Autor, Thema, Stichwörter)
+139|Text bearbeiten
+140|Verschlüsseln
+141|Seitenzahl von 1 bis {0} eingeben
+142|Alle 30 Sekunden
+143|Alle 5 Minuten
+144|Jede Minute
+145|Jede Seite hat bereits Text — „Diese Seite“ oder „Alle Seiten“ wählen, um trotzdem zu erkennen
+146|Beenden
+147|Exportieren
+148|CSV exportieren
+149|Text exportieren
+150|Jede Seite als JPG- oder PNG-Bild exportieren
+151|Export fehlgeschlagen: {0}
+152|Seiten als Bilder exportieren
+153|{0} Bild(er) exportiert
+154|{0} exportiert → {1}
+155|Exportieren…
+156|Extrahieren
+157|Seite extrahieren…
+158|Ausgewählte Seite(n) extrahieren…
+159|Seiten extrahieren
+160|Ablage
+161|Füllung
+162|Füllfarbe…
+163|Füllfarbe für neue Rechtecke und Ovale (oder keine Füllung)
+164|Füllfarbe {0} — für die nächste gezeichnete Form
+165|Keine Füllung — neue Formen sind nur Umrisse
+166|„{0}“ ausgefüllt
+167|Endgültig
+168|Suchen
+169|Weitersuchen
+170|Rückwärts suchen
+171|Suchen…
+172|Ganze Seite
+173|Seitenbreite
+174|Ganze Seite
+175|Seitenbreite
+176|Zwischen Hellgrau und Dunkelblau wechseln (⌘D)
+177|Schrift
+178|Schrift und Größe…
+179|Schrift und Größe
+180|Zur Stellungnahme
+181|Format
+182|Aus Datei
+183|Los
+184|Zur nächsten Seite (⌘↓ / Bild ab)
+185|Zur vorherigen Seite (⌘↑ / Bild auf)
+186|Hilfe
+187|Hoher Kontrast (dunkel)
+188|Hoher Kontrast (hell)
+189|Hervorheben
+190|Hervorheben: über Text ziehen
+191|So benutzen Sie Stitchup (F1)
+192|Bild
+193|Bild: klicken für Originalgröße oder ziehen, um die Breite festzulegen
+194|Bilder
+195|Bilder (JPG / PNG)…
+196|Importieren
+197|Bild einfügen…
+198|Seiten aus PDF einfügen…
+199|Ein Bild einfügen (PNG, JPEG, GIF, WebP, HEIC…): auswählen, dann auf der Seite klicken oder ziehen
+200|Pfeil in die Seite einfügen: ziehen
+201|Linie in die Seite einfügen: ziehen
+202|Oval in die Seite einfügen: ziehen
+203|Rechteck in die Seite einfügen: ziehen
+204|Leere Seite nach Seite {0} eingefügt
+205|Bild {0} auf Seite {1} eingefügt
+206|{0} auf Seite {1} eingefügt
+207|Installierte Schriften werden eingebettet (nur die verwendeten Zeichen), damit das PDF auf jedem Computer gleich aussieht.
+208|Auf diesem Computer installiert — eingebettet
+209|Kursiv
+210|JPEG
+211|KB
+212|Behalten
+213|Diese Unterschrift in Stitchup für das nächste Mal behalten
+214|Ohne Passwort gespeichert: Jeder mit Zugang zu diesem Benutzerkonto kann sie platzieren.
+215|Tastatur
+216|Querformat
+217|Sprache
+218|Verzeichnis
+219|Lizenz
+220|Hellgrau
+221|Linie: vom Anfang zum Ende ziehen
+222|Link
+223|Link: anklickbaren Bereich ziehen
+224|Link…
+225|Installierte Schriften werden geladen…
+226|Ort (optional)
+227|Verlustfrei — Bilder unverändert lassen
+228|Gescannte Seiten durchsuchbar machen: Text auf diesem Computer erkennen (Apple Vision unter macOS) und als unsichtbare Ebene hinzufügen
+229|Weißen Hintergrund transparent machen
+230|Unterschriften verwalten…
+231|{0} Objekt(e) verschoben
+232|{0} Seite(n) nach „{2}“ verschoben
+233|Name
+234|Navigation
+235|Neu
+236|Neuer Tab
+237|Neues Dokument
+238|Neuer Tab (⌘T)
+239|Neu…
+240|Weiter
+241|Nächste Seite
+242|Nächster Tab
+243|Nächster Treffer (F3 / ⌘G)
+244|Nächster Tab (⌃Tab)
+245|Noch keine Lesezeichen — ⭐ auf einer Miniatur anklicken, um eine Seite zu merken.
+246|Kein Dokument
+247|Kein Dokument geöffnet
+248|Keine Schrift passt zu „
+249|Kein Bild gewählt
+250|Keine Treffer für „{0}“
+251|Keine Seite {0}
+252|Keine Seiten
+253|Noch keine gespeicherten Unterschriften.
+254|Kein Text gefunden: {0}
+255|Keine
+256|Nicht genehmigt
+257|Notiz
+258|Nichts zuzuschneiden: Die Seite ist leer
+259|OCR
+260|ODT
+261|ODT…
+262|Aus
+263|Eine Seite zur Zeit
+264|Nur Bilder, die mit höherer Auflösung angezeigt werden, werden verkleinert; Text und Zeichnungen bleiben scharf.
+265|Deckkraft
+266|Öffnen
+267|Öffnen Sie ein PDF mit ⌘O, durch Ablegen auf dem Fenster oder dem Dock-Symbol oder aus dem Finder. ⌘S speichert an Ort und Stelle (die Datei wird als Ganzes ersetzt, nie halb geschrieben); ⌘⇧S speichert unter neuem Namen. Die Schaltfläche Speichern wird rot, solange es ungespeicherte Änderungen gibt.
+268|Bitte zuerst ein Dokument öffnen
+269|Einen leeren Tab öffnen (⌘T)
+270|Eine vorhandene PDF-Datei öffnen (⌘O)
+271|Open-Source-Komponenten
+272|Öffnen und Speichern
+273|{0} wird geöffnet
+274|Öffnen…
+275|Ausrichtung
+276|Oval: auf der Seite ziehen
+277|Besitzerpasswort (optional — zum Ändern der Berechtigungen)
+278|PNG
+279|Seite
+280|Seitenbereich (z. B. 1-3, 5)
+281|Seitengröße
+282|Seite {0}
+283|Seite {0} von {1}
+284|Seite {0} von {1}…
+285|Seiten
+286|Seiten (z. B. 1-3, 5)
+287|Seiten ohne Text
+288|Seiten pro Datei
+289|Seitenleiste
+290|Seiten…
+291|Bezahlt
+292|Papier
+293|Dokument wird gelesen…
+294|Passwort
+295|Passwort erforderlich
+296|Passwortgeschützt (für diese Sitzung entsperrt)
+297|Die Passwörter stimmen nicht überein
+298|Pastell
+299|Pastell 2
+300|Pastell 3
+301|Stift
+302|Stift: freihand zeichnen
+303|Platzieren
+304|Unterschrift platzieren
+305|Unterschrift platzieren…
+306|Ihre handschriftliche Unterschrift platzieren (aus JPG, GIF oder PNG); für das nächste Mal behalten, optional mit Passwort geschützt
+307|Platzierung
+308|Hochformat
+309|Position
+310|Wird vorbereitet…
+311|Zurück
+312|Vorherige Seite
+313|Vorheriger Tab
+314|Vorheriger Treffer (⇧F3 / ⌘⇧G)
+315|Vorheriger Tab (⌃⇧Tab)
+316|Drucken
+317|Das Dokument drucken: alle Seiten oder einen Bereich (⌘P)
+318|Druck — Bilder mit 300 dpi
+319|Drucken…
+320|Erzeuger
+321|Eigenschaften
+322|Mit Passwort schützen
+323|Mit Passwort geschützt
+324|QuickSign
+325|QuickSign (handschriftliche Unterschrift)
+326|Beenden (⌘Q)
+327|Stitchup beenden
+328|RTF
+329|RTF…
+330|Wird gelesen…
+331|Grund
+332|Erhalten
+333|{0} Zeile(n) auf {2} Seite(n) erkannt — jetzt durchsuchbar
+334|Text wird erkannt: Seite {0} von {1}…
+335|Text erkennen (OCR)
+336|Ausgewählten Text, Formen oder Kommentare oder die bearbeitete Zeile umfärben
+337|{0} Objekt(e) umgefärbt
+338|Wiederherstellen
+339|Ungespeicherte Dokumente wiederherstellen?
+340|Wiederhergestellte Dokumente öffnen sich als neue, ungespeicherte Dokumente; mit „Speichern unter“ behalten.
+341|Rechteck: auf der Seite ziehen
+342|Schwärzen
+343|Schwärzen: über Inhalte ziehen, um sie dauerhaft zu entfernen
+344|Wiederholen
+345|Wiederholen (⌘⇧Z / ⌘Y)
+346|Abgelehnt
+347|Alle Lesezeichen entfernen
+348|Lesezeichen entfernen
+349|Ausgewählte Objekte entfernen (⌫)
+350|Darstellung fehlgeschlagen:
+351|Passwort wiederholen
+352|Zoom auf 100 % zurücksetzen (⌘1)
+353|Auflösung
+354|Menüband
+355|Menüband-Register
+356|Alle drehen
+357|Alle Seiten nach rechts drehen
+358|Links drehen
+359|Rechts drehen
+360|Nach links drehen
+361|Seite nach links drehen
+362|Seite nach rechts drehen
+363|Nach rechts drehen
+364|Jede Seite um 90° im Uhrzeigersinn drehen
+365|Aktuelle Seite(n) um 90° im Uhrzeigersinn drehen (⌘R)
+366|Aktuelle Seite(n) um 90° gegen den Uhrzeigersinn drehen (⌘⇧R)
+367|Wie aktuelle Seite
+368|Speichern
+369|Speichern & Unterschrift platzieren
+370|Speichern unter
+371|Verschlüsselt speichern unter
+372|Verschlüsselt speichern unter…
+373|Speichern unter…
+374|Kopie speichern…
+375|Eine passwortgeschützte Kopie speichern (AES-256)
+376|Eine kleinere Kopie speichern: ungenutzte Daten entfernt, Datenströme komprimiert, große Bilder verkleinert
+377|Änderungen an der aktuellen Datei speichern (⌘S)
+378|Gewählte Seiten als neues PDF speichern. Dieses Dokument bleibt unverändert.
+379|Ausgewählte Seite(n) als eigene PDF-Datei speichern
+380|Unter einem neuen Dateinamen speichern (⌘⇧S)
+381|Gespeicherte Unterschriften
+382|Passwortgeschützte Kopie gespeichert → {0}
+383|Gespeichert unter {0}
+384|{0} gespeichert
+385|Gespeichert ✓
+386|Speichert eine Kopie, die zum Öffnen ein Passwort braucht (AES-256). Dieses Dokument bleibt unverändert.
+387|Speichert eine kleinere Kopie; das geöffnete Dokument bleibt unverändert. Ungenutzte Daten werden entfernt und alles neu komprimiert.
+388|Speichern…
+389|Seite auf Fensterbreite skalieren (⌘2)
+390|Ganze Seite sichtbar skalieren (⌘0)
+391|Bildschirm — Bilder mit 150 dpi (empfohlen)
+392|Den Text des Dokuments durchsuchen (⌘F)
+393|Sicherheit
+394|Sicherheit ▸ QuickSign ▸ Neue Unterschrift erstellen: Wählen Sie ein JPG, GIF oder PNG Ihrer Unterschrift. Stitchup schneidet es zu und macht das weiße Papier transparent. Auf Wunsch für das nächste Mal behalten, optional mit Passwort geschützt (verschlüsselt gespeichert; das Passwort wird bei jeder Verwendung abgefragt). Dann auf der Seite klicken, wo sie hin soll, oder ziehen, um die Breite festzulegen. Gespeicherte Unterschriften stehen unter QuickSign; „Unterschriften verwalten“ löscht sie.
+395|Auswählen
+396|Inhaltsobjekt auswählen / verschieben
+397|Alles auswählen
+398|Alle Seiten auswählen
+399|Alle Seiten auswählen (⌘A)
+400|Zuerst Text auswählen (Inhalt ▸ Auswählen, dann eine Zeile anklicken)
+401|Auswählen: Objekt anklicken oder Rahmen ziehen · ziehen zum Verschieben · ⌫ löscht
+402|Auswählen: klicken oder Rahmen ziehen · ⌘-Klick fügt hinzu · ziehen zum Verschieben · ⌫ löscht
+403|{0} Seite(n) an das Druckfenster gesendet
+404|Einstellungen
+405|Einstellungen gespeichert
+406|Einstellungen…
+407|Form
+408|Blatt
+409|Ein Unterschriftenfeld auf der Seite anzeigen
+410|Gegenüberliegende Seiten nebeneinander zeigen (F5)
+411|Seitenminiaturen ein- oder ausblenden (F8)
+412|Seitenleiste anzeigen
+413|Seitenleiste
+414|Signieren
+415|Signieren & speichern unter…
+416|Dokument signieren…
+417|Dokument signieren
+418|Unterschreiben Sie im Feld mit Maus, Trackpad oder Stift.
+419|Vorschau der Unterschrift
+420|Unterschrift „{0}“ gelöscht
+421|Unterschrift: klicken, wo sie hin soll, oder ziehen, um die Breite festzulegen
+422|Unterschrift: das Feld dorthin ziehen, wo die Unterschrift erscheint
+423|Signiert von {0} → {1}
+424|Signieren fehlgeschlagen: {0}
+425|Einzeln
+426|Einzelseite
+427|Größe
+428|Größe (pt, leer = beibehalten)
+429|Am kleinsten — Bilder mit 96 dpi
+430|Verkauft
+431|Teilen
+432|Dokument teilen…
+433|Dokument teilen
+434|Das Dokument in mehrere Dateien teilen
+435|Doppelseite
+436|Stempel
+437|Ein Text-Wasserzeichen über jede Seite legen
+438|Stempel „{0}“: auf der Seite klicken oder ziehen
+439|Stempel: klicken oder ziehen, wo er hin soll
+440|Standard — nicht eingebettet, kleinste Datei
+441|Haftnotiz
+442|Haftnotiz: klicken, wo sie hin soll
+443|Stitchup
+444|Stitchup PDF-Editor
+445|Stitchup wurde beim letzten Mal nicht korrekt beendet. Diese Dokumente hatten ungespeicherte Änderungen:
+446|Stitchup — Benutzerhandbuch
+447|Durchstreichen
+448|Durchstreichen
+449|Durchstreichen: über Text ziehen
+450|Text
+451|Textfeld
+452|Textfarbe…
+453|Textfeld: Rahmen ziehen (oder klicken), dann tippen
+454|Textfarbe
+455|Textfarbe {0} — Text auswählen (oder Zeile doppelklicken), um ihn umzufärben; auch für Umrisse neuer Formen
+456|Texterkennung fehlgeschlagen: {0}
+457|Text…
+458|Die Schrift dieser Zeile im PDF
+459|Als Nächstes öffnet sich das Druckfenster des Systems — dort sind Kopien, Drucker und „Als PDF sichern“.
+460|Hier erscheint die Unterschrift
+461|Die Unterschrift wird verschlüsselt gespeichert; Stitchup fragt bei jeder Verwendung nach diesem Passwort. Ein vergessenes Passwort lässt sich nicht wiederherstellen — erstellen Sie die Unterschrift dann neu.
+462|Dieses PDF ist verschlüsselt. Geben Sie das Passwort ein, um die Seiten zu laden.
+463|Diese Seite
+464|Dieses Dokument hat keine eingebetteten Dateien.
+465|Diese Zeile lässt sich nicht umformatieren (ihr Text ist im PDF nicht lesbar)
+466|Diese Unterschrift ist geschützt. Geben Sie ihr Passwort ein, um sie zu platzieren.
+467|Gekachelt
+468|Oben mittig
+469|Den weißen Rand um die ausgewählte(n) Seite(n) entfernen
+470|Doppelseite
+471|Typ
+472|Unterstreichen
+473|Unterstreichen: über Text ziehen
+474|Rückgängig
+475|Die letzte Änderung rückgängig machen (⌘Z)
+476|Entsperren
+477|Entsperren & platzieren
+478|Entsperrt — gespeicherte Kopien sind nicht passwortgeschützt
+479|Wird entsperrt…
+480|Ungespeicherte Dokumente werden in den privaten Ordner von Stitchup kopiert (nie über Ihre Dateien) und nach einem unerwarteten Beenden zur Wiederherstellung angeboten. Ihre eigenen Dateien werden nur beim Speichern geschrieben.
+481|Dringend
+482|Verwenden
+483|Mit Ablage – Öffnen (⌘O) ein PDF öffnen oder hier ablegen
+484|Seitenzahlen von 1 bis {0} verwenden
+485|Verwendet für
+486|Benutzerhandbuch
+487|Version und Open-Source-Lizenzen
+488|Ansicht
+489|Ungültig
+490|Wasserzeichen
+491|Wasserzeichen auf {0} Seite(n) hinzugefügt
+492|Wasserzeichen…
+493|Webadresse oder eine Seitenzahl, zu der gesprungen wird
+494|Beim Öffnen eines Dokuments
+495|Fenster
+496|Seitendaten in eine .csv-Datei schreiben
+497|Das Dokument als mehrere PDFs in einen gewählten Ordner schreiben. Dieses Dokument bleibt unverändert.
+498|Den Text des Dokuments in eine .txt-Datei schreiben
+499|Den Text des Dokuments in eine Word-.docx-Datei schreiben
+500|Den Text des Dokuments in eine OpenDocument-.odt-Datei schreiben
+501|Den Text des Dokuments in eine RTF-Datei schreiben
+502|Falsches Passwort
+503|Falsches Passwort für diese Unterschrift
+504|Falsches Passwort — bitte erneut versuchen
+505|Ihr Name
+506|Zoom
+507|Zoom +
+508|Zoom −
+509|Vergrößern
+510|Verkleinern
+511|Eine Stufe vergrößern (⌘=)
+512|Eine Stufe verkleinern (⌘−)
+513|dpi
+514|zuerst die Unterschrift zeichnen
+515|Kodierung fehlgeschlagen
+516|example.com oder 3
+517|kein Dokument geöffnet
+518|kein Passwort
+519|von
+520|Seiten
+521|Seiten ausgewählt
+522|passwortgeschützt
+523|pt
+524|das Bild scheint leer — nichts Dunkleres als das Papier gefunden
+525|entsperrt
+526|Warnung
+527|{0} KB
+528|{0}-Farbe
+529|{0} Dateien
+530|{0} kommt demnächst (Ziel {1} in GOALS.md)
+531|{0} Seite(n) ausgewählt
+532|{0} ausgewählte Seiten
+533|{0} · {1} pt
+534|{0} — auf der Seite klicken, um sie zu platzieren (ziehen, um die Breite festzulegen)
+535|{0} — ungespeicherte Änderungen
+536|· Esc zum Beenden
+537|— verschlüsseln, digital signieren, QuickSign, schwärzen, Wasserzeichen.
+538|— hervorheben, unterstreichen, durchstreichen, Notizen, Textfelder, Formen, Stempel, Links, Stift; Farbe und Füllung.
+539|— neu, öffnen, speichern, Eigenschaften, Seiten importieren, Exporte (Text, CSV, Bilder, RTF, DOCX, ODT), drucken (mit Vorschau; „Als PDF sichern“ ist im Druckfenster des Systems).
+540|— PDF-Betrachter und -Editor, offline. Ihre Dateien verlassen nie diesen Computer, und eine Datei wird nur beim Speichern ersetzt — zuerst in eine temporäre Datei geschrieben, dann ausgetauscht, also nie halb geschrieben.
+541|— drehen, löschen, hinzufügen, extrahieren, teilen, automatisch zuschneiden.
+542|— auswählen, Text bearbeiten, löschen, Schrift, Farbe, Bild einfügen, OCR.
+543|— Ansichtssteuerung.
+544|⚠ Warnungen
+545|⚠ {0} Warnung(en): {2}
+546|🔒 Zum Anzeigen dieses Dokuments ist ein Passwort nötig
+547|🔒 Passwort erforderlich — entsperren
+548|＋ Seite
+549|Alle Lesezeichen entfernt
+550|Lesezeichen entfernt
+551|Lesezeichen entfernt (Seite {0})
+552|Lesezeichen für Seite {0} gesetzt
+553|Stitchup schließen
+554|{0} Dateien kombiniert
+555|Befehl fehlgeschlagen
+556|Verwerfen und beenden
+557|Extrahieren fehlgeschlagen
+558|Schrift geändert
+559|Aktualisieren der Metadaten fehlgeschlagen
+560|Metadaten aktualisiert
+561|Öffnen fehlgeschlagen
+562|{0} Seite(n) geöffnet
+563|Zeile umgefärbt
+564|{0} wiederhergestellt — mit „Speichern unter“ behalten
+565|Wiederholen fehlgeschlagen
+566|Speichern fehlgeschlagen
+567|{0} Seite(n) gespeichert unter {2}
+568|Teilen fehlgeschlagen
+569|In {0} Dateien in {1} geteilt
+570|Stempeltext
+571|Text bearbeitet
+572|Text bearbeitet ({0})
+573|Text bearbeitet — {0}
+574|Dieses Dokument ist passwortgeschützt
+575|Rückgängig fehlgeschlagen
+576|Entsperren fehlgeschlagen
+577|{0} Seiten entsperrt
+578|Ohne Titel
+579|Experimentelle Software
+580|Verstanden
+581|Stitchup ist ein experimenteller PDF-Editor, entwickelt für den eigenen Bedarf des Autors und als Open Source geteilt. Die Nutzung erfolgt auf eigenes Risiko: Bewahren Sie Sicherungskopien wichtiger Dokumente auf und prüfen Sie die Ergebnisse, bevor Sie sich darauf verlassen. Es wird keinerlei Gewährleistung übernommen.

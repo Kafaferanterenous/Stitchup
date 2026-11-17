@@ -2,7 +2,7 @@
 
 Target: the best all-round PDF editor, at feature and look parity with the
 Windows build (github.com/Kafaferanterenous/stitchup-Win v0.12.28), and ahead of it where macOS allows.
-Updated 2026-11-17 (v0.12.0). Status key: ✅ done · 🔨 in progress · ⬜ to do. Every ✅ item is covered by an automated test.
+Updated 2026-11-17 (v0.13.0). Status key: ✅ done · 🔨 in progress · ⬜ to do. Every ✅ item is covered by an automated test.
 
 ## A. Look & navigation (same as Windows)
 | # | Goal | Status |
@@ -76,5 +76,7 @@ Duplicates removed, Nitro / macOS layout: Print Preview and Print to PDF folded 
 ## H. Other platforms
 | # | Goal | Status |
 |---|------|--------|
-| H1 | Same code base for Windows and Linux (Tauri): engine and app compile for Windows (checked from macOS); fonts, crash recovery, menus, shortcut hints and OCR availability are per-OS; manual GitHub Actions workflow builds Windows (NSIS / MSI) and Linux (deb / AppImage) installers | 🔨 |
+| H1 | Windows (NSIS / MSI) and Linux (deb / AppImage) builds from the same code base via GitHub Actions; engine tests pass on both; per-OS fonts, crash recovery, menus, shortcut hints, OCR availability. Awaiting tests on real machines | 🔨 |
 | H2 | OCR on Windows (Windows.Media.Ocr) and Linux (Tesseract) | ⬜ |
+| H3 | Interface languages: English, Polish, Italian, German, French, Chinese (Simplified) — 582 strings, Settings ▸ Language, system language on first start, native menus rebuilt on change; stamps printed in the chosen language (not Chinese: standard PDF fonts) | ✅ |
+| H4 | "Experimental — use at your own risk" notice: first start (once), About, README, release notes | ✅ |

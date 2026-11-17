@@ -64,7 +64,9 @@ fn openssl_verifies(data: &[u8], der: &[u8]) -> bool {
         .args(["smime", "-verify", "-binary", "-inform", "DER", "-noverify", "-purpose", "any"])
         .arg("-in").arg(dir.join("sig.der"))
         .arg("-content").arg(dir.join("data.bin"))
-        .args(["-out", "/dev/null"])
+        // A real file: /dev/null does not exist on Windows.
+        .arg("-out")
+        .arg(dir.join("out.bin"))
         .output();
     let _ = std::fs::remove_dir_all(&dir);
     match out {

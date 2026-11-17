@@ -1,0 +1,582 @@
+0| (in arrivo)
+1|Informazioni
+2|Informazioni su Stitchup
+3|Aggiungi
+4|Aggiungi pagina vuota dopo
+5|Aggiungi pagina
+6|Aggiungi pagina…
+7|Aggiungi una pagina vuota dopo la pagina corrente
+8|Aggiungi una firma digitale e salva una copia firmata
+9|Aggiungi pagina vuota
+10|Aggiungi la pagina corrente
+11|Aggiungi le pagine di uno o più altri PDF alla fine di questo documento
+12|{0} aggiunto a pagina {1}
+13|Aggiunge una firma digitale (RSA-2048, SHA-256) e salva una copia firmata; questo documento resta invariato. Stitchup crea un certificato autofirmato, quindi i lettori mostreranno la firma come valida ma da un’identità non verificata.
+14|Dopo la pagina
+15|Tutte
+16|Tutte (
+17|Tutte le pagine
+18|Tutte le pagine
+19|Tutte le pagine in un’unica colonna scorrevole
+20|Annota
+21|Colore annotazioni…
+22|Colore annotazioni {0} — usato per la prossima evidenziazione, sottolineatura, barratura, penna, forma o casella di testo (seleziona le annotazioni per cambiarne il colore)
+23|Colori delle annotazioni ripristinati
+24|Applica
+25|Approvato
+26|Approvati per fasi successive, non ancora usati:
+27|Freccia: trascina dall’inizio alla punta
+28|Alla fine
+29|Allegati
+30|Ritaglio auto
+31|Ritaglia automaticamente le pagine selezionate
+32|Nero
+33|Inchiostro nero
+34|Blu
+35|Inchiostro blu
+36|Grassetto
+37|Segnalibri
+38|I segnalibri valgono solo per questa sessione (mai scritti nel PDF)
+39|CSV…
+40|Annulla
+41|Centro (diagonale)
+42|Cambia carattere e dimensione del testo selezionato o della riga in modifica
+43|Le modifiche si applicano al prossimo «Salva con nome» (il file originale non viene mai modificato).
+44|Scegli da 1 a {0}
+45|Scegli un’altra immagine…
+46|Scegli cartella…
+47|Scegli immagine…
+48|Scegli una foto o una scansione della tua firma autografa (JPG, GIF o PNG). Firma su carta bianca con una penna scura per un risultato migliore.
+49|Scegli un timbro, poi fai clic o trascina sulla pagina
+50|Cancella
+51|Annulla selezione
+52|Fai clic su una riga di testo per modificarla sul posto, nel suo carattere (o semplicemente fai doppio clic su una riga)
+53|Fai clic o trascina sulla pagina per posizionare {0}
+54|Fai clic su testo, immagini o annotazioni per selezionarli (⌘-clic aggiunge, trascina un riquadro per più oggetti); trascina per spostare; ⌫ elimina
+55|Fai clic per aggiungere una nota
+56|Chiudi
+57|Chiudi scheda
+58|Chiudi scheda
+59|Chiudi scheda (⌘W)
+60|Chiudi la barra laterale (F8 la mostra di nuovo)
+61|Chiudi questa scheda (⌘W)
+62|Colore
+63|Combinazione colori
+64|Colore delle nuove annotazioni: evidenziazione, sottolineatura, barratura, penna, forme e caselle di testo
+65|Combinazione colori
+66|Combina
+67|Combina in nuovo…
+68|Combina più PDF in un nuovo documento
+69|Commento
+70|Componente
+71|Comprimi
+72|Comprimi PDF
+73|Comprimi PDF…
+74|Compressione non riuscita: {0}
+75|Compresso: {0} → {1} ({2}% più piccolo){3}
+76|Compressione…
+77|Riservato
+78|Conferma password
+79|Contenuto
+80|Continua
+81|Scorrimento continuo
+82|{0} caratteri copiati
+83|Copia
+84|Copia riga
+85|Copia non riuscita
+86|Copia il testo selezionato (⌘C)
+87|Impossibile leggere questa immagine: {0}
+88|Impossibile salvare: {0}
+89|Impossibile usare la firma: {0}
+90|Recupero dopo arresto anomalo, zoom all’apertura, barra laterale (⌘,)
+91|Istantanee di recupero
+92|Creato
+93|Crea nuova firma
+94|Crea nuova firma…
+95|Crea un nuovo documento vuoto (⌘N)
+96|Creato con
+97|Ritagliate {0} pagine
+98|Pagina corrente (
+99|Personalizzato…
+100|DOCX
+101|DOCX…
+102|Blu scuro
+103|Modalità scura
+104|Blu notte
+105|Elimina
+106|Elimina pagina
+107|Elimina pagine
+108|Elimina oggetto selezionato
+109|Elimina le pagine correnti (⌫)
+110|Oggetti eliminati: {0}
+111|Elimina…
+112|Descrizione
+113|Scarta
+114|Chiudi
+115|Documento
+116|Proprietà documento…
+117|Proprietà documento
+118|Fai doppio clic su una riga (oppure Contenuto ▸ Modifica testo, poi fai clic su di essa). Viene modificata sul posto, nel carattere del documento se contiene le lettere necessarie. Una barra sopra la riga mostra carattere e dimensione: cambia lì carattere, grassetto / corsivo, dimensione o colore, oppure usa Contenuto ▸ Colore e Carattere. Invio o un clic altrove salva; Tab passa alla riga successiva; Esc annulla; svuotare il testo elimina la riga.
+119|Bozza
+120|Trascina un riquadro, poi digita il testo
+121|Trascina sul testo
+122|Trascina sul testo per evidenziarlo
+123|Trascina sul testo per barrarlo (colore annotazioni)
+124|Trascina sul testo per sottolinearlo (colore annotazioni)
+125|Trascina sul contenuto per rimuoverlo definitivamente e oscurarlo
+126|Trascina sull’area da oscurare
+127|Trascina l’area cliccabile, poi indica un indirizzo web o un numero di pagina
+128|Trascina il riquadro della firma sulla pagina (clic = dimensione predefinita, Esc per annullare)
+129|Trascina le miniature per riordinare. ⌘-clic e Maiusc-clic selezionano più pagine; Ruota, Elimina, Estrai e Filigrana agiscono allora sulla selezione. F8 mostra o nasconde la barra laterale.
+130|Trascina per riordinare · ⌘/Maiusc-clic per selezionare · ☆ per un segnalibro
+131|Disegna
+132|Disegna un rettangolo, un ovale, una linea o una freccia (contorno, riempimento)
+133|Disegna linee a mano libera sulla pagina (colore annotazioni)
+134|Trascina qui un PDF per aprirlo
+135|Modifica
+136|Modifica testo
+137|Modifica testo: fai clic su una riga per modificarla sul posto · Invio o clic altrove salva · Tab = riga successiva · Esc = annulla · svuota il testo per eliminarlo
+138|Modifica i metadati del documento (titolo, autore, oggetto, parole chiave)
+139|Modifica del testo
+140|Cifra
+141|Inserisci un numero di pagina da 1 a {0}
+142|Ogni 30 secondi
+143|Ogni 5 minuti
+144|Ogni minuto
+145|Ogni pagina contiene già testo — scegli «Questa pagina» o «Tutte le pagine» per riconoscerlo comunque
+146|Esci
+147|Esporta
+148|Esporta CSV
+149|Esporta testo
+150|Esporta ogni pagina come immagine JPG o PNG
+151|Esportazione non riuscita: {0}
+152|Esporta pagine come immagini
+153|Immagini esportate: {0}
+154|Esportato {0} → {1}
+155|Esporta…
+156|Estrai
+157|Estrai pagina…
+158|Estrai pagine selezionate…
+159|Estrai pagine
+160|File
+161|Riempimento
+162|Colore di riempimento…
+163|Colore di riempimento per nuovi rettangoli e ovali (o nessuno)
+164|Colore di riempimento {0} — per la prossima forma disegnata
+165|Nessun riempimento — le nuove forme sono solo contorni
+166|«{0}» compilato
+167|Definitivo
+168|Trova
+169|Trova successivo
+170|Trova precedente
+171|Trova…
+172|Pagina intera
+173|Larghezza pagina
+174|Pagina intera
+175|Larghezza pagina
+176|Passa da Grigio chiaro a Blu scuro (⌘D)
+177|Carattere
+178|Carattere e dimensione…
+179|Carattere e dimensione
+180|Per commenti
+181|Formato
+182|Da file
+183|Vai
+184|Vai alla pagina successiva (⌘↓ / PgGiù)
+185|Vai alla pagina precedente (⌘↑ / PgSu)
+186|Aiuto
+187|Contrasto elevato (scuro)
+188|Contrasto elevato (chiaro)
+189|Evidenzia
+190|Evidenzia: trascina sul testo
+191|Come usare Stitchup (F1)
+192|Immagine
+193|Immagine: fai clic per posizionarla a grandezza naturale, o trascina per impostarne la larghezza
+194|Immagini
+195|Immagini (JPG / PNG)…
+196|Importa
+197|Inserisci immagine…
+198|Inserisci pagine da PDF…
+199|Inserisci un’immagine (PNG, JPEG, GIF, WebP, HEIC…): sceglila, poi fai clic o trascina sulla pagina
+200|Inserisci una freccia nella pagina: trascina
+201|Inserisci una linea nella pagina: trascina
+202|Inserisci un ovale nella pagina: trascina
+203|Inserisci un rettangolo nella pagina: trascina
+204|Inserita una pagina vuota dopo la pagina {0}
+205|Immagine {0} inserita a pagina {1}
+206|{0} inserito a pagina {1}
+207|I caratteri installati vengono incorporati (solo le lettere usate), così il PDF appare uguale su ogni computer.
+208|Installati su questo computer — incorporati
+209|Corsivo
+210|JPEG
+211|KB
+212|Mantieni
+213|Conserva questa firma in Stitchup per la prossima volta
+214|Conservata senza password: chiunque usi questo account può posizionarla.
+215|Tastiera
+216|Orizzontale
+217|Lingua
+218|Registro
+219|Licenza
+220|Grigio chiaro
+221|Linea: trascina dall’inizio alla fine
+222|Collegamento
+223|Collegamento: trascina l’area cliccabile
+224|Collegamento…
+225|Caricamento dei caratteri installati…
+226|Luogo (facoltativo)
+227|Senza perdita — immagini invariate
+228|Rendi ricercabili le pagine scansionate: riconosci il loro testo su questo computer (Apple Vision su macOS) e aggiungilo come livello invisibile
+229|Rendi trasparente lo sfondo bianco
+230|Gestisci firme…
+231|Oggetti spostati: {0}
+232|Pagine spostate ({0}) in «{2}»
+233|Nome
+234|Naviga
+235|Nuovo
+236|Nuova scheda
+237|Nuovo documento
+238|Nuova scheda (⌘T)
+239|Nuovo…
+240|Avanti
+241|Pagina successiva
+242|Scheda successiva
+243|Risultato successivo (F3 / ⌘G)
+244|Scheda successiva (⌃Tab)
+245|Nessun segnalibro — fai clic su ⭐ in una miniatura per aggiungere un segnalibro alla pagina.
+246|Nessun documento
+247|Nessun documento aperto
+248|Nessun carattere corrisponde a «
+249|Nessuna immagine scelta
+250|Nessun risultato per «{0}»
+251|Nessuna pagina {0}
+252|Nessuna pagina
+253|Nessuna firma salvata.
+254|Nessun testo trovato: {0}
+255|Nessuno
+256|Non approvato
+257|Nota
+258|Niente da ritagliare: la pagina è vuota
+259|OCR
+260|ODT
+261|ODT…
+262|Disattivato
+263|Una pagina alla volta
+264|Vengono ridotte solo le immagini mostrate a una risoluzione superiore; testo e disegni restano nitidi.
+265|Opacità
+266|Apri
+267|Apri un PDF con ⌘O, trascinandolo sulla finestra o sull’icona nel Dock, oppure dal Finder. ⌘S salva sul posto (il file viene sostituito per intero, mai scritto a metà); ⌘⇧S salva con un nuovo nome. Il pulsante Salva diventa rosso finché ci sono modifiche non salvate.
+268|Apri prima un documento
+269|Apri una scheda vuota (⌘T)
+270|Apri un file PDF esistente (⌘O)
+271|Componenti open source
+272|Aprire e salvare
+273|Apertura di {0}
+274|Apri…
+275|Orientamento
+276|Ovale: trascina sulla pagina
+277|Password del proprietario (facoltativa — per modificare i permessi)
+278|PNG
+279|Pagina
+280|Intervallo di pagine (es. 1-3, 5)
+281|Formato pagina
+282|Pagina {0}
+283|Pagina {0} di {1}
+284|Pagina {0} di {1}…
+285|Pagine
+286|Pagine (es. 1-3, 5)
+287|Pagine senza testo
+288|Pagine per file
+289|Pannello pagine
+290|Pagine…
+291|Pagato
+292|Carta
+293|Analisi del documento…
+294|Password
+295|Password richiesta
+296|Protetto da password (sbloccato per questa sessione)
+297|Le password non coincidono
+298|Pastello
+299|Pastello 2
+300|Pastello 3
+301|Penna
+302|Penna: disegno a mano libera
+303|Posiziona
+304|Posiziona firma
+305|Posiziona firma…
+306|Posiziona la tua firma autografa (da un JPG, GIF o PNG); conservala per la prossima volta, eventualmente protetta da password
+307|Posizionamento
+308|Verticale
+309|Posizione
+310|Preparazione…
+311|Indietro
+312|Pagina precedente
+313|Scheda precedente
+314|Risultato precedente (⇧F3 / ⌘⇧G)
+315|Scheda precedente (⌃⇧Tab)
+316|Stampa
+317|Stampa il documento, tutte le pagine o un intervallo (⌘P)
+318|Stampa — immagini a 300 dpi
+319|Stampa…
+320|Produttore
+321|Proprietà
+322|Proteggi con password
+323|Protetta da password
+324|QuickSign
+325|QuickSign (firma autografa)
+326|Esci (⌘Q)
+327|Esci da Stitchup
+328|RTF
+329|RTF…
+330|Lettura…
+331|Motivo
+332|Ricevuto
+333|Righe riconosciute: {0} su {2} pagine — ora ricercabili
+334|Riconoscimento del testo: pagina {0} di {1}…
+335|Riconosci testo (OCR)
+336|Cambia il colore di testo, forme o annotazioni selezionati, o della riga in modifica
+337|Oggetti ricolorati: {0}
+338|Recupera
+339|Recuperare i documenti non salvati?
+340|I documenti recuperati si aprono come nuovi documenti non salvati; usa «Salva con nome» per conservarli.
+341|Rettangolo: trascina sulla pagina
+342|Oscura
+343|Oscura: trascina sul contenuto per rimuoverlo definitivamente
+344|Ripeti
+345|Ripeti (⌘⇧Z / ⌘Y)
+346|Respinto
+347|Rimuovi tutti i segnalibri
+348|Rimuovi segnalibro
+349|Rimuovi gli oggetti selezionati (⌫)
+350|Rendering non riuscito:
+351|Ripeti password
+352|Riporta lo zoom al 100% (⌘1)
+353|Risoluzione
+354|Barra multifunzione
+355|Scheda della barra
+356|Ruota tutte
+357|Ruota tutte le pagine a destra
+358|Ruota a sinistra
+359|Ruota a destra
+360|Ruota a sinistra
+361|Ruota pagina a sinistra
+362|Ruota pagina a destra
+363|Ruota a destra
+364|Ruota ogni pagina di 90° in senso orario
+365|Ruota le pagine correnti di 90° in senso orario (⌘R)
+366|Ruota le pagine correnti di 90° in senso antiorario (⌘⇧R)
+367|Come la pagina corrente
+368|Salva
+369|Salva e posiziona firma
+370|Salva con nome
+371|Salva cifrato con nome
+372|Salva cifrato con nome…
+373|Salva con nome…
+374|Salva copia…
+375|Salva una copia protetta da password (AES-256)
+376|Salva una copia più piccola: dati inutilizzati rimossi, flussi compressi, immagini grandi ridotte
+377|Salva le modifiche al file corrente (⌘S)
+378|Salva le pagine scelte come nuovo PDF. Questo documento non cambia.
+379|Salva le pagine selezionate come file PDF a sé
+380|Salva con un nuovo nome (⌘⇧S)
+381|Firme salvate
+382|Salvata una copia protetta da password → {0}
+383|Salvato in {0}
+384|{0} salvato
+385|Salvato ✓
+386|Salva una copia che richiede una password per essere aperta (AES-256). Questo documento non cambia.
+387|Salva una copia più piccola; il documento aperto non cambia. I dati inutilizzati vengono rimossi e tutto viene ricompresso.
+388|Salva…
+389|Adatta la pagina alla larghezza della finestra (⌘2)
+390|Mostra la pagina intera (⌘0)
+391|Schermo — immagini a 150 dpi (consigliato)
+392|Cerca nel testo del documento (⌘F)
+393|Sicurezza
+394|Sicurezza ▸ QuickSign ▸ Crea nuova firma: scegli un JPG, GIF o PNG della tua firma. Stitchup la ritaglia e rende trasparente la carta bianca. Se vuoi, conservala per la prossima volta, eventualmente protetta da password (memorizzata cifrata; richiesta a ogni utilizzo). Poi fai clic sulla pagina dove deve andare, o trascina per impostarne la larghezza. Le firme salvate sono elencate sotto QuickSign; «Gestisci firme» permette di eliminarle.
+395|Seleziona
+396|Seleziona / sposta oggetto del contenuto
+397|Seleziona tutto
+398|Seleziona tutte le pagine
+399|Seleziona tutte le pagine (⌘A)
+400|Seleziona prima il testo (Contenuto ▸ Seleziona, poi fai clic su una riga)
+401|Selezione: fai clic su un oggetto o trascina un riquadro · trascina per spostare · ⌫ elimina
+402|Selezione: fai clic o trascina un riquadro · ⌘-clic aggiunge · trascina per spostare · ⌫ elimina
+403|Pagine inviate alla stampa: {0}
+404|Impostazioni
+405|Impostazioni salvate
+406|Impostazioni…
+407|Forma
+408|Foglio
+409|Mostra un riquadro della firma sulla pagina
+410|Mostra le pagine affiancate (F5)
+411|Mostra o nascondi le miniature (F8)
+412|Mostra il pannello pagine
+413|Barra laterale
+414|Firma
+415|Firma e salva con nome…
+416|Firma documento…
+417|Firma documento
+418|Firma nel riquadro con mouse, trackpad o penna.
+419|Anteprima della firma
+420|Firma «{0}» eliminata
+421|Firma: fai clic dove deve andare, o trascina per impostarne la larghezza
+422|Firma: trascina il riquadro dove appare la firma
+423|Firmato da {0} → {1}
+424|Firma non riuscita: {0}
+425|Singola
+426|Pagina singola
+427|Dimensione
+428|Dimensione (pt, vuoto = invariata)
+429|Minimo — immagini a 96 dpi
+430|Venduto
+431|Dividi
+432|Dividi documento…
+433|Dividi documento
+434|Dividi il documento in più file
+435|Affiancate
+436|Timbro
+437|Applica una filigrana di testo su ogni pagina
+438|Timbro «{0}»: fai clic o trascina sulla pagina
+439|Timbro: fai clic o trascina dove deve andare
+440|Standard — non incorporati, file più piccolo
+441|Nota adesiva
+442|Nota: fai clic dove deve andare
+443|Stitchup
+444|Editor PDF Stitchup
+445|L’ultima volta Stitchup non si è chiuso correttamente. Questi documenti avevano modifiche non salvate:
+446|Stitchup — Guida utente
+447|Barra
+448|Barrato
+449|Barrato: trascina sul testo
+450|Testo
+451|Casella di testo
+452|Colore testo…
+453|Casella di testo: trascina il riquadro (o fai clic), poi digita
+454|Colore testo
+455|Colore testo {0} — seleziona del testo (o fai doppio clic su una riga) per ricolorarlo; usato anche per il contorno delle nuove forme
+456|Riconoscimento del testo non riuscito: {0}
+457|Testo…
+458|Il carattere di questa riga nel PDF
+459|Poi si apre la finestra di stampa del sistema — lì ci sono copie, stampante e «Salva come PDF».
+460|Qui appare la firma
+461|La firma viene memorizzata cifrata; Stitchup chiede questa password a ogni utilizzo. Una password dimenticata non si può recuperare — in tal caso crea di nuovo la firma.
+462|Questo PDF è cifrato. Inserisci la password per caricare le pagine.
+463|Questa pagina
+464|Questo documento non ha file incorporati.
+465|Questa riga non può essere riformattata (il suo testo non è leggibile dal PDF)
+466|Questa firma è protetta. Inserisci la password per posizionarla.
+467|Affiancato
+468|In alto al centro
+469|Taglia il margine bianco attorno alle pagine selezionate
+470|Due pagine affiancate
+471|Tipo
+472|Sottolinea
+473|Sottolinea: trascina sul testo
+474|Annulla
+475|Annulla l’ultima modifica (⌘Z)
+476|Sblocca
+477|Sblocca e posiziona
+478|Sbloccato — le copie salvate non saranno protette da password
+479|Sblocco…
+480|I documenti non salvati vengono copiati nella cartella privata di Stitchup (mai sopra i tuoi file) e riproposti se Stitchup si chiude inaspettatamente. I tuoi file vengono scritti solo quando salvi.
+481|Urgente
+482|Usa
+483|Usa File – Apri (⌘O) per aprire un PDF, oppure trascinane uno qui
+484|Usa numeri di pagina tra 1 e {0}
+485|Usato per
+486|Guida utente
+487|Versione e licenze open source
+488|Vista
+489|Annullato
+490|Filigrana
+491|Filigrana aggiunta a {0} pagine
+492|Filigrana…
+493|Indirizzo web, o numero della pagina a cui saltare
+494|All’apertura di un documento
+495|Finestra
+496|Scrivi i dati delle pagine in un file .csv
+497|Scrivi il documento come più PDF in una cartella a scelta. Questo documento non cambia.
+498|Scrivi il testo del documento in un file .txt
+499|Scrivi il testo del documento in un file Word .docx
+500|Scrivi il testo del documento in un file OpenDocument .odt
+501|Scrivi il testo del documento in un file RTF
+502|Password errata
+503|Password errata per questa firma
+504|Password errata — riprova
+505|Il tuo nome
+506|Zoom
+507|Zoom +
+508|Zoom −
+509|Ingrandisci
+510|Riduci
+511|Ingrandisci di un passo (⌘=)
+512|Riduci di un passo (⌘−)
+513|dpi
+514|prima disegna la firma
+515|codifica non riuscita
+516|example.com o 3
+517|nessun documento aperto
+518|senza password
+519|di
+520|pagine
+521|pagine selezionate
+522|protetta da password
+523|pt
+524|l’immagine sembra vuota — non è stato trovato nulla di più scuro della carta
+525|sbloccato
+526|avviso
+527|{0} KB
+528|Colore {0}
+529|{0} file
+530|{0} in arrivo (obiettivo {1} in GOALS.md)
+531|Pagine selezionate: {0}
+532|{0} pagine selezionate
+533|{0} · {1} pt
+534|{0} — fai clic sulla pagina per posizionarla (trascina per impostarne la larghezza)
+535|{0} — modifiche non salvate
+536|· Esc per terminare
+537|— cifratura, firma digitale, QuickSign, oscuramento, filigrana.
+538|— evidenziazione, sottolineatura, barratura, note, caselle di testo, forme, timbri, collegamenti, penna; Colore e Riempimento.
+539|— nuovo, apri, salva, proprietà, importa pagine, esportazioni (testo, CSV, immagini, RTF, DOCX, ODT), stampa (con anteprima; «Salva come PDF» è nella finestra di stampa del sistema).
+540|— visualizzatore ed editor PDF offline. I tuoi file non lasciano mai questo computer, e un file viene sostituito solo quando salvi — scritto prima in un file temporaneo, poi scambiato, quindi mai scritto a metà.
+541|— ruota, elimina, aggiungi, estrai, dividi, ritaglio automatico.
+542|— seleziona, modifica testo, elimina, carattere, colore, inserisci immagine, OCR.
+543|— controlli di visualizzazione.
+544|⚠ Avvisi
+545|⚠ Avvisi ({0}): {2}
+546|🔒 Per visualizzare questo documento serve una password
+547|🔒 password richiesta — sblocca
+548|＋ Pagina
+549|Tutti i segnalibri rimossi
+550|Segnalibro rimosso
+551|Segnalibro rimosso (pagina {0})
+552|Segnalibro aggiunto a pagina {0}
+553|Chiudi Stitchup
+554|File combinati: {0}
+555|Comando non riuscito
+556|Scarta ed esci
+557|Estrazione non riuscita
+558|Carattere modificato
+559|Aggiornamento dei metadati non riuscito
+560|Metadati aggiornati
+561|Apertura non riuscita
+562|Pagine aperte: {0}
+563|Riga ricolorata
+564|{0} recuperato — usa «Salva con nome» per conservarlo
+565|Ripristino non riuscito
+566|Salvataggio non riuscito
+567|Pagine salvate ({0}) in {2}
+568|Divisione non riuscita
+569|Diviso in {0} file in {1}
+570|Testo del timbro
+571|Testo modificato
+572|Testo modificato ({0})
+573|Testo modificato — {0}
+574|Questo documento è protetto da password
+575|Annullamento non riuscito
+576|Sblocco non riuscito
+577|Pagine sbloccate: {0}
+578|Senza titolo
+579|Software sperimentale
+580|Ho capito
+581|Stitchup è un editor PDF sperimentale, creato per le esigenze del suo autore e condiviso come open source. Lo usi a tuo rischio: conserva copie di sicurezza dei documenti importanti e verifica i risultati prima di farvi affidamento. Non è fornita alcuna garanzia.

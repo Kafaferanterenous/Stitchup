@@ -9,6 +9,8 @@ import { COMMANDS, runCommand, type Command } from "../../commands";
 import { Icon } from "./icons";
 import { ColorPalette } from "../common/ColorPalette";
 
+import { tr } from "../../i18n";
+
 /** Shortcut hints in tooltips: Mac symbols on macOS, "Ctrl+…" elsewhere. */
 const MAC = /Mac/i.test(navigator.userAgent);
 export function osTip(tip: string): string {
@@ -75,7 +77,7 @@ function RibbonButton({ cmd }: { cmd: Command }) {
         aria-haspopup={cmd.choices || cmd.swatch ? "menu" : undefined}
         aria-expanded={cmd.choices || cmd.swatch ? open : undefined}
         data-cmd={cmd.id}
-        title={osTip(dirty ? `${cmd.tip} — unsaved changes` : cmd.tip)}>
+        title={osTip(dirty ? tr("{0} — unsaved changes", tr(cmd.tip)) : tr(cmd.tip))}>
         <span className="rb-icon">
           {cmd.swatch ? (
             <span className={`rb-swatch${swatchColor ? "" : " none"}`} style={{ background: swatchColor ?? undefined }} />
@@ -84,14 +86,14 @@ function RibbonButton({ cmd }: { cmd: Command }) {
           )}
         </span>
         <span className="rb-text">
-          {cmd.label}
+          {tr(cmd.label)}
           {cmd.choices || cmd.swatch ? " ▾" : ""}
         </span>
       </button>
       {open && cmd.swatch && (
         <div className="rb-choices rb-palette">
           <ColorPalette
-            label={`${cmd.label} colour`}
+            label={tr("{0} colour", tr(cmd.label))}
             value={swatchColor}
             allowNone={cmd.swatch !== "fore"}
             noneLabel={cmd.swatch === "ann" ? "Default colours" : "No fill"}
@@ -114,7 +116,7 @@ function RibbonButton({ cmd }: { cmd: Command }) {
                 setOpen(false);
                 c.run();
               }}>
-              {c.label}
+              {tr(c.label)}
             </button>
           ))}
         </div>
@@ -133,14 +135,14 @@ function PageBox() {
     if (Number.isInteger(n) && n >= 1 && n <= count) {
       store.goToPage(n);
       setV("");
-    } else store.notify(`Enter a page number from 1 to ${count}`);
+    } else store.notify(tr("Enter a page number from 1 to {0}", count));
   }
   return (
     <div className="rb-pagebox">
       <input aria-label="Go to page" inputMode="numeric" placeholder={`${app.currentPage}`} value={v} onChange={(e) => setV(e.target.value)} onKeyDown={(e) => e.key === "Enter" && go()} disabled={!count} />
       <span>/ {count || "—"}</span>
       <button type="button" className="rb-go" onClick={go} disabled={!count || !v.trim()}>
-        Go
+        {tr("Go")}
       </button>
     </div>
   );
@@ -155,7 +157,7 @@ function SearchBox() {
       <Icon name="find" size={14} />
       <input
         value={app.query}
-        placeholder="Find"
+        placeholder={tr("Find")}
         aria-label="Find text"
         disabled={!app.doc}
         onChange={(e) => store.setQuery(e.target.value)}
@@ -187,7 +189,7 @@ export function Ribbon() {
       <div className="ribbon-tabs" role="tablist" aria-label="Ribbon tabs">
         {RIBBON_TABS.map((t) => (
           <button key={t} type="button" role="tab" aria-selected={t === tab} className={`ribbon-tab${t === tab ? " active" : ""}`} onClick={() => store.setRibbonTab(t)}>
-            {t}
+            {tr(t)}
           </button>
         ))}
         <SearchBox />

@@ -6,6 +6,8 @@ import { extractTo } from "../../actions";
 import { PageOverlay } from "./PageOverlay";
 import { EditBar, runBox } from "./EditBar";
 
+import { tr } from "../../i18n";
+
 /** Places that may take focus without closing the line editor. */
 const EDIT_CHROME = ".inline-editor, .edit-bar, .ribbon, .rb-choices, .modal, .modal-backdrop";
 
@@ -304,7 +306,7 @@ function ContextMenu({ x, y, items, onClose }: { x: number; y: number; items: (M
               onClose();
               it.run?.();
             }}>
-            {it.label}
+            {tr(it.label)}
           </button>
         ),
       )}
@@ -323,7 +325,7 @@ async function copyText(text: string) {
     document.execCommand("copy");
     ta.remove();
   }
-  store.notify(`Copied ${text.length} character${text.length === 1 ? "" : "s"}`);
+  store.notify(tr("Copied {0} character{1}", text.length, text.length === 1 ? "" : "s"));
 }
 
 // ------------------------------------------------------------------ a page
@@ -780,13 +782,13 @@ export function Viewer() {
   if (!app.doc)
     return (
       <div className="empty-viewer">
-        <b>No document open</b>
-        <span>Use File – Open (⌘O) to open a PDF, or drop one here</span>
+        <b>{tr("No document open")}</b>
+        <span>{tr("Use File – Open (⌘O) to open a PDF, or drop one here")}</span>
       </div>
     );
-  if (app.doc.passwordRequired) return <div className="empty-viewer">🔒 Password required to view this document</div>;
-  if (err) return <div className="viewer-error">Renderer failed: {err}</div>;
-  if (!session) return <div className="empty-viewer">Parsing document…</div>;
+  if (app.doc.passwordRequired) return <div className="empty-viewer">{tr("🔒 Password required to view this document")}</div>;
+  if (err) return <div className="viewer-error">{tr("Renderer failed:")} {err}</div>;
+  if (!session) return <div className="empty-viewer">{tr("Parsing document…")}</div>;
 
   const pageCount = app.doc.pages.length;
   let body: ReactNode;
@@ -810,12 +812,12 @@ export function Viewer() {
     <div className="viewer-scroll" ref={scrollRef} onScroll={onScroll}>
       {app.tool && (
         <div className="viewer-hint tool-hint">
-          {app.tool === "image" && app.pendingImage?.name.startsWith("signature") ? "Signature: click where it goes, or drag to set its width" : TOOL_HINT[app.tool]} · Esc to stop
+          {app.tool === "image" && app.pendingImage?.name.startsWith("signature") ? tr("Signature: click where it goes, or drag to set its width") : tr(TOOL_HINT[app.tool])} {tr("· Esc to stop")}
         </div>
       )}
       {app.editMode && (
         <div className="viewer-hint">
-          Edit Text: click any line to edit it in place · Enter or click away to save · Tab = next line · Esc = cancel · clear the text to delete it
+          {tr("Edit Text: click any line to edit it in place · Enter or click away to save · Tab = next line · Esc = cancel · clear the text to delete it")}
         </div>
       )}
       {body}

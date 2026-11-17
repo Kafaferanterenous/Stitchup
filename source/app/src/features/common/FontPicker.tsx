@@ -5,6 +5,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { cmdListSystemFonts, type SystemFace } from "../../ipc";
 
+import { tr } from "../../i18n";
+
 export const STANDARD = ["Helvetica", "Times", "Courier"] as const;
 export type FontChoice = "original" | string; // "original", a standard family, or an installed family
 
@@ -134,14 +136,14 @@ export function FontPicker({
                 {originalLabel}
               </button>
             )}
-            {!needle && <div className="font-picker-head">Standard — not embedded, smallest file</div>}
+            {!needle && <div className="font-picker-head">{tr("Standard — not embedded, smallest file")}</div>}
             {!needle &&
               STANDARD.map((f) => (
                 <button key={f} type="button" role="option" aria-selected={value === f} className={value === f ? "on" : ""} style={{ fontFamily: f === "Times" ? '"Times New Roman", serif' : f === "Courier" ? '"Courier New", monospace' : "Helvetica, sans-serif" }} onClick={() => pick(f)}>
                   {f}
                 </button>
               ))}
-            <div className="font-picker-head">{faces.length ? "Installed on this Mac — embedded" : "Loading installed fonts…"}</div>
+            <div className="font-picker-head">{faces.length ? tr("Installed on this Mac — embedded") : tr("Loading installed fonts…")}</div>
             {shown.map(([fam, fs]) => (
               <button key={fam} type="button" role="option" aria-selected={value === fam} className={value === fam ? "on" : ""} onClick={() => pick(fam)} title={`${fam} — ${fs.length} style${fs.length > 1 ? "s" : ""}`}>
                 <span style={{ fontFamily: `"${fam}", sans-serif` }}>{fam}</span>
@@ -152,7 +154,7 @@ export function FontPicker({
                 </span>
               </button>
             ))}
-            {needle && !shown.length && <div className="font-picker-head">No font matches “{q}”</div>}
+            {needle && !shown.length && <div className="font-picker-head">{tr("No font matches “")}{q}”</div>}
           </div>
         </div>
       )}

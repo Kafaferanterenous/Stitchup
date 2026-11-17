@@ -1142,3 +1142,19 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
   engine tests; OpenSSL cross-check in sign tests skips only when openssl is missing.
 - Linux could not be compiled here (WebKitGTK system libraries; no Docker on this Mac).
 - TESTS: core 63, command layer 9, e2e 78/78.
+
+2026-11-17 — v0.13.0: WINDOWS + LINUX BUILDS, 6 LANGUAGES, RISK NOTICE
+- User: no notarization (internal use / open source); needs a clear "experimental, use at your own
+  risk" warning; bonus: Polish, Italian, German, French, Mandarin Chinese.
+- GitHub Actions run 1: Linux OK (engine tests pass on Linux); Windows engine tests failed only
+  because the OpenSSL cross-check wrote to /dev/null — now a temp file.
+- i18n: src/i18n.ts (tr keyed by English, {0} placeholders, fallback English, system language on
+  first start, Settings ▸ Language, store re-render + native menu rebuild on change). A TypeScript-AST
+  codemod wrapped JSX text, title/placeholder/alt, notify / setError / Error / status messages;
+  ribbon labels, tips, menu items, tab names, tool hints, themes etc. translated at display.
+  582 strings × 5 languages (scripts/i18n: numbered .txt sources + checker for lines/placeholders).
+  Stamps print in the interface language (not zh: standard fonts); stamp colour follows the English
+  original. Fixed: "Not Approved" stamp was green. aria-labels stay English (tests use them).
+  Backend (Rust) messages are still English.
+- Risk notice: first start (once, localStorage), About, README, release notes.
+- TESTS: core 63, command layer 9, e2e 79/79 (language switch, screenshots of de / zh).

@@ -326,6 +326,8 @@ page = await ctx.newPage();
 const consoleErrors = [];
 page.on("pageerror", (e) => consoleErrors.push(e?.message ?? JSON.stringify(e)));
 await page.addInitScript(() => {
+  localStorage.setItem("stitchup.riskAccepted", "1");
+  if (!localStorage.getItem("stitchup.language")) localStorage.setItem("stitchup.language", "en");
   window.__dialog = [];
   window.__calls = [];
   window.__TAURI_INTERNALS__ = {
@@ -1931,6 +1933,31 @@ await check("crash recovery: snapshot → backend killed → relaunch offers the
   } finally {
     bridge2.kill();
   }
+});
+
+await check("Settings ▸ Language: Polish, German, Chinese, back to English", async () => {
+  const setLang = async (code) => {
+    await page.locator(".viewer-scroll").click({ position: { x: 5, y: 5 } }).catch(() => {});
+    await page.keyboard.press("Meta+,");
+    await page.getByLabel("Language").selectOption(code);
+    await page.locator(".modal .modal-actions button").first().click();
+  };
+  const tabs = () => page.locator(".ribbon-tabs [role=tab]").allInnerTexts();
+  await setLang("pl");
+  assert((await tabs()).join() === "Dokument,Strony,Adnotacje,Zawartość,Powiększenie,Nawigacja,Zabezpieczenia", (await tabs()).join());
+  await page.locator(".ribbon-tabs [role=tab]", { hasText: "Dokument" }).click();
+  assert((await page.locator(".ribbon-card .rb-text").allInnerTexts()).includes("Zapisz jako"), "Polish ribbon labels");
+  assert((await rb("save").getAttribute("title")).startsWith("Zapisz zmiany"), "Polish tooltip");
+  await setLang("de");
+  await page.locator(".ribbon-tabs [role=tab]", { hasText: "Kommentieren" }).click();
+  await page.screenshot({ path: path.join(OUT, "lang-de.png") });
+  await setLang("zh");
+  assert((await tabs()).join() === "文档,页面,注释,内容,缩放,导航,安全", (await tabs()).join());
+  await page.locator(".ribbon-tabs [role=tab]", { hasText: "安全" }).click();
+  await page.screenshot({ path: path.join(OUT, "lang-zh.png") });
+  await setLang("en");
+  assert((await tabs()).join() === "Document,Pages,Annotate,Content,Zoom,Navigate,Security", "back to English");
+  await page.locator(".ribbon-tabs [role=tab]", { hasText: "Document" }).click();
 });
 
 await check("no uncaught errors in the page", async () => {

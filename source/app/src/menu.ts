@@ -7,6 +7,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { Menu, Submenu, MenuItem, PredefinedMenuItem, CheckMenuItem } from "@tauri-apps/api/menu";
 import { COMMANDS, MENUS, byId, runCommand } from "./commands";
 import { store, subscribe, getState, RIBBON_TABS } from "./store";
+import { tr } from "./i18n";
 import { THEMES, applyTheme, currentTheme } from "./themes/theme";
 
 let native = false;
@@ -19,7 +20,7 @@ export async function installMenu(): Promise<void> {
     const items = new Map<string, MenuItem>();
     const make = async (id: string): Promise<MenuItem> => {
       const c = byId.get(id)!;
-      const text = (c.menu ?? c.label) + (c.soon ? " (coming soon)" : "");
+      const text = tr(c.menu ?? c.label) + (c.soon ? tr(" (coming soon)") : "");
       // An id may appear in two menus (Settings): the second copy gets a suffix.
       const uid = items.has(id) ? `${id}#2` : id;
       const mi = await MenuItem.new({ id: uid, text, accelerator: items.has(id) ? undefined : c.accel, action: () => void runCommand(id) });
@@ -30,14 +31,14 @@ export async function installMenu(): Promise<void> {
 
     const schemeItems = await Promise.all(
       THEMES.map((t) =>
-        CheckMenuItem.new({ id: `scheme:${t.name}`, text: t.label, checked: currentTheme() === t.name, action: () => void applyTheme(t.name).then(syncSchemes) }),
+        CheckMenuItem.new({ id: `scheme:${t.name}`, text: tr(t.label), checked: currentTheme() === t.name, action: () => void applyTheme(t.name).then(syncSchemes) }),
       ),
     );
     async function syncSchemes() {
       for (const [i, t] of THEMES.entries()) await schemeItems[i].setChecked(currentTheme() === t.name);
     }
     const tabItems = await Promise.all(
-      RIBBON_TABS.map((t) => MenuItem.new({ id: `tab:${t}`, text: t, action: () => store.setRibbonTab(t) })),
+      RIBBON_TABS.map((t) => MenuItem.new({ id: `tab:${t}`, text: tr(t), action: () => store.setRibbonTab(t) })),
     );
 
     const submenus: Record<string, () => Promise<Item[]>> = {
@@ -47,12 +48,12 @@ export async function installMenu(): Promise<void> {
         await PredefinedMenuItem.new({ item: "Paste" }),
       ],
       schemes: async () => [
-        await Submenu.new({ text: "Colour Scheme", items: [...schemeItems, await sep(), await make("darkMode")] }),
+        await Submenu.new({ text: tr("Colour Scheme"), items: [...schemeItems, await sep(), await make("darkMode")] }),
       ],
-      ribbonTabs: async () => [await Submenu.new({ text: "Ribbon Tab", items: tabItems })],
+      ribbonTabs: async () => [await Submenu.new({ text: tr("Ribbon Tab"), items: tabItems })],
       export: async () => [
         await Submenu.new({
-          text: "Export",
+          text: tr("Export"),
           items: await Promise.all(["exportText", "exportCsv", "exportImages", "exportRtf", "exportDocx", "exportOdt"].map((id) => make(id))),
         }),
       ],
@@ -95,11 +96,11 @@ export async function installMenu(): Promise<void> {
       if (m.title === "Help")
         bar.push(
           await Submenu.new({
-            text: "Window",
+            text: tr("Window"),
             items: [await PredefinedMenuItem.new({ item: "Minimize" }), await PredefinedMenuItem.new({ item: "Maximize" }), await sep(), await make("prevTab"), await make("nextTab")],
           }),
         );
-      bar.push(await Submenu.new({ text: m.title, items: its }));
+      bar.push(await Submenu.new({ text: tr(m.title), items: its }));
     }
     const menu = await Menu.new({ items: bar });
     await menu.setAsAppMenu();
