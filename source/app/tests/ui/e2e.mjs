@@ -366,6 +366,58 @@ await check("starts like Windows: 7 ribbon tabs, empty-state hint, status bar", 
   assert((await page.locator(".pages-pane").count()) === 0, "no sidebar without a document");
 });
 
+// Android tablets / phones: the app must fill the screen at 1:1 (no
+// zoomed-out "desktop page"), with nothing wider than the screen.
+for (const [label, w, h] of [["tablet portrait", 800, 1280], ["tablet landscape", 1280, 800], ["phone", 412, 915]]) {
+  await check(`Android ${label} (${w}×${h}): fills the screen, nothing wider than it`, async () => {
+    const mctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+    const m = await mctx.newPage();
+    await m.addInitScript(() => {
+      localStorage.setItem("stitchup.riskAccepted", "1");
+      localStorage.setItem("stitchup.language", "en");
+      window.__TAURI_INTERNALS__ = {
+        async invoke(cmd, args) {
+          if (cmd.startsWith("plugin:")) return null;
+          if (cmd === "platform_info") return { os: "android", ocr: false };
+          const r = await fetch(`/ipc/${cmd}`, { method: "POST", body: JSON.stringify(args ?? {}) });
+          const j = await r.json();
+          if ("err" in j) throw j.err;
+          return j.ok;
+        },
+        transformCallback: () => 0,
+        convertFileSrc: (p) => p,
+        metadata: { currentWindow: { label: "main" }, currentWebview: { windowLabel: "main", label: "main" } },
+      };
+    });
+    await m.goto(BASE);
+    await m.locator(".ribbon-tabs").waitFor();
+    await m.waitForTimeout(300);
+    const geo = await m.evaluate(() => ({
+      inner: window.innerWidth,
+      scale: window.visualViewport?.scale ?? 1,
+      scrollW: document.documentElement.scrollWidth,
+      scrollH: document.documentElement.scrollHeight,
+      innerH: window.innerHeight,
+      wide: [...document.querySelectorAll("body *")]
+        .filter((e) => e.getBoundingClientRect().right > window.innerWidth + 1 && getComputedStyle(e).position !== "fixed")
+        .slice(0, 5)
+        .map((e) => `${e.tagName.toLowerCase()}.${[...e.classList].join(".")}:${Math.round(e.getBoundingClientRect().right)}`),
+    }));
+    if (process.env.MOBILE_DEBUG) console.log("        overflow:", JSON.stringify(await m.evaluate((W) => {
+      document.documentElement.style.width = W + "px";
+      document.body.style.width = W + "px";
+      return [...document.querySelectorAll("body *")]
+        .filter((e) => e.scrollWidth > e.clientWidth + 1 || e.getBoundingClientRect().width > W + 1)
+        .slice(0, 12)
+        .map((e) => `${e.tagName.toLowerCase()}.${[...e.classList].join(".")} w=${Math.round(e.getBoundingClientRect().width)} sw=${e.scrollWidth} cw=${e.clientWidth} minw=${getComputedStyle(e).minWidth}`);
+    }, w)));
+    await m.screenshot({ path: path.join(OUT, `android-${label.replace(" ", "-")}.png`) });
+    await mctx.close();
+    assert(geo.inner === w && Math.abs(geo.scale - 1) < 0.01, `zoomed out: ${JSON.stringify(geo)}`);
+    assert(geo.scrollW <= w + 1 && geo.scrollH <= geo.innerH + 1, `page larger than the screen: ${JSON.stringify(geo)}`);
+  });
+}
+
 await check("Document tab has the Windows button set", async () => {
   const labels = await page.locator(".ribbon-card .rb-text").allInnerTexts();
   const want = "New,Open,Save,Save As,Properties,Import,Export ▾,Print";

@@ -2028,3 +2028,49 @@ kbd {
 }
 .sig-hit:hover { outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent); }
 .qs-dir code { overflow-wrap: anywhere; font-size: 11px; }
+
+/* Narrow screens (Android tablets in portrait, phones): the tab row scrolls
+   sideways instead of forcing the page wider than the screen (Android would
+   then zoom the whole app out). */
+.ribbon-tabs {
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+.ribbon-tabs::-webkit-scrollbar {
+  display: none;
+}
+.ribbon-tab {
+  flex-shrink: 0;
+}
+.search-box {
+  flex-shrink: 1;
+  min-width: 0;
+}
+.search-box input {
+  min-width: 48px;
+  flex: 1 1 160px;
+}
+.app-shell {
+  max-width: 100vw;
+  overflow: hidden;
+}
+@media (max-width: 900px) {
+  .ribbon-tab {
+    padding: 4px 10px;
+  }
+  .search-box input {
+    width: 90px;
+  }
+}
+/* Touch screens: larger targets. */
+@media (pointer: coarse) {
+  .ribbon-tab {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+  .ribbon-tabs {
+    height: 36px;
+  }
+}
