@@ -81,12 +81,27 @@ export const isUntitled = (doc: Document | null) => !!doc && doc.path.startsWith
 /** Friendly names for untitled documents (e.g. recovered after a crash). */
 const displayNames = new Map<string, string>();
 
+/** File name for a path, or for an Android content:// URI (best effort). */
+export function baseName(path: string): string {
+  if (path.startsWith("content://")) {
+    let last = path.split("/").pop() ?? "";
+    try {
+      last = decodeURIComponent(last);
+    } catch {
+      /* keep it encoded */
+    }
+    const name = last.split(/[\\/:]/).pop() ?? "";
+    return /\.[a-z0-9]{2,5}$/i.test(name) ? name : "Document.pdf";
+  }
+  return path.split(/[\\/]/).pop() ?? path;
+}
+
 export function docName(doc: Document | null): string {
   if (!doc) return "";
   const shown = displayNames.get(doc.path);
   if (shown) return shown;
   if (isUntitled(doc)) return `Untitled ${doc.path.slice(UNTITLED.length)}`;
-  return doc.path.split(/[\\/]/).pop() ?? doc.path;
+  return baseName(doc.path);
 }
 
 export interface AppState {
@@ -502,7 +517,7 @@ export const store = {
       return;
     }
     await this.freshTab();
-    const fileName = path.split(/[\\/]/).pop() ?? path;
+    const fileName = baseName(path);
     set({ busy: true, lastError: null, loading: { name: fileName, since: Date.now() }, statusMessage: tr("Opening {0}", fileName) });
     try {
       const doc = await openDocumentAdapter.open(path);

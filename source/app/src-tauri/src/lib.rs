@@ -20,6 +20,7 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .manage(session)
         .invoke_handler(tauri::generate_handler![
             commands::open_document,
@@ -92,6 +93,7 @@ pub fn run() {
             commands::quit_app,
         ])
         .setup(|app| {
+            let _ = commands::APP.set(app.handle().clone());
             // Scan the installed fonts in the background (font picker, fallback).
             std::thread::spawn(|| {
                 let _ = stitchup_core::fonts::system_faces();

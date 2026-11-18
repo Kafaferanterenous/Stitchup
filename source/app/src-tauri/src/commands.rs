@@ -13,12 +13,72 @@ use stitchup_core::error::{EngineError, ErrorCode};
 use stitchup_core::model::{collect_pages, read_metadata, Metadata, PageMeta};
 use stitchup_core::oplog::{self, OpLog, OpRecord};
 use stitchup_core::ops::{
-    assert_source_unmodified, commit_export as core_commit, delete_pages, extract,
+    delete_pages, extract,
     flatten_page_tree, insert_blank, merge_doc, open_bytes, reorder, replace_text, rotate_pages,
     set_metadata as ops_set_metadata, split, unlock_document as core_unlock, CommitResult,
 };
 use stitchup_core::textedit::{self, EditOutcome, EditRequest};
 use stitchup_core::docops;
+
+// ---------------------------------------------------------------- user files
+//
+// On Android the file pickers return `content://` URIs, not paths. They are
+// read and written through the fs plugin; everything else is a plain path.
+
+/// The app, for the fs plugin (set at start-up).
+pub static APP: std::sync::OnceLock<tauri::AppHandle> = std::sync::OnceLock::new();
+
+fn is_uri(p: &std::path::Path) -> bool {
+    p.to_str().is_some_and(|s| s.starts_with("content://"))
+}
+
+#[cfg(mobile)]
+fn uri_file(p: &std::path::Path, write: bool) -> std::io::Result<std::fs::File> {
+    use tauri_plugin_fs::{FsExt, OpenOptions};
+    let app = APP.get().ok_or_else(|| std::io::Error::other("app not ready"))?;
+    let url = tauri::Url::parse(p.to_str().unwrap_or_default()).map_err(std::io::Error::other)?;
+    let mut o = OpenOptions::new();
+    if write {
+        o.write(true).truncate(true).create(true);
+    } else {
+        o.read(true);
+    }
+    app.fs().open(tauri_plugin_fs::FilePath::Url(url), o)
+}
+
+/// Read a user file (path, or content:// URI on Android).
+pub fn read_path(p: &std::path::Path) -> std::io::Result<Vec<u8>> {
+    #[cfg(mobile)]
+    if is_uri(p) {
+        use std::io::Read;
+        let mut v = Vec::new();
+        uri_file(p, false)?.read_to_end(&mut v)?;
+        return Ok(v);
+    }
+    std::fs::read(p)
+}
+
+/// Write a whole document to a user file: atomic (temp + rename) for paths,
+/// straight through for content:// URIs.
+fn core_commit(doc: &mut PdfDoc, target: &std::path::Path) -> Result<CommitResult, EngineError> {
+    if is_uri(target) {
+        let mut data = Vec::new();
+        doc.save_to(&mut data)?;
+        return write_atomic(target, &data);
+    }
+    stitchup_core::ops::commit_export(doc, target)
+}
+
+/// The opened file must still be what was opened before it is overwritten.
+fn assert_source_unmodified(hash: &str, path: &std::path::Path) -> Result<(), EngineError> {
+    if !is_uri(path) {
+        return stitchup_core::ops::assert_source_unmodified(hash, path);
+    }
+    if stitchup_core::hash::sha256_hex(&read_path(path)?) != hash {
+        return Err(EngineError::new(ErrorCode::PermissionDenied, "source file changed during session; refusing to overwrite anything"));
+    }
+    Ok(())
+}
 
 /// In-memory session: the ONE document the UI is working on.
 #[derive(Default)]
@@ -166,7 +226,7 @@ pub fn open_document_inner(
     }
 
     // Fresh open from disk.
-    let bytes = std::fs::read(&path_buf)?;
+    let bytes = read_path(&path_buf)?;
     let info = open_bytes(bytes.clone(), path_buf.clone())?;
 
     let mut g = lock(&st)?;
@@ -343,7 +403,7 @@ pub fn merge_document_inner(
             "cannot merge a file onto itself",
         ));
     }
-    let other_bytes = std::fs::read(&target)?;
+    let other_bytes = read_path(std::path::Path::new(&target))?;
     let other = stitchup_core::model::load_lenient(&other_bytes).map_err(EngineError::from)?;
     if other.is_encrypted() {
         return Err(EngineError::new(
@@ -712,7 +772,7 @@ pub fn combine_documents_inner(st: &Mutex<SessionState>, paths: Vec<String>) -> 
     let mut iter = paths.iter();
     let first = iter.next().ok_or_else(|| EngineError::new(ErrorCode::ValidationFailed, "choose at least one PDF"))?;
     let load = |p: &String| -> Result<PdfDoc, EngineError> {
-        let doc = stitchup_core::model::load_lenient(&std::fs::read(p)?).map_err(EngineError::from)?;
+        let doc = stitchup_core::model::load_lenient(&read_path(std::path::Path::new(&p))?).map_err(EngineError::from)?;
         if doc.is_encrypted() {
             return Err(EngineError::new(ErrorCode::Encrypted, format!("{p} is password-protected")));
         }
@@ -750,7 +810,7 @@ pub fn adopt_saved_path(st: tauri::State<'_, Mutex<SessionState>>, path: String)
 pub fn adopt_saved_path_inner(st: &Mutex<SessionState>, path: String) -> Result<OpenPayload, EngineError> {
     let mut g = lock(st)?;
     let target = PathBuf::from(&path);
-    let bytes = std::fs::read(&target)?;
+    let bytes = read_path(std::path::Path::new(&target))?;
     g.path = Some(target.clone());
     g.source_hash = Some(stitchup_core::hash::sha256_hex(&bytes));
     g.source_size = bytes.len() as u64;
@@ -797,7 +857,7 @@ pub fn save_document_inner(st: &Mutex<SessionState>) -> Result<CommitResult, Eng
     let doc = g.doc.as_mut().ok_or_else(no_doc)?;
     // A signed PDF is saved as an incremental update, so its signatures stay valid.
     let signed = password.is_none() && !sign::list_signatures(doc).is_empty();
-    let incremental = if signed { std::fs::read(&path).ok().and_then(|b| docops::incremental_update(&b, doc).ok()) } else { None };
+    let incremental = if signed { read_path(&path).ok().and_then(|b| docops::incremental_update(&b, doc).ok()) } else { None };
     let result = match (&password, incremental) {
         (_, Some(bytes)) => write_atomic(&path, &bytes)?,
         (Some(pw), None) => core_commit(&mut docops::encrypted_copy(doc, pw, pw)?, &path)?,
@@ -971,6 +1031,17 @@ pub fn write_file_inner(st: &Mutex<SessionState>, path: String, b64: String) -> 
 /// Temp file in the target directory, fsync, rename — never a half-written file.
 fn write_atomic(target: &std::path::Path, bytes: &[u8]) -> Result<CommitResult, EngineError> {
     use std::io::Write;
+    #[cfg(mobile)]
+    if is_uri(target) {
+        let mut f = uri_file(target, true)?;
+        f.write_all(bytes)?;
+        let _ = f.sync_all();
+        return Ok(CommitResult {
+            new_sha256: stitchup_core::hash::sha256_hex(bytes),
+            size_bytes: bytes.len() as u64,
+            published_path: target.to_path_buf(),
+        });
+    }
     let dir = target.parent().filter(|p| !p.as_os_str().is_empty()).ok_or_else(|| EngineError::new(ErrorCode::IoError, "target has no folder"))?;
     let name = target.file_name().and_then(|n| n.to_str()).unwrap_or("export");
     let tmp = dir.join(format!(".stitchup-tmp-{}-{name}", std::process::id()));
@@ -1277,7 +1348,7 @@ pub fn sign_document_inner(st: &Mutex<SessionState>, target: String, spec: Value
     // Unchanged since it was opened/saved → sign the file's exact bytes as an
     // incremental update, so signatures already in it stay valid.
     let pristine = !g.dirty() && !g.untitled && g.password.is_none();
-    let on_disk = g.path.as_ref().and_then(|p| std::fs::read(p).ok()).filter(|b| {
+    let on_disk = g.path.as_ref().and_then(|p| read_path(p).ok()).filter(|b| {
         g.source_hash.as_deref() == Some(stitchup_core::hash::sha256_hex(b).as_str())
     });
     // Edited since opening: append the edits as an incremental update of
@@ -1333,7 +1404,7 @@ pub fn signature_info_inner(st: &Mutex<SessionState>) -> Result<Vec<stitchup_cor
         }
         g.path.clone()
     };
-    Ok(path.and_then(|p| std::fs::read(p).ok()).map(|b| stitchup_core::sigcheck::signatures(&b)).unwrap_or_default())
+    Ok(path.and_then(|p| read_path(&p).ok()).map(|b| stitchup_core::sigcheck::signatures(&b)).unwrap_or_default())
 }
 
 /// All form fields with their widgets (page + rect) and current values.
@@ -1460,6 +1531,14 @@ pub fn insert_image_inner(st: &Mutex<SessionState>, page: u32, rect: [f64; 4], i
 /// Read an image file the user picked (for Insert Image).
 #[tauri::command]
 pub fn read_image_file(path: String) -> Result<HashMap<String, String>, EngineError> {
+    if is_uri(std::path::Path::new(&path)) {
+        // Android picker: no file extension to go by; the image decoder checks it.
+        let bytes = read_path(std::path::Path::new(&path))?;
+        if bytes.len() > 60 * 1024 * 1024 {
+            return Err(EngineError::new(ErrorCode::ValidationFailed, "image is larger than 60 MB"));
+        }
+        return Ok(HashMap::from([("b64".to_string(), B64.encode(bytes))]));
+    }
     let lower = path.to_lowercase();
     if ![".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp", ".heic", ".tif", ".tiff"].iter().any(|e| lower.ends_with(e)) {
         return Err(EngineError::new(ErrorCode::ValidationFailed, "choose a PNG, JPEG, GIF, WebP, BMP, HEIC or TIFF image"));

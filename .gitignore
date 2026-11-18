@@ -35,3 +35,6 @@ source/app/src-tauri/icons/Square*.png
 source/app/src-tauri/icons/StoreLogo.png
 # Local sample PDFs for manual testing (third-party; not published)
 /fixtures/*.pdf
+
+# Android signing key (never published)
+/private/

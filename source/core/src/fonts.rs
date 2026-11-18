@@ -52,6 +52,9 @@ pub fn font_dirs() -> Vec<PathBuf> {
         if let Ok(local) = std::env::var("LOCALAPPDATA") {
             d.push(Path::new(&local).join("Microsoft").join("Windows").join("Fonts"));
         }
+    } else if cfg!(target_os = "android") {
+        d.push(PathBuf::from("/system/fonts"));
+        d.push(PathBuf::from("/product/fonts"));
     } else {
         // Linux / BSD: fonts live in sub-folders (scanned recursively).
         d.push(PathBuf::from("/usr/share/fonts"));
