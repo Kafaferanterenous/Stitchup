@@ -729,3 +729,15 @@
 728|Lista rozwijana: przeciągnij prostokąt (lub kliknij)
 729|Pole podpisu: przeciągnij prostokąt (lub kliknij)
 730|Edycja pól: przeciągnij, by przesunąć · kliknij dwukrotnie – właściwości · ⌫ usuwa
+731|Dodaj {0} pole‖Dodaj {0} pola‖Dodaj {0} pól
+732|Dodano {0} pole‖Dodano {0} pola‖Dodano {0} pól
+733|Kliknij, aby uwzględnić
+734|Kliknij, aby pominąć
+735|Wykryj pola
+736|Anulowano wykrywanie pól
+737|Wykryj pola…
+738|Znajdź puste ramki, linie, pola wyboru i kółka na formularzu do druku i zamień je na pola
+739|Znaleziono {0} możliwe pole‖Znaleziono {0} możliwe pola‖Znaleziono {0} możliwych pól
+740|Szukanie pól…
+741|Nie znaleziono pustych ramek ani linii, które wyglądają na pola
+742|kliknij ramkę, aby ją pominąć

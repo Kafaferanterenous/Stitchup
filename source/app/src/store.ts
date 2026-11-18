@@ -50,6 +50,7 @@ import {
   cmdInsertShape,
   cmdUnderline,
   cmdFormFieldOp,
+  cmdListFields,
   type FormField,
   cmdSetField,
   cmdInsertImage,
@@ -65,6 +66,7 @@ import {
   type OcrLine,
 } from "./ipc";
 import { pageImage, toBase64 } from "./export";
+import { detectPage, type Suggestion } from "./features/forms/detect";
 import { loadSettings } from "./settings";
 import { signatureFromPng, SIGNATURE_WIDTH_PT, type PreparedSignature } from "./quicksign";
 import { ask } from "@tauri-apps/plugin-dialog";
@@ -161,6 +163,8 @@ export interface AppState {
   fieldSel: string | null;
   /** Last radio group used, so the next button joins it. */
   lastRadioGroup: string | null;
+  /** Forms ▸ Detect Fields: places found that could become fields. */
+  suggestions: Suggestion[] | null;
   strokeWidth: number;
   /** Select tool: picked content objects ("t12"/"i30") and annotations (obj #). */
   picked: { page: number; objects: string[]; annots: number[] } | null;
@@ -325,6 +329,7 @@ let state: AppState = {
   fieldDraft: null,
   fieldSel: null,
   lastRadioGroup: null,
+  suggestions: null,
   strokeWidth: 2,
   picked: null,
   pendingInput: null,
@@ -497,6 +502,7 @@ export const store = {
       const doc = await openDocumentAdapter.open(path);
       set({
         doc,
+        suggestions: null,
         currentPage: 1,
         zoomMode: loadSettings().openZoom === "actual" ? "actual" : loadSettings().openZoom,
         zoom: loadSettings().openZoom === "actual" ? 1 : state.zoom,
@@ -776,6 +782,67 @@ export const store = {
     if (ok && op === "remove") set({ fieldSel: null });
     if (ok && op === "add" && data.kind === "radio") set({ lastRadioGroup: name });
     return ok ? name : null;
+  },
+
+  /** Forms ▸ Detect Fields: scan every page for boxes and lines to fill in. */
+  async detectFields() {
+    const doc = state.doc;
+    const session = state.session;
+    if (!doc || !session || state.busy) return;
+    set({ busy: true, suggestions: null, tool: null, fieldSel: null, statusMessage: tr("Looking for fields…") });
+    try {
+      const taken: Record<number, number[][]> = {};
+      for (const f of await cmdListFields().catch(() => [])) for (const w of f.widgets) (taken[w.page] ??= []).push(w.rect);
+      const found: Suggestion[] = [];
+      for (let p = 1; p <= doc.pages.length; p++) {
+        if (state.doc !== doc) return; // the document changed meanwhile
+        found.push(...(await detectPage(session, p, taken[p] ?? [])));
+      }
+      if (!found.length) {
+        set({ statusMessage: tr("No empty boxes or lines that look like fields were found") });
+        notify(tr("No empty boxes or lines that look like fields were found"));
+        return;
+      }
+      const pages = new Set(found.map((f) => f.page)).size;
+      set({
+        suggestions: found,
+        statusMessage: trn(found.length, "Found {0} possible field", "Found {0} possible fields") + " · " + trn(pages, "on {0} page", "on {0} pages"),
+      });
+      if (!found.some((f) => f.page === state.currentPage)) this.goToPage(found[0].page);
+    } catch (e) {
+      set({ lastError: e as Error, statusMessage: tr("Command failed") });
+    } finally {
+      set({ busy: false });
+    }
+  },
+
+  /** Include / leave out one found place. */
+  toggleSuggestion(i: number) {
+    const s = state.suggestions;
+    if (!s?.[i]) return;
+    set({ suggestions: s.map((x, k) => (k === i ? { ...x, on: !x.on } : x)) });
+  },
+
+  clearSuggestions() {
+    if (state.suggestions) set({ suggestions: null, statusMessage: tr("Detect Fields cancelled") });
+  },
+
+  /** Turn the chosen places into real fields (one undo step). */
+  async acceptSuggestions() {
+    const doc = state.doc;
+    const chosen = (state.suggestions ?? []).filter((s) => s.on);
+    if (!doc || !chosen.length) return this.clearSuggestions();
+    const fields = chosen.map((s) => ({ kind: s.kind, name: s.name, page: s.page, rect: s.rect, value: s.value ?? null, font_size: 0 }));
+    let added = 0;
+    await this.command(
+      { kind: "object", before: doc.pages.map((p) => p.page_no), data: { op: "add_many", count: fields.length } },
+      async () => {
+        const r = await cmdFormFieldOp("add_many", { fields });
+        added = Number(r.name) || fields.length;
+        return r.pages;
+      },
+      () => ({ status: trn(added, "Added {0} field", "Added {0} fields") }),
+    );
   },
 
   setTypeSize(pt: number) {
@@ -1136,7 +1203,7 @@ export const store = {
     parked.set(state.activeTab, sliceOf(state));
     const slice = parked.get(id) ?? EMPTY_SLICE;
     parked.delete(id);
-    set({ ...slice, stale: undefined, activeTab: id, session: null, searchHits: [], searchIndex: -1, picked: null, tool: null, editMode: false, scrollSeq: state.scrollSeq + 1 } as Partial<AppState>);
+    set({ ...slice, stale: undefined, activeTab: id, session: null, searchHits: [], searchIndex: -1, picked: null, tool: null, editMode: false, suggestions: null, scrollSeq: state.scrollSeq + 1 } as Partial<AppState>);
     if (slice.stale && slice.doc) {
       // Pages arrived from another tab while this one was parked.
       const next = await withFreshBytes(await refreshPages(slice.doc));
@@ -1223,6 +1290,8 @@ export const store = {
       const extra = after?.(result) ?? {};
       set({
         doc: { ...next, history: [...next.history, op], redo: [] },
+        // Found places refer to the old pages.
+        suggestions: null,
         currentPage: clampPage(next, extra.page ?? state.currentPage),
         // Text/page positions changed: stale search boxes would mislead.
         searchHits: [],

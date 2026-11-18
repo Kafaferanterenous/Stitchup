@@ -729,3 +729,15 @@
 728|Elenco a discesa: trascina un riquadro (o fai clic)
 729|Campo firma: trascina un riquadro (o fai clic)
 730|Modifica campi: trascina per spostare · doppio clic per le proprietà · ⌫ elimina
+731|Aggiungi {0} campo‖Aggiungi {0} campi
+732|Aggiunto {0} campo‖Aggiunti {0} campi
+733|Clic per includerlo
+734|Clic per escluderlo
+735|Rileva campi
+736|Rilevamento campi annullato
+737|Rileva campi…
+738|Trova riquadri vuoti, linee, caselle di controllo e cerchi in un modulo da stampare e trasformali in campi
+739|Trovato {0} possibile campo‖Trovati {0} possibili campi
+740|Ricerca dei campi…
+741|Nessun riquadro vuoto o linea simile a un campo trovato
+742|fai clic su un riquadro per escluderlo

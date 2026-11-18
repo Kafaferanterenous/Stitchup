@@ -729,5 +729,17 @@
  "Radio Button: click where it goes",
  "Drop-down: drag a box (or click)",
  "Signature Field: drag a box (or click)",
- "Edit Fields: drag to move \u00b7 double-click for properties \u00b7 \u232b deletes"
+ "Edit Fields: drag to move \u00b7 double-click for properties \u00b7 \u232b deletes",
+ "Add {0} Fields",
+ "Added {0} fields",
+ "Click to include this",
+ "Click to leave this out",
+ "Detect Fields",
+ "Detect Fields cancelled",
+ "Detect Fields\u2026",
+ "Find the empty boxes, lines, check boxes and circles on a printed-style form and turn them into fields",
+ "Found {0} possible fields",
+ "Looking for fields\u2026",
+ "No empty boxes or lines that look like fields were found",
+ "click a box to leave it out"
 ]

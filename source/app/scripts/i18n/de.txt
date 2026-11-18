@@ -729,3 +729,15 @@
 728|Auswahlliste: Rechteck ziehen (oder klicken)
 729|Unterschriftsfeld: Rechteck ziehen (oder klicken)
 730|Felder bearbeiten: ziehen zum Verschieben · Doppelklick für Eigenschaften · ⌫ löscht
+731|{0} Feld hinzufügen‖{0} Felder hinzufügen
+732|{0} Feld hinzugefügt‖{0} Felder hinzugefügt
+733|Klicken, um es aufzunehmen
+734|Klicken, um es auszulassen
+735|Felder erkennen
+736|Felderkennung abgebrochen
+737|Felder erkennen…
+738|Leere Kästchen, Linien, Kontrollkästchen und Kreise auf einem Formular zum Ausdrucken finden und in Felder umwandeln
+739|{0} mögliches Feld gefunden‖{0} mögliche Felder gefunden
+740|Suche nach Feldern…
+741|Keine leeren Kästchen oder Linien gefunden, die wie Felder aussehen
+742|Kästchen anklicken, um es auszulassen

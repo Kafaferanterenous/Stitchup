@@ -450,6 +450,28 @@ export function PageOverlay({
       {tool?.startsWith("field-") && !stale && (
         <FieldEditLayer fields={fields} pageNo={pageNo} viewBox={viewBox} toPdf={(x, y) => toPdf(x, y)} local={(e) => local(e)} editing={tool === "field-edit"} />
       )}
+      {/* Forms ▸ Detect Fields: places found, click to include / leave out */}
+      {app.suggestions && !stale &&
+        app.suggestions.map((g, i) => {
+          if (g.page !== pageNo) return null;
+          const b = viewBox(g.rect);
+          const label = g.kind === "radio" ? `${g.name}: ${g.value ?? ""}` : g.name;
+          return (
+            <div
+              key={`sg${i}`}
+              className={`suggest-box kind-${g.kind}${g.on ? " on" : ""}`}
+              style={{ left: b[0], top: b[1], width: b[2] - b[0], height: b[3] - b[1] }}
+              title={(g.on ? tr("Click to leave this out") : tr("Click to include this")) + ` · ${label}`}
+              data-suggest={i}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                store.toggleSuggestion(i);
+              }}>
+              <span className="field-box-name">{label}</span>
+            </div>
+          );
+        })}
       {/* Fillable form fields (reading mode) */}
       {!tool && !app.editMode && !stale && <FormLayer fields={fields} pageNo={pageNo} viewBox={viewBox} zoom={zoom} />}
 

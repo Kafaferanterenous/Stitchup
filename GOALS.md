@@ -88,3 +88,4 @@ Duplicates removed, Nitro / macOS layout: Print Preview and Print to PDF folded 
 | H10 | Type Text (click anywhere, type; 9–18 pt) and ✓ / ✗ marks, for forms without real fields — like Nitro's Type Text / Acrobat Fill & Sign | ✅ |
 | H11 | Underline selected lines (⌘U); proper plural forms (Polish 1/2–4/5+); ~30 more strings translated | ✅ |
 | H12 | Form creation: Forms tab — text, multi-line, check box, radio group, drop-down, signature fields; Edit Fields (move, properties, required / read-only, delete); undoable; read by pdf-lib | ✅ |
+| H13 | Detect Fields: find boxes, blank lines, check boxes and circles on flat forms (rendered-page scan), name them from nearby labels, group radio rows; click to leave out, add all in one undo step | ✅ |

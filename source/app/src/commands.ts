@@ -243,6 +243,7 @@ export const COMMANDS: Command[] = [
   { id: "formRadio", label: "Radio Button", menu: "Radio Button", tip: "Draw a radio button; buttons with the same group name allow one choice", icon: "f-radio", tab: "Forms", enabled: hasDoc, active: isTool("field-radio"), run: toolCmd("field-radio") },
   { id: "formChoice", label: "Drop-down", menu: "Drop-down List", tip: "Draw a drop-down list of choices", icon: "f-choice", tab: "Forms", enabled: hasDoc, active: isTool("field-choice"), run: toolCmd("field-choice") },
   { id: "formSign", label: "Signature Field", menu: "Signature Field", tip: "Draw a box where someone signs (Acrobat and other apps can sign into it)", icon: "f-sign", tab: "Forms", enabled: hasDoc, active: isTool("field-signature"), run: toolCmd("field-signature") },
+  { id: "formDetect", label: "Detect Fields", menu: "Detect Fields…", tip: "Find the empty boxes, lines, check boxes and circles on a printed-style form and turn them into fields", icon: "f-detect", tab: "Forms", group: "edit", enabled: (s) => hasDoc(s) && !s.busy, active: (s) => !!s.suggestions, run: () => void store.detectFields() },
   { id: "formEdit", label: "Edit Fields", menu: "Edit Fields", tip: "Move fields, change their names and options, or delete them", icon: "f-edit", tab: "Forms", group: "edit", enabled: hasDoc, active: isTool("field-edit"), run: toolCmd("field-edit") },
 
   // ------------------------------------------------------------------- Pages
@@ -425,7 +426,7 @@ export const MENUS: { title: string; items: (string | "-" | { submenu: string })
   { title: "Edit", items: ["undo", "redo", "-", { submenu: "clipboard" }, "-", "find", "findNext", "findPrev", "-", "select", "editText", "objDelete", "fore", "font", "underline", "image", "ocr"] },
   { title: "Pages", items: ["import", "addPage", "delete", "-", "rotateCw", "rotateCcw", "rotateAll", "-", "extract", "split", "autoCrop", "headerFooter", "-", "selectAll"] },
   { title: "Annotate", items: ["annType", "annMark", "-", "annHighlight", "annUnderline", "annStrike", "annNote", "annText", "annShape", "annStamp", "annLink", "annPen", "-", "annFore", "back"] },
-  { title: "Forms", items: ["formText", "formMulti", "formCheck", "formRadio", "formChoice", "formSign", "-", "formEdit"] },
+  { title: "Forms", items: ["formText", "formMulti", "formCheck", "formRadio", "formChoice", "formSign", "-", "formDetect", "formEdit"] },
   { title: "Security", items: ["encrypt", "sign", "quickSign", "annRedact", "watermark"] },
   { title: "View", items: ["zoomIn", "zoomOut", "zoom100", "fitWidth", "fitPage", "-", "prev", "next", "-", "spread", "single", "continuous", "sidebar", "-", { submenu: "ribbonTabs" }, { submenu: "schemes" }] },
   { title: "Help", items: ["guide", "checkUpdate"] },

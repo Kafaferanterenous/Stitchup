@@ -729,3 +729,15 @@
 728|Liste déroulante : tracez un cadre (ou cliquez)
 729|Champ de signature : tracez un cadre (ou cliquez)
 730|Modifier les champs : glissez pour déplacer · double-clic pour les propriétés · ⌫ supprime
+731|Ajouter {0} champ‖Ajouter {0} champs
+732|{0} champ ajouté‖{0} champs ajoutés
+733|Cliquez pour l’inclure
+734|Cliquez pour l’exclure
+735|Détecter les champs
+736|Détection des champs annulée
+737|Détecter les champs…
+738|Trouver les cases vides, lignes, cases à cocher et cercles d’un formulaire imprimable et les transformer en champs
+739|{0} champ possible trouvé‖{0} champs possibles trouvés
+740|Recherche des champs…
+741|Aucune case vide ni ligne ressemblant à un champ n’a été trouvée
+742|cliquez sur une case pour l’exclure

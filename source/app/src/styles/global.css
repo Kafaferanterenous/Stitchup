@@ -1910,3 +1910,56 @@ kbd {
   min-height: 90px;
   font: inherit;
 }
+
+/* Forms ▸ Detect Fields */
+.suggest-box {
+  position: absolute;
+  z-index: 13;
+  box-sizing: border-box;
+  border: 1.5px dashed color-mix(in srgb, var(--fg) 35%, transparent);
+  background: transparent;
+  border-radius: 2px;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.suggest-box.on {
+  border: 2px solid #1f9d55;
+  background: color-mix(in srgb, #1f9d55 14%, transparent);
+}
+.suggest-box:not(.on) .field-box-name {
+  text-decoration: line-through;
+  background: color-mix(in srgb, var(--fg) 40%, transparent);
+}
+.suggest-box.on .field-box-name {
+  background: #1f9d55;
+  color: #fff;
+}
+.suggest-box.kind-checkbox .field-box-name,
+.suggest-box.kind-radio .field-box-name {
+  max-width: 160px;
+}
+.suggest-bar {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100vw - 32px);
+  padding: 8px 10px 8px 14px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--fg);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  font-size: 13px;
+}
+.suggest-bar span {
+  flex: 1;
+  min-width: 0;
+}
+.suggest-bar button.primary {
+  font-weight: 600;
+}

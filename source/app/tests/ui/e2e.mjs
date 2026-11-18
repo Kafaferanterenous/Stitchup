@@ -2266,6 +2266,97 @@ await check("Annotate ▸ Type Text and ✓ / ✗ fill in a form that has no fie
   openPath = MAIN;
 });
 
+await check("Forms ▸ Detect Fields finds boxes, lines, check boxes and circles on a flat form, names them, adds the chosen ones", async () => {
+  // A printed-style form: nothing fillable, just boxes, lines and labels.
+  const f = path.join(WORK, "flat-form.pdf");
+  {
+    const d = await PDFDocument.create();
+    const p = d.addPage([612, 792]);
+    const font = await d.embedFont(StandardFonts.Helvetica);
+    const ink = rgb(0.2, 0.2, 0.2);
+    const t = (s, x, y) => p.drawText(s, { x, y, size: 11, font });
+    p.drawText("Membership form", { x: 72, y: 740, size: 20, font });
+    t("Full Name:", 72, 702);
+    p.drawRectangle({ x: 160, y: 694, width: 260, height: 22, borderColor: ink, borderWidth: 1 });
+    t("Email:", 72, 662);
+    p.drawRectangle({ x: 160, y: 654, width: 260, height: 22, borderColor: ink, borderWidth: 1 });
+    t("Comments:", 72, 620);
+    p.drawRectangle({ x: 72, y: 520, width: 348, height: 86, borderColor: ink, borderWidth: 1 });
+    t("Phone:", 72, 482);
+    p.drawLine({ start: { x: 120, y: 480 }, end: { x: 320, y: 480 }, thickness: 0.8, color: ink });
+    t("Gender:", 72, 446);
+    p.drawCircle({ x: 79, y: 428, size: 6, borderColor: ink, borderWidth: 1 });
+    t("Male", 90, 424);
+    p.drawCircle({ x: 159, y: 428, size: 6, borderColor: ink, borderWidth: 1 });
+    t("Female", 170, 424);
+    p.drawRectangle({ x: 72, y: 384, width: 12, height: 12, borderColor: ink, borderWidth: 1 });
+    t("I agree to the terms", 92, 386);
+    // Underlined text is not a blank line.
+    t("Read the rules first", 72, 340);
+    p.drawLine({ start: { x: 72, y: 337 }, end: { x: 180, y: 337 }, thickness: 0.8, color: ink });
+    await writeFile(f, await d.save({ useObjectStreams: false }));
+  }
+  await openViaRibbon(f);
+  await tab("Forms");
+  await rb("formDetect").click();
+  await waitStatus(/Found \d+ possible field/);
+  const found = await page.evaluate(() => window.__stitchup.state().suggestions);
+  const desc = found.map((g) => `${g.kind}:${g.name}${g.value ? "=" + g.value : ""}`).sort();
+  const want = ["checkbox:I agree to the terms", "multiline:Comments", "radio:Gender=Female", "radio:Gender=Male", "text:Email", "text:Full Name", "text:Phone"];
+  assert(desc.join("|") === want.join("|"), desc.join("|"));
+  const phone = found.find((g) => g.name === "Phone");
+  assert(Math.abs(phone.rect[1] - 480) < 2 && phone.rect[3] - phone.rect[1] >= 10, `sits on the line ${phone.rect}`);
+  await page.screenshot({ path: path.join(OUT, "detect-fields.png") });
+  // Leave Email out, add the rest (one undo step).
+  const email = found.findIndex((g) => g.name === "Email");
+  await page.locator(`.suggest-box[data-suggest="${email}"]`).click();
+  await page.locator(".suggest-bar").getByRole("button", { name: "Add 6 Fields" }).click();
+  await waitStatus(/Added 6 fields/);
+  assert(!(await page.locator(".suggest-bar").count()), "bar gone");
+  const names = (await ipc("list_fields")).map((x) => `${x.kind}:${x.name}`).sort();
+  assert(names.join("|") === "checkbox:I agree to the terms|radio:Gender|text:Comments|text:Full Name|text:Phone", names.join("|"));
+  const out = path.join(WORK, "detected-form.pdf");
+  await pick(out);
+  await tab("Document");
+  await rb("saveAs").click();
+  await waitStatus(/detected-form\.pdf/);
+  const form = (await PDFDocument.load(await readFile(out))).getForm();
+  assert(form.getRadioGroup("Gender").getOptions().join() === "Male,Female", "radio options");
+  assert(form.getTextField("Comments").isMultiline(), "multi-line");
+  // Again: existing fields are not suggested twice; Esc cancels.
+  await tab("Forms");
+  await rb("formDetect").click();
+  await waitStatus(/Found \d+ possible field/);
+  const again = await page.evaluate(() => window.__stitchup.state().suggestions);
+  assert(again.length === 1 && again[0].name === "Email", again.map((g) => g.name).join());
+  await page.keyboard.press("Escape");
+  assert(!(await page.locator(".suggest-bar").count()), "Esc cancels");
+  await page.keyboard.press("Meta+z");
+  for (let i = 0; i < 20 && (await ipc("list_fields")).length; i++) await page.waitForTimeout(200);
+  assert(!(await ipc("list_fields")).length, "one undo removes them all");
+
+  // The real Canva sample form, when present locally.
+  const local = path.resolve(APP, "..", "..", "fixtures", "fillable-form.pdf");
+  if (existsSync(local)) {
+    await openViaRibbon(local);
+    await tab("Forms");
+    await rb("formDetect").click();
+    await waitStatus(/Found \d+ possible field/);
+    const s = await page.evaluate(() => window.__stitchup.state().suggestions);
+    const k = (kind) => s.filter((g) => g.kind === kind);
+    console.log("        sample form:", s.map((g) => `${g.page}/${g.kind}:${g.name}${g.value ? "=" + g.value : ""}`).join(" | "));
+    assert(k("text").length >= 3 && k("multiline").length >= 1 && k("radio").length === 2 && k("checkbox").length >= 2, "sample form kinds");
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: path.join(OUT, "detect-sample.png") });
+    await page.keyboard.press("Escape");
+    await page.locator(".doc-tab.active .doc-tab-close").click();
+  }
+  await page.locator(".doc-tab.active .doc-tab-close").click();
+  await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
+  await waitStatus(/main\.pdf/);
+  openPath = MAIN;
+});
+
 // Local sample files (not in the repo): run when present.
 const LOCAL = path.resolve(APP, "..", "..", "fixtures");
 if (existsSync(path.join(LOCAL, "protected.pdf"))) {

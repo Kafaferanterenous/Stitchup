@@ -364,6 +364,30 @@ pub fn add_field(doc: &mut PdfDoc, spec: &NewField) -> Result<String, EngineErro
     Ok(name)
 }
 
+/// Add several fields at once (Detect Fields). Radio buttons that share a
+/// `name` in the batch form one new group, even if the document already has
+/// a group by that name. Returns the final names, in order.
+pub fn add_fields(doc: &mut PdfDoc, specs: &[NewField]) -> Result<Vec<String>, EngineError> {
+    let mut groups: std::collections::HashMap<String, String> = Default::default();
+    let mut out = Vec::with_capacity(specs.len());
+    for spec in specs {
+        let mut s = spec.clone();
+        if s.kind == "radio" {
+            let key = s.name.trim().to_string();
+            match groups.get(&key) {
+                Some(real) => s.name = real.clone(),
+                None => s.name = unique_name(doc, &key),
+            }
+            let name = add_field(doc, &s)?;
+            groups.insert(key, name.clone());
+            out.push(name);
+        } else {
+            out.push(add_field(doc, &s)?);
+        }
+    }
+    Ok(out)
+}
+
 fn add_to_page(doc: &mut PdfDoc, page: ObjectId, widget: ObjectId) -> Result<(), EngineError> {
     let mut annots = annots_of(doc, doc.get_object(page)?.as_dict()?);
     annots.push(Object::Reference(widget));

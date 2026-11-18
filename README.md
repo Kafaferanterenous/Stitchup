@@ -61,6 +61,9 @@ not notarized. The first time you open it, right-click it and choose
   check boxes, radio button groups, drop-down lists and signature fields;
   Edit Fields moves, renames, marks required / read-only and deletes them.
   The forms work in Acrobat, Preview and browsers.
+  **Detect Fields** turns a flat form (scan, Canva export) into a fillable
+  one: it finds the empty boxes, blank lines, check boxes and circles, names
+  each from its label, and adds the ones you keep in one step.
   Forms without real fields (scans, Canva exports): **Type Text** anywhere
   and tick boxes with ✓ / ✗ (Annotate tab).
 - **OCR:** Pages ▸ OCR reads scanned pages with Apple's Vision framework, on

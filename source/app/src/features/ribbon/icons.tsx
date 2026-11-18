@@ -71,7 +71,8 @@ export type IconName =
   | "f-radio"
   | "f-choice"
   | "f-sign"
-  | "f-edit";
+  | "f-edit"
+  | "f-detect";
 
 const ICONS: Record<IconName, ReactNode> = {
   open: (
@@ -335,6 +336,9 @@ const ICONS: Record<IconName, ReactNode> = {
   ),
   "f-multi": (
     <><rect x="3" y="4" width="18" height="16" rx="1.5" /><path d="M7 9h10M7 13h10M7 17h6" /></>
+  ),
+  "f-detect": (
+    <><rect x="3" y="5" width="12" height="6" rx="1" strokeDasharray="2 1.6" /><path d="M3 17h8" strokeDasharray="2 1.6" /><path d="M18 11.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z" /><path d="M18.5 3.5l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z" /></>
   ),
   "f-check": (
     <><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 12.5l3 3 5-6.5" /></>

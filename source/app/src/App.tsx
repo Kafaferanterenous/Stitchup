@@ -38,6 +38,7 @@ import {
   PropertiesDialog,
   SplitDialog,
   WatermarkDialog, FieldDialog } from "./features/common/Dialogs";
+import { SuggestBar } from "./features/forms/SuggestBar";
 
 import { tr } from "./i18n";
 
@@ -178,6 +179,9 @@ export default function App() {
         } else if (st.editMode) {
           e.preventDefault();
           store.setEditMode(false);
+        } else if (st.suggestions) {
+          e.preventDefault();
+          store.clearSuggestions();
         }
       }
       if (!inField && (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "c" && getState().selectionText) {
@@ -236,6 +240,7 @@ export default function App() {
       <PropertiesDialog />
       {app.dialog === "about" && <AboutDialog />}
       {app.dialog === "field" && <FieldDialog />}
+      <SuggestBar />
       {app.dialog === "extract" && <ExtractDialog />}
       {app.dialog === "split" && <SplitDialog />}
       {app.dialog === "new" && <NewDialog />}

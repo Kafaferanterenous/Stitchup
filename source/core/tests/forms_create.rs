@@ -127,3 +127,24 @@ fn fields_are_renamed_changed_moved_and_deleted_and_undo_restores() {
     assert_eq!(forms::list(&d).len(), 2, "undo brings the field back");
     assert!(formedit::remove_field(&mut d, "nope").is_err());
 }
+
+#[test]
+fn detected_fields_are_added_in_one_batch_with_fresh_radio_groups() {
+    let mut d = blank();
+    let mut old = nf("radio", "Gender", 1, [72.0, 300.0, 86.0, 314.0]);
+    old.value = Some("Yes".into());
+    formedit::add_field(&mut d, &old).unwrap();
+    let mut a = nf("radio", "Gender", 1, [72.0, 480.0, 86.0, 494.0]);
+    a.value = Some("Male".into());
+    let mut b = nf("radio", "Gender", 1, [140.0, 480.0, 154.0, 494.0]);
+    b.value = Some("Female".into());
+    let specs = vec![nf("text", "Email", 1, [72.0, 700.0, 300.0, 720.0]), a, b, nf("checkbox", "Agree", 2, [72.0, 520.0, 86.0, 534.0])];
+    let names = formedit::add_fields(&mut d, &specs).unwrap();
+    assert_eq!(names, vec!["Email", "Gender_2", "Gender_2", "Agree"]);
+    let back = reload(&mut d);
+    let list = forms::list(&back);
+    assert_eq!(list.len(), 4);
+    let g = list.iter().find(|f| f.name == "Gender_2").unwrap();
+    assert_eq!(g.widgets.len(), 2, "both detected buttons form one new group");
+    assert_eq!(list.iter().find(|f| f.name == "Gender").unwrap().widgets.len(), 1, "the old group is left alone");
+}

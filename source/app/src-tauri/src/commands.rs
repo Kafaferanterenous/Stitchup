@@ -1354,6 +1354,15 @@ pub fn form_field_op_inner(st: &Mutex<SessionState>, op: String, data: Value) ->
             let ids = formedit::touched_ids(doc, spec.name.trim());
             logged_objects(&mut g, "Add form field", &ids, |doc| formedit::add_field(doc, &spec).map(|n| out = n))?
         }
+        "add_many" => {
+            let specs: Vec<formedit::NewField> =
+                serde_json::from_value(data.get("fields").cloned().unwrap_or_default()).map_err(validation)?;
+            if specs.is_empty() {
+                return Err(EngineError::new(ErrorCode::ValidationFailed, "no fields to add"));
+            }
+            let ids = formedit::touched_ids(doc, "");
+            logged_objects(&mut g, "Add detected fields", &ids, |doc| formedit::add_fields(doc, &specs).map(|n| out = n.len().to_string()))?
+        }
         "update" => {
             let p: formedit::FieldProps = serde_json::from_value(data.clone()).map_err(validation)?;
             let ids = formedit::touched_ids(doc, &p.name);
