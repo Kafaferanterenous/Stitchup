@@ -51,6 +51,7 @@ import {
   cmdUnderline,
   cmdFormFieldOp,
   cmdListFields,
+  cmdSignatureInfo,
   type FormField,
   cmdSetField,
   cmdInsertImage,
@@ -163,6 +164,8 @@ export interface AppState {
   fieldSel: string | null;
   /** Last radio group used, so the next button joins it. */
   lastRadioGroup: string | null;
+  /** Security ▸ Signatures: the signature field to show first (clicked on the page). */
+  sigFocus: string | null;
   /** Forms ▸ Detect Fields: places found that could become fields. */
   suggestions: Suggestion[] | null;
   strokeWidth: number;
@@ -281,6 +284,7 @@ export type Dialog =
   | "quickSignNew"
   | "quickSignUnlock"
   | "quickSignManage"
+  | "signatures"
   | "headerFooter"
   | "field"
   | "recovery";
@@ -330,6 +334,7 @@ let state: AppState = {
   fieldSel: null,
   lastRadioGroup: null,
   suggestions: null,
+  sigFocus: null,
   strokeWidth: 2,
   picked: null,
   pendingInput: null,
@@ -488,7 +493,8 @@ function legacyCopy(text: string): boolean {
 }
 
 export const store = {
-  async open(path: string) {
+  /** `quiet`: no "signed by" notice (the caller says something itself). */
+  async open(path: string, quiet = false) {
     // Already open in a tab → just show it.
     const existing = state.tabs.find((t) => t.path === path);
     if (existing) {
@@ -523,6 +529,21 @@ export const store = {
       const w = doc.warnings.filter((x) => !/password-protected/.test(x));
       if (!doc.passwordRequired && w.length) {
         notify(tr("⚠ {0} warning{1}: {2}", w.length, w.length > 1 ? "s" : "", w[0]));
+      } else if (!doc.passwordRequired && !quiet) {
+        // Signed documents say so (details: Security ▸ Signatures).
+        void cmdSignatureInfo()
+          .then((sigs) => {
+            if (!sigs.length || state.doc !== doc) return;
+            const bad = sigs.some((g) => g.status === "invalid");
+            notify(
+              bad
+                ? tr("⚠ A signature in this document does not match — Security ▸ Signatures for details")
+                : sigs.length === 1
+                  ? tr("Signed by {0} — Security ▸ Signatures for details", sigs[0].name)
+                  : trn(sigs.length, "{0} signature — Security ▸ Signatures for details", "{0} signatures — Security ▸ Signatures for details"),
+            );
+          })
+          .catch(() => {});
       }
     } catch (e) {
       set({ lastError: e as Error, statusMessage: tr("Open failed") });
@@ -821,6 +842,11 @@ export const store = {
     const s = state.suggestions;
     if (!s?.[i]) return;
     set({ suggestions: s.map((x, k) => (k === i ? { ...x, on: !x.on } : x)) });
+  },
+
+  /** Security ▸ Signatures (optionally starting at one signature field). */
+  showSignatures(field: string | null = null) {
+    set({ sigFocus: field, dialog: "signatures" });
   },
 
   clearSuggestions() {

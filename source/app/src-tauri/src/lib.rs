@@ -77,6 +77,8 @@ pub fn run() {
             commands::about_sound_clear,
             commands::recolor_annotations,
             commands::quicksign_list,
+            commands::quicksign_dir,
+            commands::signature_info,
             commands::quicksign_save,
             commands::quicksign_load,
             commands::quicksign_delete,

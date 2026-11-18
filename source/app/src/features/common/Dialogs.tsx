@@ -3,7 +3,7 @@ import { open as openDialog, save as saveDialog } from "@tauri-apps/plugin-dialo
 import appIcon from "../../../src-tauri/icons/128x128@2x.png";
 import { useAppState, store, getState, docName, isUntitled, rgb, annotColor, type FieldKind } from "../../store";
 import { extractTo, parsePages, splitInto } from "../../actions";
-import { cmdListFields, cmdAboutSoundClear, cmdAboutSoundGet, cmdAboutSoundSet, cmdSaveCompressed, cmdDiscardRecovery, cmdListAttachments, cmdSaveAttachment, cmdSaveEncrypted, cmdSign, cmdWriteFile, type AttachmentInfo, type RecoveryEntry } from "../../ipc";
+import { cmdListFields, cmdAboutSoundClear, cmdAboutSoundGet, cmdAboutSoundSet, cmdSaveCompressed, cmdDiscardRecovery, cmdListAttachments, cmdSaveAttachment, cmdSaveEncrypted, cmdSign, cmdSignatureInfo, cmdWriteFile, type AttachmentInfo, type SigInfo, type RecoveryEntry } from "../../ipc";
 import { loadSettings, saveSettings, type Settings } from "../../settings";
 import { FontPicker, fontName, useSystemFonts, type FontChoice } from "./FontPicker";
 import { THEMES, applyTheme, currentTheme, type ThemeName } from "../../themes/theme";
@@ -489,7 +489,7 @@ export function EncryptDialog() {
     const doc = getState().doc;
     if (!doc || !ok) return;
     const base = docName(doc).replace(/\.pdf$/i, "");
-    const dir = isUntitled(doc) ? "" : doc.path.slice(0, doc.path.lastIndexOf("/") + 1);
+    const dir = isUntitled(doc) ? "" : doc.path.slice(0, Math.max(doc.path.lastIndexOf("/"), doc.path.lastIndexOf("\\")) + 1);
     const target = await saveDialog({ defaultPath: `${dir}${base}-protected.pdf`, filters: [{ name: "PDF", extensions: ["pdf"] }] });
     if (typeof target !== "string") return;
     try {
@@ -593,7 +593,7 @@ export function ExportImagesDialog() {
     if (!s.session || !s.doc) return;
     const pages = range === "all" ? s.doc.pages.map((p) => p.page_no) : store.targets();
     const base = docName(s.doc).replace(/\.pdf$/i, "");
-    const dir = isUntitled(s.doc) ? "" : s.doc.path.slice(0, s.doc.path.lastIndexOf("/") + 1);
+    const dir = isUntitled(s.doc) ? "" : s.doc.path.slice(0, Math.max(s.doc.path.lastIndexOf("/"), s.doc.path.lastIndexOf("\\")) + 1);
     const target = await saveDialog({ defaultPath: `${dir}${base}.${fmt}`, filters: [{ name: fmt.toUpperCase(), extensions: [fmt] }] });
     if (typeof target !== "string") return;
     const stem = target.replace(/\.(png|jpe?g)$/i, "");
@@ -912,12 +912,15 @@ async function signNow(spec: SignDetails) {
   store.setTool(null);
   if (!doc) return;
   const base = docName(doc).replace(/\.pdf$/i, "");
-  const dir = isUntitled(doc) ? "" : doc.path.slice(0, doc.path.lastIndexOf("/") + 1);
+  const dir = isUntitled(doc) ? "" : doc.path.slice(0, Math.max(doc.path.lastIndexOf("/"), doc.path.lastIndexOf("\\")) + 1);
   const target = await saveDialog({ defaultPath: `${dir}${base}-signed.pdf`, filters: [{ name: "PDF", extensions: ["pdf"] }] });
   if (typeof target !== "string") return;
   try {
     const r = await cmdSign(target, spec);
-    store.notify(tr("Signed by {0} → {1}", spec.name, r.published_path));
+    // Show the signed copy (this document stays unsigned), at the signature.
+    await store.open(r.published_path, true);
+    if (spec.page) store.goToPage(spec.page);
+    store.notify(tr("Signed by {0} → {1} (opened; Security ▸ Signatures shows the details)", spec.name, r.published_path));
   } catch (e) {
     store.notify(tr("Signing failed: {0}", (e as Error).message ?? e));
   }
@@ -979,6 +982,96 @@ export function SignDialog() {
           {visible ? tr("Place Signature…") : tr("Sign & Save As…")}
         </button>
         <button onClick={close}>{tr("Cancel")}</button>
+      </div>
+    </Modal>
+  );
+}
+
+/** Security ▸ Signatures: every digital signature in the file, checked. */
+export function SignaturesDialog() {
+  const app = useAppState();
+  const [list, setList] = useState<SigInfo[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    cmdSignatureInfo().then(setList, (e) => setError(String((e as Error).message ?? e)));
+  }, []);
+  const dirty = !!app.doc && app.doc.history.length > app.savedLen;
+  const STATUS: Record<SigInfo["status"], [string, string]> = {
+    valid: ["✓", tr("Valid — the document has not been changed since it was signed")],
+    changed: ["!", tr("Valid, but the document was changed after this signature (later edits or another signature)")],
+    invalid: ["✗", tr("Not valid — the signed part of the document was altered, or the signature is damaged")],
+    unknown: ["?", tr("Could not be checked")],
+  };
+  const focus = app.sigFocus;
+  const shown = list && focus ? [...list].sort((a, b) => Number(b.field === focus) - Number(a.field === focus)) : list;
+  return (
+    <Modal title={tr("Signatures")} onClose={close} wide>
+      {error && <p className="error">{error}</p>}
+      {!list && !error && <p className="muted">{tr("Checking…")}</p>}
+      {list && !list.length && (
+        <p className="muted">
+          {focus ? tr("This signature field is empty: nobody has signed it yet.") + " " : ""}
+          {tr("This document has no digital signatures. Security ▸ Sign adds one and saves a signed copy.")}
+        </p>
+      )}
+      {focus && list && list.length > 0 && !list.some((g) => g.field === focus) && (
+        <p className="muted">{tr("This signature field is empty: nobody has signed it yet.")}</p>
+      )}
+      {shown?.map((g) => (
+        <div key={g.field + g.date} className={`sig-card sig-${g.status}${g.field === focus ? " focused" : ""}`}>
+          <div className="sig-head">
+            <span className="sig-badge" aria-hidden="true">{STATUS[g.status][0]}</span>
+            <b>{tr("Signed by {0}", g.name || "?")}</b>
+            {g.date && <span className="muted"> · {g.date}</span>}
+          </div>
+          <div className="sig-status">{STATUS[g.status][1]}</div>
+          {g.detail && g.status !== "valid" && <div className="muted">{g.detail}</div>}
+          <table className="sig-table">
+            <tbody>
+              {g.reason && (
+                <tr>
+                  <td>{tr("Reason")}</td>
+                  <td>{g.reason}</td>
+                </tr>
+              )}
+              {g.location && (
+                <tr>
+                  <td>{tr("Location")}</td>
+                  <td>{g.location}</td>
+                </tr>
+              )}
+              <tr>
+                <td>{tr("Certificate")}</td>
+                <td>
+                  {g.subject || "—"}
+                  {g.self_signed && <div className="muted">{tr("Self-signed: the name was typed by the signer and is not confirmed by a certificate authority.")}</div>}
+                </td>
+              </tr>
+              <tr>
+                <td>{tr("Field")}</td>
+                <td>
+                  {g.field || "—"}
+                  {g.page ? ` · ${tr("page {0}", g.page)}` : ` · ${tr("invisible (no box on the page)")}`}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          {g.page && (
+            <button
+              onClick={() => {
+                close();
+                store.goToPage(g.page!);
+              }}>
+              {tr("Show on Page")}
+            </button>
+          )}
+        </div>
+      ))}
+      {dirty && list && list.length > 0 && <p className="muted">{tr("These are the signatures in the file as last saved; unsaved edits are not included.")}</p>}
+      <div className="modal-actions">
+        <button onClick={close} autoFocus>
+          {tr("Close")}
+        </button>
       </div>
     </Modal>
   );
@@ -1146,7 +1239,7 @@ export function CompressDialog() {
     const doc = app.doc;
     if (!doc) return;
     const base = docName(doc).replace(/\.pdf$/i, "");
-    const dir = isUntitled(doc) ? "" : doc.path.slice(0, doc.path.lastIndexOf("/") + 1);
+    const dir = isUntitled(doc) ? "" : doc.path.slice(0, Math.max(doc.path.lastIndexOf("/"), doc.path.lastIndexOf("\\")) + 1);
     const target = await saveDialog({ defaultPath: `${dir}${base}-compressed.pdf`, filters: [{ name: "PDF", extensions: ["pdf"] }] });
     if (typeof target !== "string") return;
     const l = COMPRESS_LEVELS.find((x) => x.id === level)!;

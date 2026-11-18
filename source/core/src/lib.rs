@@ -14,6 +14,7 @@ pub mod ops;
 pub mod textedit;
 pub mod docops;
 pub mod sign;
+pub mod sigcheck;
 pub mod annots;
 pub mod objects;
 pub mod std14;

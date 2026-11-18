@@ -1269,3 +1269,20 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
   frames later. Shortcut table row added.
 - e2e fillable-form sample: skipped when it already has fields (the user saved a filled copy over it).
 - TESTS: e2e 90/90.
+
+2026-11-18 — v0.18.0: SIGNATURES YOU CAN SEE AND CHECK
+- User report: digital Sign wrote a separate signed copy and left the unsigned document on screen,
+  so the signature was never seen; no way to view its details. QuickSign: unclear where kept
+  signatures are / how to place one again.
+- core/src/sigcheck.rs: signatures(file bytes) → SigInfo {field, name, reason, location, date,
+  page, rect, status valid|changed|invalid|unknown, self_signed, subject, detail}. Checks ByteRange,
+  SHA-256 digest vs CMS messageDigest, RSA PKCS#1 v1.5 over the DER signed attributes (cert from the
+  blob). "changed" = valid but the byte range does not reach the end of the file. Tests: sigcheck (3).
+- Command signature_info (file as last saved), quicksign_dir.
+- UI: Security ▸ Signatures dialog (cards, Show on Page); signature widgets clickable in reading
+  mode (.sig-hit); after Sign the signed copy opens (store.open(path, quiet)) at the signature page;
+  opening a signed file says "Signed by …". QuickSign drop-down always has Manage Signatures (shows
+  the folder); "saved" notice says where to find it next time.
+- Fixes: open_url used macOS `open` everywhere → rundll32 (Windows) / xdg-open (Linux); Windows
+  paths: save-dialog default folders and file names split on "\" too.
+- TESTS: e2e 90/90 (Sign: signed copy opens, box click → "Valid"; two signatures → changed + valid).

@@ -102,7 +102,7 @@ function stem(): string {
 function dirOf(): string {
   const d = getState().doc;
   if (!d || isUntitled(d)) return "";
-  const i = d.path.lastIndexOf("/");
+  const i = Math.max(d.path.lastIndexOf("/"), d.path.lastIndexOf("\\"));
   return i > 0 ? d.path.slice(0, i + 1) : "";
 }
 
@@ -182,7 +182,7 @@ async function insertImage() {
   try {
     const { b64 } = await cmdReadImage(p);
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    const name = p.split("/").pop() ?? "image";
+    const name = p.split(/[\\/]/).pop() ?? "image";
     const bmp = await createImageBitmap(new Blob([bytes]));
     const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8;
     if (isJpeg) {
@@ -342,8 +342,9 @@ export const COMMANDS: Command[] = [
     choices: () => [
       ...getState().signatures.map((g) => ({ label: `${g.protected ? "🔒 " : ""}${g.name}`, run: () => void store.useSignature(g) })),
       { label: "Create New Signature…", run: () => store.setDialog("quickSignNew") },
-      ...(getState().signatures.length ? [{ label: "Manage Signatures…", run: () => store.setDialog("quickSignManage") }] : []),
+      { label: "Manage Signatures…", run: () => store.setDialog("quickSignManage") },
     ], run: () => {} },
+  { id: "sigInfo", label: "Signatures", menu: "Signatures…", tip: "See who digitally signed this document, when, and whether it has changed since", icon: "sig-info", tab: "Security", enabled: hasDoc, run: () => store.showSignatures() },
   { id: "annRedact", label: "Redact", tip: "Drag over content to permanently remove it and black it out", icon: "redact", tab: "Security", enabled: hasDoc, active: isTool("redact"), run: toolCmd("redact") },
   { id: "watermark", label: "Watermark", menu: "Watermark…", tip: "Stamp a text watermark across every page", icon: "watermark", tab: "Security", enabled: hasDoc, run: () => store.setDialog("watermark") },
 
@@ -427,7 +428,7 @@ export const MENUS: { title: string; items: (string | "-" | { submenu: string })
   { title: "Pages", items: ["import", "addPage", "delete", "-", "rotateCw", "rotateCcw", "rotateAll", "-", "extract", "split", "autoCrop", "headerFooter", "-", "selectAll"] },
   { title: "Annotate", items: ["annType", "annMark", "-", "annHighlight", "annUnderline", "annStrike", "annNote", "annText", "annShape", "annStamp", "annLink", "annPen", "-", "annFore", "back"] },
   { title: "Forms", items: ["formText", "formMulti", "formCheck", "formRadio", "formChoice", "formSign", "-", "formDetect", "formEdit"] },
-  { title: "Security", items: ["encrypt", "sign", "quickSign", "annRedact", "watermark"] },
+  { title: "Security", items: ["encrypt", "sign", "sigInfo", "quickSign", "annRedact", "watermark"] },
   { title: "View", items: ["zoomIn", "zoomOut", "zoom100", "fitWidth", "fitPage", "-", "prev", "next", "-", "spread", "single", "continuous", "sidebar", "-", { submenu: "ribbonTabs" }, { submenu: "schemes" }] },
   { title: "Help", items: ["guide", "checkUpdate"] },
 ];

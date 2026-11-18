@@ -1302,7 +1302,38 @@ pub fn open_url(url: String) -> Result<(), EngineError> {
     if !(lower.starts_with("http://") || lower.starts_with("https://") || lower.starts_with("mailto:")) {
         return Err(EngineError::new(ErrorCode::PermissionDenied, "only web and mail links are opened"));
     }
-    std::process::Command::new("open").arg(&url).spawn().map(|_| ()).map_err(|e| EngineError::new(ErrorCode::IoError, e.to_string()))
+    #[cfg(target_os = "macos")]
+    let mut cmd = std::process::Command::new("open");
+    #[cfg(target_os = "windows")]
+    let mut cmd = {
+        use std::os::windows::process::CommandExt;
+        // rundll32 opens the URL in the default browser without a console
+        // window or `start`'s shell quoting of & in query strings.
+        let mut c = std::process::Command::new("rundll32");
+        c.arg("url.dll,FileProtocolHandler").creation_flags(0x0800_0000);
+        c
+    };
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    let mut cmd = std::process::Command::new("xdg-open");
+    cmd.arg(&url).spawn().map(|_| ()).map_err(|e| EngineError::new(ErrorCode::IoError, e.to_string()))
+}
+
+/// Digital signatures in the open document's file (as last saved): who
+/// signed, when, where the box is, and whether the file is unchanged.
+#[tauri::command]
+pub fn signature_info(st: tauri::State<'_, Mutex<SessionState>>) -> Result<Vec<stitchup_core::sigcheck::SigInfo>, EngineError> {
+    signature_info_inner(&st)
+}
+
+pub fn signature_info_inner(st: &Mutex<SessionState>) -> Result<Vec<stitchup_core::sigcheck::SigInfo>, EngineError> {
+    let path = {
+        let g = lock(st)?;
+        if g.untitled || g.password.is_some() {
+            return Ok(vec![]);
+        }
+        g.path.clone()
+    };
+    Ok(path.and_then(|p| std::fs::read(p).ok()).map(|b| stitchup_core::sigcheck::signatures(&b)).unwrap_or_default())
 }
 
 /// All form fields with their widgets (page + rect) and current values.
@@ -1678,6 +1709,12 @@ pub fn about_sound_clear() {
 #[tauri::command]
 pub fn quicksign_list() -> Vec<stitchup_core::quicksign::SavedSignature> {
     stitchup_core::quicksign::list(&signature_dir())
+}
+
+/// Where QuickSign keeps signatures (shown in Manage Signatures).
+#[tauri::command]
+pub fn quicksign_dir() -> String {
+    signature_dir().to_string_lossy().into_owned()
 }
 
 #[tauri::command]

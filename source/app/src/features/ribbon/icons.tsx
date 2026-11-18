@@ -72,7 +72,8 @@ export type IconName =
   | "f-choice"
   | "f-sign"
   | "f-edit"
-  | "f-detect";
+  | "f-detect"
+  | "sig-info";
 
 const ICONS: Record<IconName, ReactNode> = {
   open: (
@@ -336,6 +337,9 @@ const ICONS: Record<IconName, ReactNode> = {
   ),
   "f-multi": (
     <><rect x="3" y="4" width="18" height="16" rx="1.5" /><path d="M7 9h10M7 13h10M7 17h6" /></>
+  ),
+  "sig-info": (
+    <><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z" /><path d="M8.5 12l2.5 2.5 4.5-5" /></>
   ),
   "f-detect": (
     <><rect x="3" y="5" width="12" height="6" rx="1" strokeDasharray="2 1.6" /><path d="M3 17h8" strokeDasharray="2 1.6" /><path d="M18 11.5l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z" /><path d="M18.5 3.5l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z" /></>

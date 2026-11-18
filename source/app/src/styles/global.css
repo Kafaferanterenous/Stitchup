@@ -1985,3 +1985,46 @@ kbd {
 .field-handle.h-s { left: 50%; top: 100%; cursor: ns-resize; }
 .field-handle.h-sw { left: 0; top: 100%; cursor: nesw-resize; }
 .field-handle.h-w { left: 0; top: 50%; cursor: ew-resize; }
+
+/* Security ▸ Signatures */
+.sig-card {
+  margin: 10px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-left: 4px solid #1f9d55;
+  border-radius: 6px;
+}
+.sig-card.sig-changed { border-left-color: #d69e2e; }
+.sig-card.sig-invalid { border-left-color: #c53030; }
+.sig-card.sig-unknown { border-left-color: var(--fg-muted); }
+.sig-card.focused { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent); }
+.sig-head { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.sig-badge {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  background: #1f9d55;
+}
+.sig-changed .sig-badge { background: #d69e2e; }
+.sig-invalid .sig-badge { background: #c53030; }
+.sig-unknown .sig-badge { background: var(--fg-muted); }
+.sig-status { margin: 4px 0 6px; }
+.sig-table { border-collapse: collapse; margin-bottom: 8px; font-size: 12px; }
+.sig-table td { padding: 2px 10px 2px 0; vertical-align: top; overflow-wrap: anywhere; }
+.sig-table td:first-child { color: var(--fg-muted); white-space: nowrap; }
+.sig-hit {
+  position: absolute;
+  z-index: 11;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.sig-hit:hover { outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent); }
+.qs-dir code { overflow-wrap: anywhere; font-size: 11px; }

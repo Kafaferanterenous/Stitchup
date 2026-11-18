@@ -746,3 +746,30 @@
 745|Sposta e ridimensiona i campi, cambiane nomi e opzioni o eliminali
 746|Campo “{0}” ridimensionato
 747|Zoom attorno al puntatore (o pizzica sul trackpad)
+748|Certificato
+749|Verifica…
+750|Impossibile verificare
+751|Campo
+752|Luogo
+753|Non valida — la parte firmata del documento è stata modificata o la firma è danneggiata
+754|Le firme salvate sono in Sicurezza ▸ QuickSign: sceglile lì (o premi Posiziona qui) e fai clic sulla pagina.
+755|Vedi chi ha firmato digitalmente questo documento, quando e se è cambiato da allora
+756|Autofirmato: il nome è stato digitato dal firmatario e non è confermato da un’autorità di certificazione.
+757|Mostra sulla pagina
+758|Firma “{0}” salvata — la prossima volta sceglila da Sicurezza ▸ QuickSign
+759|Firma “{0}” salvata con password — la prossima volta sceglila da Sicurezza ▸ QuickSign
+760|Firma “{0}” — fai clic per i dettagli
+761|Firme
+762|Firme…
+763|Firmato da {0}
+764|Firmato da {0} — dettagli in Sicurezza ▸ Firme
+765|Firmato da {0} → {1} (aperto; dettagli in Sicurezza ▸ Firme)
+766|Salvate su questo computer in:
+767|Sono le firme del file come salvato; le modifiche non salvate non sono incluse.
+768|Questo documento non ha firme digitali. Sicurezza ▸ Firma ne aggiunge una e salva una copia firmata.
+769|Questo campo firma è vuoto: nessuno l’ha ancora firmato.
+770|Valida — il documento non è cambiato dalla firma
+771|Valida, ma il documento è stato modificato dopo questa firma (modifiche o un’altra firma)
+772|invisibile (nessun riquadro sulla pagina)
+773|{0} firma — dettagli in Sicurezza ▸ Firme‖{0} firme — dettagli in Sicurezza ▸ Firme
+774|⚠ Una firma in questo documento non corrisponde — dettagli in Sicurezza ▸ Firme

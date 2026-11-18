@@ -37,7 +37,7 @@ import {
   PrintDialog,
   PropertiesDialog,
   SplitDialog,
-  WatermarkDialog, FieldDialog } from "./features/common/Dialogs";
+  WatermarkDialog, FieldDialog, SignaturesDialog } from "./features/common/Dialogs";
 import { SuggestBar } from "./features/forms/SuggestBar";
 
 import { tr } from "./i18n";
@@ -240,6 +240,7 @@ export default function App() {
       <PropertiesDialog />
       {app.dialog === "about" && <AboutDialog />}
       {app.dialog === "field" && <FieldDialog />}
+      {app.dialog === "signatures" && <SignaturesDialog />}
       <SuggestBar />
       {app.dialog === "extract" && <ExtractDialog />}
       {app.dialog === "split" && <SplitDialog />}

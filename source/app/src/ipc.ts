@@ -213,6 +213,22 @@ export interface SavedSignature {
   preview?: string;
 }
 export const cmdQuickSignList = () => cmd<SavedSignature[]>("quicksign_list");
+export const cmdQuickSignDir = () => cmd<string>("quicksign_dir");
+/** A digital signature found in the open file (Security ▸ Signatures). */
+export interface SigInfo {
+  field: string;
+  name: string;
+  reason: string;
+  location: string;
+  date: string;
+  page: number | null;
+  rect: number[] | null;
+  status: "valid" | "changed" | "invalid" | "unknown";
+  self_signed: boolean;
+  subject: string;
+  detail: string;
+}
+export const cmdSignatureInfo = () => cmd<SigInfo[]>("signature_info");
 export const cmdQuickSignSave = (name: string, png_b64: string, password?: string) => cmd<SavedSignature>("quicksign_save", { name, png_b64, password });
 export const cmdQuickSignLoad = (id: string, password?: string) => cmd<string>("quicksign_load", { id, password });
 export const cmdQuickSignDelete = (id: string, password?: string) => cmd<void>("quicksign_delete", { id, password });

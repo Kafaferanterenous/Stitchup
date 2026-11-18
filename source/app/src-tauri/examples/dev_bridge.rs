@@ -106,6 +106,8 @@ fn dispatch(st: &Mutex<SessionState>, cmd: &str, a: &Value) -> Result<Value, Val
         "tab_close" => go!(tab_close_inner(st, arg(a, "id").map_err(bad)?)),
         "move_pages_to_tab" => go!(move_pages_to_tab_inner(st, arg(a, "pages").map_err(bad)?, arg(a, "to").map_err(bad)?)),
         "quicksign_list" => go!(Ok::<_, stitchup_core::EngineError>(quicksign_list())),
+        "quicksign_dir" => go!(Ok::<_, stitchup_core::EngineError>(quicksign_dir())),
+        "signature_info" => go!(signature_info_inner(st)),
         "quicksign_save" => go!(quicksign_save(arg(a, "name").map_err(bad)?, arg(a, "png_b64").map_err(bad)?, arg(a, "password").unwrap_or(None))),
         "quicksign_load" => go!(quicksign_load(arg(a, "id").map_err(bad)?, arg(a, "password").unwrap_or(None))),
         "quicksign_delete" => go!(quicksign_delete(arg(a, "id").map_err(bad)?, arg(a, "password").unwrap_or(None))),

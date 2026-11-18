@@ -144,6 +144,8 @@ async function check(name, fn) {
   } catch (e) {
     results.push({ ok: false, name, err: String(e?.message ?? e).split("\n")[0] });
     console.log(`  FAIL  ${name}\n        ${String(e?.message ?? e).split("\n")[0]}`);
+    const at = String(e?.stack ?? "").split("\n").find((l) => l.includes("e2e.mjs"));
+    if (at) console.log(`        at ${at.trim()}`);
     await page?.screenshot({ path: path.join(OUT, `fail-${results.length}.png`) }).catch(() => {});
     // Don't let a dialog left open by a failed check block the next ones.
     for (let i = 0; i < 3; i++) await page?.keyboard.press("Escape").catch(() => {});
@@ -1048,6 +1050,19 @@ await check("Security ▸ Sign: place a signature box; OpenSSL verifies the sign
   execFileSync("openssl", ["smime", "-verify", "-binary", "-inform", "DER", "-noverify", "-purpose", "any", "-in", path.join(WORK, "sig.der"), "-content", path.join(WORK, "sig.data"), "-out", "/dev/null"], { stdio: "pipe" });
   const text = await pdfText(target);
   assert(text.length === 4, "signed copy readable");
+  // The signed copy opens in its own tab; its box is clickable for details.
+  await page.waitForFunction((t) => document.querySelector(".doc-tab.active")?.title === t, target);
+  const hit = page.locator('[data-page="1"] .sig-hit');
+  await hit.waitFor();
+  await hit.click();
+  const dlg = page.locator(".modal");
+  await dlg.getByText("Signed by Jan Kowalski").waitFor();
+  const card = await dlg.locator(".sig-card").innerText();
+  assert(/Valid — the document has not been changed/.test(card) && /Łódź/.test(card) && /Self-signed/.test(card) && /page 1/.test(card), card);
+  await dlg.getByRole("button", { name: "Close" }).click();
+  await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
+  await waitStatus(/main\.pdf/);
+  openPath = MAIN;
 });
 
 
@@ -1068,6 +1083,15 @@ await check("signing an already-signed PDF adds a second signature; both stay va
   await verifySignature(second, 0);
   const n = await verifySignature(second, 1);
   assert(n[2] + n[3] === both.length, "second signature covers the whole file");
+  // Security ▸ Signatures on the twice-signed copy (opened after signing).
+  await page.waitForFunction((t) => document.querySelector(".doc-tab.active")?.title === t, second);
+  await rb("sigInfo").click();
+  await page.locator(".modal .sig-card").nth(1).waitFor();
+  const cards = await page.locator(".modal .sig-card").allInnerTexts();
+  const jan = cards.find((c) => c.includes("Jan Kowalski"));
+  const anna = cards.find((c) => c.includes("Anna Nowak"));
+  assert(/changed after this signature/.test(jan) && /Valid — the document has not been changed/.test(anna) && /invisible/.test(anna), cards.join(" || "));
+  await page.locator(".modal").getByRole("button", { name: "Close" }).click();
   await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
   await waitStatus(/main\.pdf/);
   openPath = MAIN;
@@ -1352,7 +1376,7 @@ await check("Security ▸ QuickSign: a signature from a PNG, kept locked with a 
   assert(await btn("Save & Place Signature").isDisabled(), "mismatched passwords block saving");
   await page.getByLabel("Repeat password").fill("pióro2026");
   await btn("Save & Place Signature").click();
-  await waitNotice(/saved, locked with a password — click on the page/);
+  await waitNotice(/saved, locked with a password — next time choose it from Security ▸ QuickSign — click on the page/);
   assert(/Signature: click where it goes/.test(await page.locator(".tool-hint").innerText()), "signature hint");
   const [x, y] = await emptySpot(1, 0.55, 0.75);
   await page.mouse.click(x, y);
@@ -1419,7 +1443,7 @@ await check("Security ▸ QuickSign: a signature from a PNG, kept locked with a 
   await page.mouse.up();
   await page.getByLabel("Signature name").fill("Drawn");
   await btn("Save & Place Signature").click();
-  await waitNotice(/“Drawn” saved for next time/);
+  await waitNotice(/“Drawn” saved — next time choose it from Security ▸ QuickSign/);
   const [x4, y4] = await emptySpot(1, 0.3, 0.4);
   await page.mouse.click(x4, y4);
   assert((await waitImages(4)) === 4, "drawn signature placed");

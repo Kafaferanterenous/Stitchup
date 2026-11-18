@@ -746,3 +746,30 @@
 745|Felder verschieben und in der Größe ändern, Namen und Optionen ändern oder löschen
 746|Größe von Feld „{0}“ geändert
 747|Um den Mauszeiger zoomen (oder auf dem Trackpad mit zwei Fingern ziehen)
+748|Zertifikat
+749|Wird geprüft…
+750|Konnte nicht geprüft werden
+751|Feld
+752|Ort
+753|Ungültig — der signierte Teil des Dokuments wurde verändert oder die Signatur ist beschädigt
+754|Gespeicherte Unterschriften finden Sie unter Sicherheit ▸ QuickSign: dort auswählen (oder hier Platzieren drücken) und auf die Seite klicken.
+755|Sehen, wer dieses Dokument digital signiert hat, wann, und ob es seitdem geändert wurde
+756|Selbstsigniert: Der Name wurde vom Unterzeichner eingegeben und von keiner Zertifizierungsstelle bestätigt.
+757|Auf der Seite zeigen
+758|Unterschrift „{0}“ gespeichert — beim nächsten Mal unter Sicherheit ▸ QuickSign auswählen
+759|Unterschrift „{0}“ mit Passwort gespeichert — beim nächsten Mal unter Sicherheit ▸ QuickSign auswählen
+760|Signatur „{0}“ — klicken für Details
+761|Signaturen
+762|Signaturen…
+763|Signiert von {0}
+764|Signiert von {0} — Details unter Sicherheit ▸ Signaturen
+765|Signiert von {0} → {1} (geöffnet; Details unter Sicherheit ▸ Signaturen)
+766|Gespeichert auf diesem Computer in:
+767|Dies sind die Signaturen der zuletzt gespeicherten Datei; ungespeicherte Änderungen sind nicht enthalten.
+768|Dieses Dokument hat keine digitalen Signaturen. Sicherheit ▸ Signieren fügt eine hinzu und speichert eine signierte Kopie.
+769|Dieses Signaturfeld ist leer: Es wurde noch nicht unterschrieben.
+770|Gültig — das Dokument wurde seit der Signatur nicht geändert
+771|Gültig, aber das Dokument wurde nach dieser Signatur geändert (spätere Änderungen oder eine weitere Signatur)
+772|unsichtbar (kein Feld auf der Seite)
+773|{0} Signatur — Details unter Sicherheit ▸ Signaturen‖{0} Signaturen — Details unter Sicherheit ▸ Signaturen
+774|⚠ Eine Signatur in diesem Dokument stimmt nicht — Details unter Sicherheit ▸ Signaturen

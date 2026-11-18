@@ -746,3 +746,30 @@
 745|Przenoś pola i zmieniaj ich rozmiar, nazwy i opcje albo je usuwaj
 746|Zmieniono rozmiar pola „{0}”
 747|Powiększanie wokół wskaźnika (lub szczypanie na gładziku)
+748|Certyfikat
+749|Sprawdzanie…
+750|Nie udało się sprawdzić
+751|Pole
+752|Miejsce
+753|Nieważny — podpisana część dokumentu została zmieniona albo podpis jest uszkodzony
+754|Zapisane podpisy są w Zabezpieczenia ▸ QuickSign: wybierz tam podpis (albo naciśnij tutaj Umieść) i kliknij na stronie.
+755|Zobacz, kto podpisał cyfrowo ten dokument, kiedy i czy od tego czasu został zmieniony
+756|Podpisany samodzielnie: nazwisko wpisał podpisujący, nie potwierdza go urząd certyfikacji.
+757|Pokaż na stronie
+758|Zapisano podpis „{0}” — następnym razem wybierz go z Zabezpieczenia ▸ QuickSign
+759|Zapisano podpis „{0}” chroniony hasłem — następnym razem wybierz go z Zabezpieczenia ▸ QuickSign
+760|Podpis „{0}” — kliknij, aby zobaczyć szczegóły
+761|Podpisy
+762|Podpisy…
+763|Podpisane przez: {0}
+764|Podpisane przez: {0} — szczegóły w Zabezpieczenia ▸ Podpisy
+765|Podpisane przez: {0} → {1} (otwarto; szczegóły w Zabezpieczenia ▸ Podpisy)
+766|Zapisane na tym komputerze w:
+767|To podpisy w pliku w ostatnio zapisanej wersji; niezapisane zmiany nie są uwzględnione.
+768|Ten dokument nie ma podpisów cyfrowych. Zabezpieczenia ▸ Podpisz dodaje podpis i zapisuje podpisaną kopię.
+769|To pole podpisu jest puste: nikt go jeszcze nie podpisał.
+770|Ważny — dokument nie zmienił się od podpisania
+771|Ważny, ale dokument zmieniono po tym podpisie (późniejsze zmiany lub kolejny podpis)
+772|niewidoczny (bez ramki na stronie)
+773|{0} podpis — szczegóły w Zabezpieczenia ▸ Podpisy‖{0} podpisy — szczegóły w Zabezpieczenia ▸ Podpisy‖{0} podpisów — szczegóły w Zabezpieczenia ▸ Podpisy
+774|⚠ Podpis w tym dokumencie się nie zgadza — szczegóły w Zabezpieczenia ▸ Podpisy

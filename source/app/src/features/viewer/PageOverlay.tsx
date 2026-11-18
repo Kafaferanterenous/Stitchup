@@ -559,8 +559,22 @@ function FormLayer({
   return (
     <>
       {items.map(({ f, w }, i) => {
-        if (f.kind === "signature" || f.kind === "button") return null;
+        if (f.kind === "button") return null;
         const b = viewBox(w.rect);
+        if (f.kind === "signature") {
+          if (b[2] - b[0] < 4 || b[3] - b[1] < 4) return null; // invisible signature
+          return (
+            <button
+              key={`${f.name}#${i}`}
+              type="button"
+              className="sig-hit"
+              style={{ left: b[0], top: b[1], width: b[2] - b[0], height: b[3] - b[1] }}
+              title={tr("Signature “{0}” — click for details", f.name)}
+              aria-label={tr("Signature “{0}” — click for details", f.name)}
+              onClick={() => store.showSignatures(f.name)}
+            />
+          );
+        }
         const style = { left: b[0], top: b[1], width: b[2] - b[0], height: b[3] - b[1] };
         const fontSize = Math.max(8, Math.min(14 * zoom, (b[3] - b[1]) * 0.7));
         const key = `${f.name}#${i}`;

@@ -1,11 +1,11 @@
 //! QuickSign dialogs: create a signature from an image, unlock a
 //! password-protected one, and manage the saved ones.
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { INKS, SignaturePad, type SignaturePadHandle } from "./SignaturePad";
 import { open as openDialog } from "@tauri-apps/plugin-dialog";
 import { store, useAppState } from "../../store";
-import { cmdQuickSignDelete, cmdQuickSignLoad, cmdQuickSignSave, cmdReadImage, type SavedSignature } from "../../ipc";
+import { cmdQuickSignDelete, cmdQuickSignDir, cmdQuickSignLoad, cmdQuickSignSave, cmdReadImage, type SavedSignature } from "../../ipc";
 import { prepareSignature, signatureFromPng, type PreparedSignature } from "../../quicksign";
 
 import { tr } from "../../i18n";
@@ -56,7 +56,7 @@ export function QuickSignNewDialog() {
     if (typeof p !== "string") return;
     try {
       const { b64 } = await cmdReadImage(p);
-      const fname = p.split("/").pop() ?? "signature";
+      const fname = p.split(/[\\/]/).pop() ?? "signature";
       setFile({ b64, name: fname });
       if (name === "My signature" || !name.trim()) setName(fname.replace(/\.[^.]+$/, ""));
       await prepare(b64, removeWhite);
@@ -83,7 +83,9 @@ export function QuickSignNewDialog() {
         try {
           await cmdQuickSignSave(name, sig.png, lock ? pw1 : undefined);
           await store.loadSignatures();
-          note = lock ? tr("Signature “{0}” saved, locked with a password", name) : tr("Signature “{0}” saved for next time", name);
+          note = lock
+            ? tr("Signature “{0}” saved, locked with a password — next time choose it from Security ▸ QuickSign", name)
+            : tr("Signature “{0}” saved — next time choose it from Security ▸ QuickSign", name);
         } catch (e) {
           // Keeping it failed (e.g. the folder is blocked): still let the user sign.
           note = tr("Could not keep the signature ({0}) — placing it this once", errText(e));
@@ -275,8 +277,14 @@ function SavedRow({ s }: { s: SavedSignature }) {
 /** QuickSign ▸ Manage Signatures. */
 export function QuickSignManageDialog() {
   const app = useAppState();
+  const [dir, setDir] = useState("");
+  useEffect(() => {
+    void store.loadSignatures();
+    cmdQuickSignDir().then(setDir, () => {});
+  }, []);
   return (
     <Modal title={tr("Saved Signatures")} onClose={close}>
+      <p className="muted">{tr("Saved signatures appear in Security ▸ QuickSign: choose one there (or press Place here) and click on the page.")}</p>
       {app.signatures.length ? (
         <ul className="qs-list">
           {app.signatures.map((s) => (
@@ -285,6 +293,11 @@ export function QuickSignManageDialog() {
         </ul>
       ) : (
         <p className="muted">{tr("No saved signatures yet.")}</p>
+      )}
+      {dir && (
+        <p className="muted qs-dir">
+          {tr("Stored on this computer in:")} <code>{dir}</code>
+        </p>
       )}
       <div className="modal-actions">
         <button onClick={() => store.setDialog("quickSignNew")}>{tr("Create New Signature…")}</button>

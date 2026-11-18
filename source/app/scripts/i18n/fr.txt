@@ -746,3 +746,30 @@
 745|Déplacer et redimensionner les champs, modifier leurs noms et options, ou les supprimer
 746|Champ « {0} » redimensionné
 747|Zoomer autour du pointeur (ou pincer sur le trackpad)
+748|Certificat
+749|Vérification…
+750|Impossible de vérifier
+751|Champ
+752|Lieu
+753|Non valide — la partie signée du document a été modifiée ou la signature est endommagée
+754|Les signatures enregistrées se trouvent dans Sécurité ▸ QuickSign : choisissez-en une (ou cliquez ici sur Placer), puis cliquez sur la page.
+755|Voir qui a signé numériquement ce document, quand, et s’il a été modifié depuis
+756|Auto-signé : le nom a été saisi par le signataire et n’est confirmé par aucune autorité de certification.
+757|Afficher sur la page
+758|Signature « {0} » enregistrée — la prochaine fois, choisissez-la dans Sécurité ▸ QuickSign
+759|Signature « {0} » enregistrée, protégée par mot de passe — la prochaine fois, choisissez-la dans Sécurité ▸ QuickSign
+760|Signature « {0} » — cliquez pour les détails
+761|Signatures
+762|Signatures…
+763|Signé par {0}
+764|Signé par {0} — détails dans Sécurité ▸ Signatures
+765|Signé par {0} → {1} (ouvert ; détails dans Sécurité ▸ Signatures)
+766|Enregistrées sur cet ordinateur dans :
+767|Signatures du fichier tel qu’enregistré ; les modifications non enregistrées ne sont pas incluses.
+768|Ce document n’a pas de signature numérique. Sécurité ▸ Signer en ajoute une et enregistre une copie signée.
+769|Ce champ de signature est vide : personne ne l’a encore signé.
+770|Valide — le document n’a pas été modifié depuis la signature
+771|Valide, mais le document a été modifié après cette signature (modifications ou autre signature)
+772|invisible (pas de cadre sur la page)
+773|{0} signature — détails dans Sécurité ▸ Signatures‖{0} signatures — détails dans Sécurité ▸ Signatures
+774|⚠ Une signature de ce document ne correspond pas — détails dans Sécurité ▸ Signatures

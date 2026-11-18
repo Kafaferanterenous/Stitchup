@@ -78,11 +78,16 @@ not notarized. The first time you open it, right-click it and choose
   (trimmed, white paper made transparent), or draw it with the mouse,
   trackpad or pen. Stitchup can keep it for next
   time, optionally locked with a password (stored encrypted), like Nitro's
-  QuickSign.
+  QuickSign. Kept signatures are listed in the QuickSign drop-down; Manage
+  Signatures shows where they are stored and deletes them.
 - **Security:** AES-256 password protection, watermarks, and digital signatures
   (RSA-2048 / SHA-256 PKCS#7, verifiable with OpenSSL). Signing an already
   signed PDF, or saving changes to it, adds an incremental update, so earlier
   signatures stay valid.
+  After signing, the signed copy opens so you can see it. **Security ▸
+  Signatures** (or clicking a signature box) shows who signed, when, the
+  reason and place, and checks each signature: valid, changed after signing,
+  or altered.
 - **Safety:** quitting with unsaved changes asks first. Optional crash-recovery
   snapshots (File ▸ Settings, ⌘,) bring unsaved work back after a crash.
 - **Export:** Text, CSV, RTF, DOCX, ODT, and PNG or JPEG images. Print with
