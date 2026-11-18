@@ -244,7 +244,7 @@ export const COMMANDS: Command[] = [
   { id: "formChoice", label: "Drop-down", menu: "Drop-down List", tip: "Draw a drop-down list of choices", icon: "f-choice", tab: "Forms", enabled: hasDoc, active: isTool("field-choice"), run: toolCmd("field-choice") },
   { id: "formSign", label: "Signature Field", menu: "Signature Field", tip: "Draw a box where someone signs (Acrobat and other apps can sign into it)", icon: "f-sign", tab: "Forms", enabled: hasDoc, active: isTool("field-signature"), run: toolCmd("field-signature") },
   { id: "formDetect", label: "Detect Fields", menu: "Detect Fields…", tip: "Find the empty boxes, lines, check boxes and circles on a printed-style form and turn them into fields", icon: "f-detect", tab: "Forms", group: "edit", enabled: (s) => hasDoc(s) && !s.busy, active: (s) => !!s.suggestions, run: () => void store.detectFields() },
-  { id: "formEdit", label: "Edit Fields", menu: "Edit Fields", tip: "Move fields, change their names and options, or delete them", icon: "f-edit", tab: "Forms", group: "edit", enabled: hasDoc, active: isTool("field-edit"), run: toolCmd("field-edit") },
+  { id: "formEdit", label: "Edit Fields", menu: "Edit Fields", tip: "Move and resize fields, change their names and options, or delete them", icon: "f-edit", tab: "Forms", group: "edit", enabled: hasDoc, active: isTool("field-edit"), run: toolCmd("field-edit") },
 
   // ------------------------------------------------------------------- Pages
   { id: "rotate", label: "Rotate", menu: "Rotate", tip: "Rotate the current page(s) left or right, or every page", icon: "rotate-cw", tab: "Pages", enabled: hasDoc,

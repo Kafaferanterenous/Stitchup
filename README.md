@@ -59,7 +59,7 @@ not notarized. The first time you open it, right-click it and choose
 - **Forms:** fill text fields, checkboxes, radio buttons and drop-downs.
   **Create forms** (Forms tab): draw text fields, multi-line text areas,
   check boxes, radio button groups, drop-down lists and signature fields;
-  Edit Fields moves, renames, marks required / read-only and deletes them.
+  Edit Fields moves, resizes (drag a handle), renames, marks required / read-only and deletes them.
   The forms work in Acrobat, Preview and browsers.
   **Detect Fields** turns a flat form (scan, Canva export) into a fillable
   one: it finds the empty boxes, blank lines, check boxes and circles, names

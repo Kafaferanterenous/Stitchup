@@ -796,6 +796,7 @@ export function HelpDialog() {
               ["⌘A", "Select all pages"],
               ["⌘U", "Underline Text"],
               ["⌘= / ⌘− / ⌘1 / ⌘2 / ⌘0", "Zoom in / out / 100% / fit width / fit page"],
+              ["Ctrl / ⌘ + wheel", "Zoom around the pointer (or pinch on a trackpad)"],
               ["⌘↑ ⌘↓, PgUp PgDn", "Previous / next page"],
               ["F5 / F8", "Two-page spread / sidebar"],
               ["⌘P / ⌘⇧P", "Print / print preview"],

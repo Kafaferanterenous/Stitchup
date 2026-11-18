@@ -1963,3 +1963,25 @@ kbd {
 .suggest-bar button.primary {
   font-weight: 600;
 }
+
+/* Edit Fields: resize handles on the picked field */
+.field-handle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  box-sizing: border-box;
+  border: 1px solid var(--accent);
+  background: var(--card, #fff);
+  border-radius: 2px;
+  pointer-events: auto;
+  z-index: 2;
+}
+.field-handle.h-nw { left: 0; top: 0; cursor: nwse-resize; }
+.field-handle.h-n { left: 50%; top: 0; cursor: ns-resize; }
+.field-handle.h-ne { left: 100%; top: 0; cursor: nesw-resize; }
+.field-handle.h-e { left: 100%; top: 50%; cursor: ew-resize; }
+.field-handle.h-se { left: 100%; top: 100%; cursor: nwse-resize; }
+.field-handle.h-s { left: 50%; top: 100%; cursor: ns-resize; }
+.field-handle.h-sw { left: 0; top: 100%; cursor: nesw-resize; }
+.field-handle.h-w { left: 0; top: 50%; cursor: ew-resize; }

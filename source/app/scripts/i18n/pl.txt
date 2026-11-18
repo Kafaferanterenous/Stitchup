@@ -741,3 +741,8 @@
 740|Szukanie pól…
 741|Nie znaleziono pustych ramek ani linii, które wyglądają na pola
 742|kliknij ramkę, aby ją pominąć
+743|Edycja pól: przeciągnij pole, aby je przenieść · kliknij je i przeciągnij uchwyt, aby zmienić rozmiar · kliknij dwukrotnie, aby zobaczyć właściwości · ⌫ usuwa
+744|Edycja pól: przeciągnij, aby przenieść · przeciągnij uchwyt, aby zmienić rozmiar · dwuklik: właściwości · ⌫ usuwa
+745|Przenoś pola i zmieniaj ich rozmiar, nazwy i opcje albo je usuwaj
+746|Zmieniono rozmiar pola „{0}”
+747|Powiększanie wokół wskaźnika (lub szczypanie na gładziku)

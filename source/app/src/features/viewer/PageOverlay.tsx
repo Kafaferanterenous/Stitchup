@@ -711,11 +711,19 @@ function FieldEditLayer({
 }) {
   const app = useAppState();
   const [drag, setDrag] = useState<{ name: string; start: [number, number]; cur: [number, number] } | null>(null);
+  // Resizing one box by a handle ("n", "se"…): its edges follow the pointer.
+  const [rs, setRs] = useState<{ key: string; edges: string; start: [number, number]; cur: [number, number] } | null>(null);
   const items = fields.flatMap((f) => f.widgets.filter((w) => w.page === pageNo).map((w, i) => ({ f, w, i })));
+  const resized = (b: Box, edges: string, dx: number, dy: number): Box => {
+    const n: Box = [b[0] + (edges.includes("w") ? dx : 0), b[1] + (edges.includes("n") ? dy : 0), b[2] + (edges.includes("e") ? dx : 0), b[3] + (edges.includes("s") ? dy : 0)];
+    return norm(n);
+  };
   return (
     <>
       {items.map(({ f, w, i }) => {
-        const b = viewBox(w.rect);
+        const key = `${w.id[0]}_${w.id[1]}`;
+        const sizing = rs?.key === key;
+        const b = sizing ? resized(viewBox(w.rect), rs!.edges, rs!.cur[0] - rs!.start[0], rs!.cur[1] - rs!.start[1]) : viewBox(w.rect);
         const moving = drag?.name === f.name;
         const dx = moving ? drag!.cur[0] - drag!.start[0] : 0;
         const dy = moving ? drag!.cur[1] - drag!.start[1] : 0;
@@ -754,6 +762,40 @@ function FieldEditLayer({
               store.openFieldDialog({ mode: "edit", field: f });
             }}>
             <span className="field-box-name">{label}</span>
+            {editing && app.fieldSel === f.name &&
+              ["nw", "n", "ne", "e", "se", "s", "sw", "w"].map((h) => (
+                <span
+                  key={h}
+                  className={`field-handle h-${h}`}
+                  data-handle={h}
+                  onPointerDown={(e) => {
+                    if (e.button !== 0) return;
+                    e.preventDefault();
+                    e.stopPropagation();
+                    (e.target as Element).setPointerCapture?.(e.pointerId);
+                    const p = local(e);
+                    setRs({ key, edges: h, start: p, cur: p });
+                  }}
+                  onPointerMove={(e) => {
+                    if (rs?.key !== key || rs.edges !== h) return;
+                    e.stopPropagation();
+                    setRs({ ...rs, cur: local(e) });
+                  }}
+                  onPointerUp={(e) => {
+                    if (rs?.key !== key) return;
+                    e.stopPropagation();
+                    const p = local(e);
+                    const r = rs;
+                    setRs(null);
+                    if (Math.abs(p[0] - r.start[0]) < 2 && Math.abs(p[1] - r.start[1]) < 2) return;
+                    const nb = resized(viewBox(w.rect), r.edges, p[0] - r.start[0], p[1] - r.start[1]);
+                    const a = toPdf(nb[0], nb[1]);
+                    const c = toPdf(nb[2], nb[3]);
+                    const rect = [Math.min(a[0], c[0]), Math.min(a[1], c[1]), Math.max(a[0], c[0]), Math.max(a[1], c[1])].map((v) => Math.round(v * 100) / 100);
+                    void store.formField("resize", { name: f.name, id: w.id, rect, page: pageNo });
+                  }}
+                />
+              ))}
           </div>
         );
       })}

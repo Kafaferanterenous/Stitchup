@@ -741,5 +741,10 @@
  "Found {0} possible fields",
  "Looking for fields\u2026",
  "No empty boxes or lines that look like fields were found",
- "click a box to leave it out"
+ "click a box to leave it out",
+ "Edit Fields: drag a field to move it \u00b7 click it, then drag a handle to resize \u00b7 double-click for its properties \u00b7 \u232b deletes",
+ "Edit Fields: drag to move \u00b7 drag a handle to resize \u00b7 double-click for properties \u00b7 \u232b deletes",
+ "Move and resize fields, change their names and options, or delete them",
+ "Resized field \u201c{0}\u201d",
+ "Zoom around the pointer (or pinch on a trackpad)"
 ]

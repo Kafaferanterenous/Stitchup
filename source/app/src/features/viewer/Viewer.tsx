@@ -671,7 +671,7 @@ const TOOL_HINT: Record<string, string> = {
   "field-radio": "Radio Button: click where it goes",
   "field-choice": "Drop-down: drag a box (or click)",
   "field-signature": "Signature Field: drag a box (or click)",
-  "field-edit": "Edit Fields: drag to move · double-click for properties · ⌫ deletes",
+  "field-edit": "Edit Fields: drag to move · drag a handle to resize · double-click for properties · ⌫ deletes",
   typetext: "Type Text: click where the text goes, type, Enter",
   check: "Check mark: click the box to tick",
   cross: "Cross: click the box to mark",
@@ -716,6 +716,46 @@ export function Viewer() {
     const ro = new ResizeObserver(m);
     ro.observe(el);
     return () => ro.disconnect();
+  }, [app.session !== null]);
+
+  // Ctrl (or ⌘) + mouse wheel, and trackpad pinch, zoom around the pointer.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let pending: number | null = null;
+    const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      const st = getState();
+      if (!st.doc) return;
+      // A mouse notch (~100 px) is one 10 % step; a pinch is smooth.
+      const dy = e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY;
+      const factor = Math.exp(-Math.max(-100, Math.min(100, dy)) * 0.00095);
+      const z0 = st.zoom;
+      const z1 = Math.min(5, Math.max(0.25, Math.round(z0 * factor * 100) / 100));
+      if (z1 === z0) return;
+      // Keep the document point under the pointer where it is.
+      const r = el.getBoundingClientRect();
+      const mx = e.clientX - r.left;
+      const my = e.clientY - r.top;
+      const fx = (el.scrollLeft + mx) / Math.max(1, el.scrollWidth);
+      const fy = (el.scrollTop + my) / Math.max(1, el.scrollHeight);
+      store.setZoom(z1, "custom");
+      if (pending) cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(() =>
+        (pending = requestAnimationFrame(() => {
+          pending = null;
+          programmaticUntil.current = Date.now() + 200;
+          el.scrollLeft = fx * el.scrollWidth - mx;
+          el.scrollTop = fy * el.scrollHeight - my;
+        })),
+      );
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      if (pending) cancelAnimationFrame(pending);
+    };
   }, [app.session !== null]);
 
   // Mirror the document selection for Copy (A-c10).

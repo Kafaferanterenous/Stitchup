@@ -741,3 +741,8 @@
 740|Ricerca dei campi…
 741|Nessun riquadro vuoto o linea simile a un campo trovato
 742|fai clic su un riquadro per escluderlo
+743|Modifica campi: trascina un campo per spostarlo · fai clic e trascina una maniglia per ridimensionarlo · doppio clic per le proprietà · ⌫ elimina
+744|Modifica campi: trascina per spostare · trascina una maniglia per ridimensionare · doppio clic per le proprietà · ⌫ elimina
+745|Sposta e ridimensiona i campi, cambiane nomi e opzioni o eliminali
+746|Campo “{0}” ridimensionato
+747|Zoom attorno al puntatore (o pizzica sul trackpad)

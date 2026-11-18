@@ -1374,6 +1374,18 @@ pub fn form_field_op_inner(st: &Mutex<SessionState>, op: String, data: Value) ->
             out = name.clone();
             logged_objects(&mut g, "Delete form field", &ids, |doc| formedit::remove_field(doc, &name))?
         }
+        "resize" => {
+            let name = str_of("name");
+            #[derive(Deserialize)]
+            struct Resize {
+                id: (u32, u16),
+                rect: [f64; 4],
+            }
+            let rs: Resize = serde_json::from_value(data.clone()).map_err(validation)?;
+            let ids = formedit::touched_ids(doc, &name);
+            out = name.clone();
+            logged_objects(&mut g, "Resize form field", &ids, |doc| formedit::resize_field(doc, &name, rs.id, rs.rect))?
+        }
         "move" => {
             let name = str_of("name");
             let num = |k: &str| data.get(k).and_then(|v| v.as_f64()).unwrap_or(0.0);

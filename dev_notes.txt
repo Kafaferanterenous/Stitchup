@@ -1258,3 +1258,14 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
 - TESTS: core forms_create (3), e2e 90/90 (synthetic flat form + the Canva sample: 8/8 found and named).
 - UI: Forms ▸ Detect Fields; green boxes on the pages (click to leave out), bar with All/None,
   Add N Fields, Cancel (Esc). Any document change clears the suggestions.
+
+2026-11-18 — v0.17.0: RESIZE FIELDS, CTRL+WHEEL ZOOM
+- core formedit::resize_field(name, widget id, rect): new /Rect + appearance redrawn (text/choice,
+  check box keeps its on-state, radio, signature via the new signature_appearance()).
+  form_field_op "resize" {name, id, rect}. Test: forms_create (4).
+- Edit Fields: the picked field shows 8 handles (.field-handle h-nw…); dragging one moves those edges.
+- Viewer: non-passive wheel listener on .viewer-scroll; Ctrl/⌘ (pinch = ctrlKey) → zoom by
+  exp(-dy·0.00095) (one mouse notch ≈ 10 %), clamp 25–500 %, scroll re-anchored to the pointer two
+  frames later. Shortcut table row added.
+- e2e fillable-form sample: skipped when it already has fields (the user saved a filled copy over it).
+- TESTS: e2e 90/90.

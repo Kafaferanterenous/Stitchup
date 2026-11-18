@@ -741,3 +741,8 @@
 740|Suche nach Feldern…
 741|Keine leeren Kästchen oder Linien gefunden, die wie Felder aussehen
 742|Kästchen anklicken, um es auszulassen
+743|Felder bearbeiten: Feld ziehen zum Verschieben · anklicken, dann Griff ziehen zum Ändern der Größe · Doppelklick für Eigenschaften · ⌫ löscht
+744|Felder bearbeiten: ziehen zum Verschieben · Griff ziehen zum Ändern der Größe · Doppelklick für Eigenschaften · ⌫ löscht
+745|Felder verschieben und in der Größe ändern, Namen und Optionen ändern oder löschen
+746|Größe von Feld „{0}“ geändert
+747|Um den Mauszeiger zoomen (oder auf dem Trackpad mit zwei Fingern ziehen)

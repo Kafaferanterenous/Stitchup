@@ -741,3 +741,8 @@
 740|Recherche des champs…
 741|Aucune case vide ni ligne ressemblant à un champ n’a été trouvée
 742|cliquez sur une case pour l’exclure
+743|Modifier les champs : faites glisser un champ pour le déplacer · cliquez-le puis tirez une poignée pour le redimensionner · double-cliquez pour ses propriétés · ⌫ supprime
+744|Modifier les champs : glisser pour déplacer · tirer une poignée pour redimensionner · double-clic pour les propriétés · ⌫ supprime
+745|Déplacer et redimensionner les champs, modifier leurs noms et options, ou les supprimer
+746|Champ « {0} » redimensionné
+747|Zoomer autour du pointeur (ou pincer sur le trackpad)

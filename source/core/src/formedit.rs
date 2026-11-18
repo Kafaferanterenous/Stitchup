@@ -336,22 +336,7 @@ pub fn add_field(doc: &mut PdfDoc, spec: &NewField) -> Result<String, EngineErro
         "signature" => {
             d.set("FT", "Sig");
             d.set("Ff", req);
-            let (w, h) = (rect[2] - rect[0], rect[3] - rect[1]);
-            let mut ops = Deco { border: Some(BORDER), arrow: false }.ops(w, h);
-            // A baseline to sign on.
-            ops.extend([
-                Operation::new("q", vec![]),
-                Operation::new("RG", BORDER.iter().map(|v| r(*v)).collect()),
-                Operation::new("w", vec![r(0.5)]),
-                Operation::new("m", vec![r(6.0), r(h * 0.28)]),
-                Operation::new("l", vec![r(w - 6.0), r(h * 0.28)]),
-                Operation::new("S", vec![]),
-                Operation::new("Q", vec![]),
-            ]);
-            let ap = doc.add_object(Stream::new(
-                dictionary! { "Type" => "XObject", "Subtype" => "Form", "BBox" => vec![0.into(), 0.into(), r(w), r(h)] },
-                Content { operations: ops }.encode()?,
-            ));
+            let ap = signature_appearance(doc, rect)?;
             d.set("AP", dictionary! { "N" => ap });
             doc.add_object(d)
         }
@@ -386,6 +371,57 @@ pub fn add_fields(doc: &mut PdfDoc, specs: &[NewField]) -> Result<Vec<String>, E
         }
     }
     Ok(out)
+}
+
+/// Empty signature box: border and a baseline to sign on.
+fn signature_appearance(doc: &mut PdfDoc, rect: [f64; 4]) -> Result<ObjectId, EngineError> {
+    let (w, h) = (rect[2] - rect[0], rect[3] - rect[1]);
+    let mut ops = Deco { border: Some(BORDER), arrow: false }.ops(w, h);
+    ops.extend([
+        Operation::new("q", vec![]),
+        Operation::new("RG", BORDER.iter().map(|v| r(*v)).collect()),
+        Operation::new("w", vec![r(0.5)]),
+        Operation::new("m", vec![r(6.0), r(h * 0.28)]),
+        Operation::new("l", vec![r(w - 6.0), r(h * 0.28)]),
+        Operation::new("S", vec![]),
+        Operation::new("Q", vec![]),
+    ]);
+    Ok(doc.add_object(Stream::new(
+        dictionary! { "Type" => "XObject", "Subtype" => "Form", "BBox" => vec![0.into(), 0.into(), r(w), r(h)] },
+        Content { operations: ops }.encode()?,
+    )))
+}
+
+/// Give one widget of a field a new box (Edit Fields ▸ drag a handle) and
+/// redraw its appearance at the new size.
+pub fn resize_field(doc: &mut PdfDoc, name: &str, widget: ObjectId, rect: [f64; 4]) -> Result<(), EngineError> {
+    let f = forms::list(doc).into_iter().find(|f| f.name == name).ok_or_else(|| crate::err!(ErrorCode::ValidationFailed, "no field {name}"))?;
+    let w = f.widgets.iter().find(|w| w.id == widget).ok_or_else(|| crate::err!(ErrorCode::ValidationFailed, "{name} has no such box"))?;
+    let rect = norm(rect);
+    if rect[2] - rect[0] < 4.0 || rect[3] - rect[1] < 4.0 {
+        return Err(crate::err!(ErrorCode::ValidationFailed, "the field is too small"));
+    }
+    doc.get_object_mut(w.id)?.as_dict_mut()?.set("Rect", rect.iter().map(|v| r(*v)).collect::<Vec<_>>());
+    let border = forms::mk_border(doc, w.id);
+    match f.kind.as_str() {
+        "text" | "choice" => {
+            let deco = Deco { border, arrow: f.kind == "choice" && f.combo };
+            let ap = forms::text_appearance(doc, rect, &f.value, &f.da, f.multiline, deco)?;
+            doc.get_object_mut(w.id)?.as_dict_mut()?.set("AP", dictionary! { "N" => ap });
+        }
+        "checkbox" => forms::check_appearance(doc, w.id, rect, w.on_state.as_deref().unwrap_or("Yes"), border)?,
+        "radio" => {
+            let ap = radio_appearance(doc, rect, w.on_state.as_deref().unwrap_or("Choice"));
+            doc.get_object_mut(w.id)?.as_dict_mut()?.set("AP", ap);
+        }
+        "signature" => {
+            let ap = signature_appearance(doc, rect)?;
+            doc.get_object_mut(w.id)?.as_dict_mut()?.set("AP", dictionary! { "N" => ap });
+        }
+        // Push buttons etc.: viewers stretch the old appearance to the box.
+        _ => {}
+    }
+    Ok(())
 }
 
 fn add_to_page(doc: &mut PdfDoc, page: ObjectId, widget: ObjectId) -> Result<(), EngineError> {

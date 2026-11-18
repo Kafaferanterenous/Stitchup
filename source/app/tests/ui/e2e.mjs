@@ -1659,7 +1659,7 @@ await check("bookmarks: star toggle, list, jump, clear", async () => {
 });
 
 // ---- Zoom / Navigate views
-await check("Zoom ▸ − / + / 100% / Fit Width / Fit Page", async () => {
+await check("Zoom ▸ − / + / 100% / Fit Width / Fit Page; Ctrl + mouse wheel", async () => {
   await tab("Zoom");
   const readout = async () => Number((await page.locator(".ribbon-readout").innerText()).replace("%", ""));
   await rb("zoom100").click();
@@ -1674,6 +1674,26 @@ await check("Zoom ▸ − / + / 100% / Fit Width / Fit Page", async () => {
   await rb("fitPage").click();
   await page.waitForTimeout(300);
   assert((await readout()) < fw, "fit page smaller than fit width");
+  // Ctrl + mouse wheel zooms around the pointer; a plain wheel doesn't zoom.
+  await rb("zoom100").click();
+  const vb = await page.locator(".viewer-scroll").boundingBox();
+  await page.mouse.move(vb.x + vb.width / 2, vb.y + vb.height / 2);
+  await page.keyboard.down("Control");
+  await page.mouse.wheel(0, -100);
+  await page.keyboard.up("Control");
+  await page.waitForTimeout(250);
+  const zin = await readout();
+  assert(zin > 100 && zin <= 112, `Ctrl+wheel up zooms in one step: ${zin}`);
+  await page.keyboard.down("Control");
+  for (let i = 0; i < 3; i++) await page.mouse.wheel(0, 100);
+  await page.keyboard.up("Control");
+  await page.waitForTimeout(250);
+  assert((await readout()) < 100, `Ctrl+wheel down zooms out: ${await readout()}`);
+  const z = await readout();
+  await page.mouse.wheel(0, 200);
+  await page.waitForTimeout(250);
+  assert((await readout()) === z, "plain wheel does not zoom");
+  await rb("zoom100").click();
 });
 
 await check("Navigate ▸ Single / Spread (F5) / Continuous, Sidebar (F8)", async () => {
@@ -2178,6 +2198,17 @@ await check("Forms: draw text, check box, radio group, drop-down and signature f
   await waitStatus(/Moved field “Full name”/);
   const r1 = (await fields()).find((f) => f.name === "Full name").widgets[0].rect;
   assert(r1[0] > r0[0] + 20 && Math.abs(r1[1] - r0[1]) < 1, `moved right: ${r0} → ${r1}`);
+  // The picked field has handles: drag the bottom-right one to make it bigger.
+  const se = page.locator('[data-page="1"] .field-box[data-field="Full name"] .field-handle.h-se');
+  await se.waitFor();
+  const hb = await se.boundingBox();
+  await page.mouse.move(hb.x + hb.width / 2, hb.y + hb.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(hb.x + hb.width / 2 + 60, hb.y + hb.height / 2 + 30, { steps: 6 });
+  await page.mouse.up();
+  await waitStatus(/Resized field “Full name”/);
+  const r2 = (await fields()).find((f) => f.name === "Full name").widgets[0].rect;
+  assert(r2[2] > r1[2] + 20 && r2[1] < r1[1] - 10 && Math.abs(r2[0] - r1[0]) < 1 && Math.abs(r2[3] - r1[3]) < 1, `wider and taller, top-left kept: ${r1} → ${r2}`);
   await page.locator('[data-page="1"] .field-box[data-field="Full name"]').evaluate((el) => el.scrollIntoView({ block: "center" }));
   await page.locator('[data-page="1"] .field-box[data-field="Full name"]').dblclick();
   await page.waitForFunction(() => document.querySelector('.modal [aria-label="Field name"]')?.value === "Full name");
@@ -2340,6 +2371,9 @@ await check("Forms ▸ Detect Fields finds boxes, lines, check boxes and circles
   if (existsSync(local)) {
     await openViaRibbon(local);
     await tab("Forms");
+  }
+  // (Skipped once the sample has been made fillable and saved over.)
+  if (existsSync(local) && !(await ipc("list_fields")).length) {
     await rb("formDetect").click();
     await waitStatus(/Found \d+ possible field/);
     const s = await page.evaluate(() => window.__stitchup.state().suggestions);
@@ -2349,8 +2383,8 @@ await check("Forms ▸ Detect Fields finds boxes, lines, check boxes and circles
     await page.waitForTimeout(300);
     await page.screenshot({ path: path.join(OUT, "detect-sample.png") });
     await page.keyboard.press("Escape");
-    await page.locator(".doc-tab.active .doc-tab-close").click();
-  }
+  } else if (existsSync(local)) console.log("        sample form already has fields: skipped");
+  if (existsSync(local)) await page.locator(".doc-tab.active .doc-tab-close").click();
   await page.locator(".doc-tab.active .doc-tab-close").click();
   await page.locator(".doc-tab", { hasText: "main.pdf" }).click();
   await waitStatus(/main\.pdf/);

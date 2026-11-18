@@ -750,7 +750,7 @@ export const store = {
   setTool(tool: Tool | null) {
     const next = state.tool === tool ? null : tool;
     set({ tool: next, picked: null, editMode: false, pendingInput: null, fieldSel: null });
-    if (next === "field-edit") notify(tr("Edit Fields: drag a field to move it · double-click for its properties · ⌫ deletes"));
+    if (next === "field-edit") notify(tr("Edit Fields: drag a field to move it · click it, then drag a handle to resize · double-click for its properties · ⌫ deletes"));
     else if (next?.startsWith("field-")) notify(tr("Drag a box on the page for the new field (or click for the usual size)"));
     if (next === "select") notify(tr("Select: click an object or drag a box · drag to move · ⌫ deletes"));
   },
@@ -765,11 +765,11 @@ export const store = {
   },
 
   /** Add / change / move / delete a form field (one undo step each). */
-  async formField(op: "add" | "update" | "move" | "remove", data: Record<string, unknown>) {
+  async formField(op: "add" | "update" | "move" | "resize" | "remove", data: Record<string, unknown>) {
     const doc = state.doc;
     if (!doc) return null;
     let name: string | null = null;
-    const label: Record<string, string> = { add: tr("Added field “{0}”"), update: tr("Updated field “{0}”"), move: tr("Moved field “{0}”"), remove: tr("Deleted field “{0}”") };
+    const label: Record<string, string> = { add: tr("Added field “{0}”"), update: tr("Updated field “{0}”"), move: tr("Moved field “{0}”"), resize: tr("Resized field “{0}”"), remove: tr("Deleted field “{0}”") };
     const ok = await this.command(
       { kind: "object", before: doc.pages.map((p) => p.page_no), data: { op, ...data } },
       async () => {

@@ -148,3 +148,45 @@ fn detected_fields_are_added_in_one_batch_with_fresh_radio_groups() {
     assert_eq!(g.widgets.len(), 2, "both detected buttons form one new group");
     assert_eq!(list.iter().find(|f| f.name == "Gender").unwrap().widgets.len(), 1, "the old group is left alone");
 }
+
+#[test]
+fn fields_are_resized_and_redrawn_at_the_new_size() {
+    let mut d = blank();
+    formedit::add_field(&mut d, &nf("text", "Name", 1, [72.0, 700.0, 200.0, 720.0])).unwrap();
+    formedit::add_field(&mut d, &nf("checkbox", "Agree", 1, [72.0, 600.0, 86.0, 614.0])).unwrap();
+    let mut a = nf("radio", "Size", 1, [72.0, 500.0, 86.0, 514.0]);
+    a.value = Some("Small".into());
+    formedit::add_field(&mut d, &a).unwrap();
+    formedit::add_field(&mut d, &nf("signature", "Sign", 1, [72.0, 400.0, 200.0, 440.0])).unwrap();
+    let bbox = |d: &PdfDoc, id: (u32, u16)| -> Vec<f64> {
+        let w = d.get_object(id).unwrap().as_dict().unwrap();
+        let n = w.get(b"AP").unwrap().as_dict().unwrap().get(b"N").unwrap();
+        let s = match n {
+            Object::Reference(r) => d.get_object(*r).unwrap(),
+            o => o,
+        };
+        let s = match s {
+            Object::Stream(s) => s.clone(),
+            // radio / check box: /N << /On … /Off … >>
+            Object::Dictionary(dd) => {
+                let (_, v) = dd.iter().next().unwrap();
+                d.get_object(v.as_reference().unwrap()).unwrap().as_stream().unwrap().clone()
+            }
+            _ => panic!("no appearance"),
+        };
+        s.dict.get(b"BBox").unwrap().as_array().unwrap().iter().map(|v| v.as_float().unwrap() as f64).collect()
+    };
+    for (name, rect) in [("Name", [72.0, 690.0, 300.0, 720.0]), ("Agree", [72.0, 600.0, 92.0, 620.0]), ("Size", [72.0, 500.0, 94.0, 522.0]), ("Sign", [72.0, 380.0, 272.0, 440.0])] {
+        let f = forms::list(&d).into_iter().find(|f| f.name == name).unwrap();
+        let id = f.widgets[0].id;
+        formedit::resize_field(&mut d, name, id, rect).unwrap();
+        let back = reload(&mut d);
+        let f = forms::list(&back).into_iter().find(|f| f.name == name).unwrap();
+        let r = f.widgets[0].rect;
+        assert!((r[2] - rect[2]).abs() < 0.01 && (r[1] - rect[1]).abs() < 0.01, "{name}: {r:?}");
+        let b = bbox(&d, id);
+        assert!((b[2] - (rect[2] - rect[0])).abs() < 0.01 && (b[3] - (rect[3] - rect[1])).abs() < 0.01, "{name} redrawn at the new size: {b:?}");
+    }
+    let first = forms::list(&d)[0].widgets[0].id;
+    assert!(formedit::resize_field(&mut d, "Name", first, [0.0, 0.0, 2.0, 2.0]).is_err(), "too small");
+}

@@ -89,3 +89,4 @@ Duplicates removed, Nitro / macOS layout: Print Preview and Print to PDF folded 
 | H11 | Underline selected lines (⌘U); proper plural forms (Polish 1/2–4/5+); ~30 more strings translated | ✅ |
 | H12 | Form creation: Forms tab — text, multi-line, check box, radio group, drop-down, signature fields; Edit Fields (move, properties, required / read-only, delete); undoable; read by pdf-lib | ✅ |
 | H13 | Detect Fields: find boxes, blank lines, check boxes and circles on flat forms (rendered-page scan), name them from nearby labels, group radio rows; click to leave out, add all in one undo step | ✅ |
+| H14 | Resize form fields by dragging handles (Edit Fields), appearance redrawn at the new size; Ctrl / ⌘ + mouse wheel (and trackpad pinch) zooms around the pointer | ✅ |
