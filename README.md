@@ -33,6 +33,10 @@ unzip it and drag **Stitchup.app** to Applications. The app is ad-hoc signed,
 not notarized. The first time you open it, right-click it and choose
 **Open**, or run `xattr -dr com.apple.quarantine Stitchup.app`.
 
+> **Android (early test):** `Stitchup-android-v<version>.apk` on the releases page, built by the manual
+> "Android build" workflow. Opens, edits and saves PDFs from the Android file picker; printing and
+> OCR are not available there yet.
+
 ## What it does
 
 - **Edit text in place:** double-click a line, or use Pages ▸ Edit Text. The

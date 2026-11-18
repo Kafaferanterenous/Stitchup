@@ -1286,3 +1286,14 @@ project root on 2026-09-30 13:51 from outside this session — decide its fate.
 - Fixes: open_url used macOS `open` everywhere → rundll32 (Windows) / xdg-open (Linux); Windows
   paths: save-dialog default folders and file names split on "\" too.
 - TESTS: e2e 90/90 (Sign: signed copy opens, box click → "Valid"; two signatures → changed + valid).
+
+2026-11-18 — ANDROID TEST BUILD (attached to v0.18.0)
+- .github/workflows/android.yml (manual): Java 17, NDK = $ANDROID_NDK_LATEST_HOME, Rust targets
+  aarch64 + x86_64; `tauri android init --ci` (gen/ not committed) → `tauri android build --apk`;
+  zipalign + apksigner. Key from secrets ANDROID_KEYSTORE_B64 / _PASSWORD (PKCS#12, alias stitchup;
+  local copy in private/android/, git-ignored) — not set yet, so each build uses a throwaway key.
+- commands.rs: APP handle; read_path / core_commit / write_atomic / assert_source_unmodified handle
+  content:// URIs through tauri-plugin-fs (cfg(mobile)); read_image_file accepts URIs.
+  print_window: desktop only. fonts.rs: /system/fonts, /product/fonts on Android.
+- Frontend: baseName() for content:// URIs (falls back to "Document.pdf").
+- Not yet: printing, OCR, open_url on Android; touch-first layout; real-device testing.
