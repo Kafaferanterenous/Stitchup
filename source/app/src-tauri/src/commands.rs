@@ -1100,7 +1100,13 @@ pub fn print_window(window: tauri::WebviewWindow, width: Option<f64>, height: Op
             .map_err(|e| EngineError::new(ErrorCode::IoError, e.to_string()));
     }
     let _ = (width, height, landscape);
-    window.print().map_err(|e| EngineError::new(ErrorCode::IoError, e.to_string()))
+    #[cfg(desktop)]
+    return window.print().map_err(|e| EngineError::new(ErrorCode::IoError, e.to_string()));
+    #[cfg(mobile)]
+    {
+        let _ = window;
+        Err(EngineError::new(ErrorCode::Unsupported, "printing is not available on Android yet — export a PDF and print it from another app"))
+    }
 }
 
 #[tauri::command]
