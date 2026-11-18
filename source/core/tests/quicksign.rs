@@ -36,7 +36,8 @@ fn protected_signature_is_encrypted_and_needs_the_right_password() {
     let raw = std::fs::read_to_string(d.join(format!("{}.json", s.id))).unwrap();
     use base64::Engine;
     let b64 = base64::engine::general_purpose::STANDARD.encode(png());
-    assert!(!raw.contains(&b64[..40]) && !raw.contains("PNG"), "stored encrypted");
+    // (Random ciphertext may spell "PNG" by chance; the base64 PNG signature cannot.)
+    assert!(!raw.contains(&b64[..40]) && !raw.contains("iVBORw0KGgo"), "stored encrypted");
     #[cfg(unix)]
     {
         use std::os::unix::fs::PermissionsExt;
